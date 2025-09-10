@@ -1,0 +1,49 @@
+name: lhens_app
+description: "LH EnS Flutter App"
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.0
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  dio: ^5.8.0+1
+  retrofit: ^4.0.3
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.8.1
+  flutter_riverpod: ^2.5.3
+  riverpod_annotation: ^2.5.3
+  go_router: ^14.6.1
+  shared_preferences: ^2.3.3 # 캐시 저장용
+  flutter_gen_runner: ^5.8.0 # 애샛 변수명으로 사용
+  flutter_screenutil: ^5.7.0 # font정교하게 dpi, 폰트 스케일 등 고려하여
+  flutter_secure_storage: ^9.2.4
+  http: ^0.13.5
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.6
+  retrofit_generator: ^9.1.7
+  riverpod_generator: ^2.4.0
+  freezed: ^2.4.6
+  json_serializable: ^6.9.5
+
+flutter:
+
+  uses-material-design: true
+  assets:
+    - asset/image/
+    - asset/image/home/
+    - asset/image/menu/
+    - asset/image/mypage/
+    - asset/image/common/
