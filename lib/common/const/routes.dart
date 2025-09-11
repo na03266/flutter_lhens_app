@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../../alarm/view/alarm_screen.dart';
 import '../../drawer/notice/view/board_screen.dart';
 import '../../chat/view/chat_screen.dart';
+import '../../home/my_page/change_info/view/change_info_screen.dart';
+import '../../home/my_page/view/my_page_screen.dart';
 import '../../menual/view/menual_screen.dart';
 import '../../risk/view/risk_screen.dart';
 import '../../user/view/login_screen.dart';
@@ -31,6 +33,26 @@ List<RouteBase> get routes => [
         path: '/home',
         name: HomeScreen.routeName,
         builder: (context, state) => HomeScreen(),
+        routes: [
+          GoRoute(
+            path: '/notice',
+            name: NoticeScreen.routeName,
+            builder: (context, state) => NoticeScreen(),
+          ),
+          GoRoute(
+            path: '/my-page',
+            name: MyPageScreen.routeName,
+            builder: (context, state) => MyPageScreen(),
+            routes:[
+              GoRoute(
+                path: '/change-info',
+                name: ChangeInfoScreen.routeName,
+                builder: (context, state) => ChangeInfoScreen(),
+              ),
+            ],
+          ),
+
+        ],
       ),
       GoRoute(
         path: '/chat',
@@ -51,11 +73,6 @@ List<RouteBase> get routes => [
         path: '/menual',
         name: MenualScreen.routeName,
         builder: (context, state) => MenualScreen(),
-      ),
-      GoRoute(
-        path: '/notice',
-        name: BoardScreen.routeName,
-        builder: (context, state) => BoardScreen(),
       ),
     ],
   ),

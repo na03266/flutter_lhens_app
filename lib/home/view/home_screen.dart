@@ -23,14 +23,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final noticeState = ref.watch(noticeProvider);
 
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
           children: [
             MyData(),
-            HomeBoardList(noticeState: noticeState),
+            HomeBoardList(),
             SizedBox(height: 20),
             HomeBoardImg(),
           ],
@@ -41,43 +40,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 }
 
 class HomeBoardList extends StatelessWidget {
-  final NoticeState noticeState;
 
-  const HomeBoardList({super.key, required this.noticeState});
+  const HomeBoardList({super.key, });
 
   @override
   Widget build(BuildContext context) {
-    if (noticeState.isLoading) {
-      return const Padding(
-        padding: EdgeInsets.all(20.0),
-        child: Center(child: CircularProgressIndicator()),
-      );
-    }
 
-    if (noticeState.error != null) {
-      return Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Center(child: Text('Error: ${noticeState.error}')),
-        // child: Center(
-        //   child: Column(
-        //     children: [
-        //       Text('Error: ${noticeState.error}'),
-        //       ElevatedButton(
-        //         onPressed: () {
-        //           // 에러 발생 시 재시도 로직 추가 가능
-        //         },
-        //         child: const Text('Retry'),
-        //       ),
-        //     ],
-        //   ),
-        // ),
-      );
-    }
-
-    final List<Map<String, dynamic>> listData = noticeState.notices
-        .map((notice) => notice.toBoardListFormat())
-        .toList();
-
+    List<Map<String, dynamic>> listData = [];
     return BoardList(title: '공지사항', listData: listData);
   }
 }

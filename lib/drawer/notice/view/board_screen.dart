@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../../common/compornts/tabbar/custom_tab.dart';
 
-class BoardScreen extends StatefulWidget {
-  static String get routeName => 'board';
+class NoticeScreen extends StatefulWidget {
+  static String get routeName => '공지사항';
 
-  const BoardScreen({super.key});
+  const NoticeScreen({super.key});
 
   @override
-  State<BoardScreen> createState() => _BoardScreenState();
+  State<NoticeScreen> createState() => _NoticeScreenState();
 }
 
-class _BoardScreenState extends State<BoardScreen> {
+class _NoticeScreenState extends State<NoticeScreen> {
   // 샘플 데이터 (실제로는 API에서 가져올 데이터)
   final List<Map<String, dynamic>> listData = [
     {'id': 1, 'title': '공지사항 1', 'type': '내부 공지사항', 'content': '내부 공지사항 내용'},
@@ -36,6 +36,7 @@ class _BoardScreenState extends State<BoardScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Column(
       children: [
         // 커스텀 탭바

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RiskScreen extends StatefulWidget {
-  static String get routeName => 'risk';
+  static String get routeName => '위험신고';
   
   const RiskScreen({super.key});
 

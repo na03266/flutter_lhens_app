@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AlarmScreen extends StatefulWidget {
-  static String get routeName => 'alarm';
+  static String get routeName => '알림';
   
   const AlarmScreen({super.key});
 

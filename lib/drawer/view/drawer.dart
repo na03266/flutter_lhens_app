@@ -5,12 +5,15 @@ import '../../common/const/appColorPicker.dart';
 import '../../common/const/drawer_menus.dart';
 
 class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({super.key});
+  final Function(String) getTitle;
+
+  const CustomDrawer({super.key, required this.getTitle});
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: Colors.white,
+      shape: ContinuousRectangleBorder(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -99,7 +102,8 @@ class CustomDrawer extends StatelessWidget {
                       ),
                       onTap: () {
                         Navigator.of(context).pop();
-                        context.go(menu.route);
+                        context.goNamed(menu.route);
+                        getTitle(menu.label);
                       },
                     ),
                     const Divider(height: 1, color: AppColors.menuBorderColor),

@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../../auth/provider/auth_provider.dart';
+import '../../user/auth/provider/auth_provider.dart';
 import '../const/data.dart';
 import '../secure_storage/secure_storage.dart';
 

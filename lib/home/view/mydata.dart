@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lhens_app/gen/assets.gen.dart';
 
 import '../../common/const/appBorderRadius.dart';
 import '../../common/const/appColorPicker.dart';
 import '../../common/const/appPadding.dart';
+import '../../common/provider/app_bar_title_provider.dart';
+import '../my_page/view/my_page_screen.dart';
 
-class MyData extends StatelessWidget {
+class MyData extends ConsumerWidget {
   const MyData({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         // Stack 위젯을 사용하여 배경과 카드를 겹치게 배치
@@ -33,7 +38,7 @@ class MyData extends StatelessWidget {
                     Row(
                       children: [
                         Image.asset(
-                          'asset/image/home/logo.png',
+                          Assets.image.home.logo.path,
                           width: 120.r,
                           fit: BoxFit.contain,
                         ),
@@ -43,7 +48,7 @@ class MyData extends StatelessWidget {
                             return GestureDetector(
                               onTap: () => Scaffold.of(context).openEndDrawer(),
                               child: Image.asset(
-                                'asset/image/home/top_menu.png',
+                                Assets.image.home.topMenu.path,
                                 width: 30.r,
                                 height: 30.r,
                                 fit: BoxFit.contain,
@@ -92,10 +97,14 @@ class MyData extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              Icon(
-                                Icons.add,
+                              IconButton(
+                                onPressed: () {
+                                  context.pushNamed(MyPageScreen.routeName);
+                                  ref.read(appBarTitleProvider.notifier).state =
+                                      MyPageScreen.routeName;
+                                },
                                 color: Colors.white,
-                                size: 24.r,
+                                icon: Icon(Icons.add),
                               ),
                             ],
                           ),
@@ -161,7 +170,6 @@ class MyData extends StatelessWidget {
                 ),
               ),
             ),
-            
           ],
         ),
       ],
@@ -174,16 +182,14 @@ class MyData extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(16.r, 16.r, 16.r, 12.r),
       decoration: ShapeDecoration(
         color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppBorderRadius.radius15,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: AppBorderRadius.radius15),
         shadows: const [
           BoxShadow(
             color: Color(0x19000000),
             blurRadius: 10,
             offset: Offset(0, 5),
             spreadRadius: 0,
-          )
+          ),
         ],
       ),
       child: Column(
@@ -200,11 +206,7 @@ class MyData extends StatelessWidget {
           ),
           Align(
             alignment: Alignment.bottomRight,
-            child: Image.asset(
-              iconPath,
-              width: 60.r,
-              height: 60.r,
-            ),
+            child: Image.asset(iconPath, width: 60.r, height: 60.r),
           ),
         ],
       ),

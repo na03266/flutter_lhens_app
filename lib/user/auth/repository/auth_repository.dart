@@ -2,10 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lhens_app/common/const/data.dart';
 
-import '../../common/model/login_response.dart';
-import '../../common/model/token_response.dart';
-import '../../common/utils/data_utils.dart';
-import '../../common/dio/dio.dart';
+import '../../../common/dio/dio.dart';
+import '../../../common/model/login_response.dart';
+import '../../../common/model/token_response.dart';
+import '../../../common/utils/data_utils.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final dio = ref.watch(dioProvider);

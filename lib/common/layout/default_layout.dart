@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../drawer/view/drawer.dart';
-import '../const/appColorPicker.dart';
+import 'package:lhens_app/alarm/view/alarm_screen.dart';
+import 'package:lhens_app/chat/view/chat_screen.dart';
+import 'package:lhens_app/home/view/home_screen.dart';
 
-class DefaultLayout extends StatelessWidget {
+import '../../drawer/view/drawer.dart';
+import '../../gen/assets.gen.dart';
+import '../../menual/view/menual_screen.dart';
+import '../../risk/view/risk_screen.dart';
+import '../provider/app_bar_title_provider.dart';
+
+class DefaultLayout extends ConsumerWidget {
   final Color? backgroundColor;
   final Widget child;
-  final String? title;
   final Widget? bottomNavigationBar;
   final Widget? floatingActionButton;
 
@@ -14,118 +21,110 @@ class DefaultLayout extends StatelessWidget {
     super.key,
     required this.child,
     this.backgroundColor,
-    this.title,
     this.bottomNavigationBar,
     this.floatingActionButton,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final location = GoRouterState.of(context).uri.toString();
+    final isHome = location.endsWith('/home');
 
-    final isHome = location.startsWith('/home');
-
-    // 홈 화면은 AppBar를 숨김, 그 외 페이지는 공통 AppBar 제목 사용
-    final title = isHome ? null : _getAppBarTitle(location);
-
-    return Scaffold(
-      backgroundColor: backgroundColor ?? Colors.white,
-
-      appBar: renderAppBar(context, title, isHome),
-
-      endDrawer: CustomDrawer(),
-      body: child,
-      // bottomNavigationBar: bottomNavigationBar,
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedFontSize: 12.0,
-        unselectedFontSize: 12.0,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        currentIndex: _getIndex(location),
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              context.go('/risk');
-              break;
-            case 1:
-              context.go('/chat');
-              break;
-            case 2:
-              context.go('/home');
-              break;
-            case 3:
-              context.go('/alarm');
-              break;
-            case 4:
-              context.go('/menual');
-              break;
-          }
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset("asset/image/menu/risk.png"),
-            label: '위험신고',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("asset/image/menu/chat.png"),
-            label: '커뮤니케이션',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("asset/image/menu/home.png"),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("asset/image/menu/alarm.png"),
-            label: '알림',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("asset/image/menu/manual.png"),
-            label: '업무매뉴얼',
-          ),
-        ],
-      ),
-      floatingActionButton: floatingActionButton,
-    );
-  }
-
-  void openPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return Scaffold(
-            appBar: AppBar(title: const Text('Second page')),
-            body: const Center(
-              child: Text(
-                'This is the Second page',
-                style: TextStyle(fontSize: 24),
-              ),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: backgroundColor ?? Colors.white,
+        appBar: isHome ? null : renderAppBar(context, ref),
+        endDrawer: CustomDrawer(
+          getTitle: (item) {
+            ref.read(appBarTitleProvider.notifier).state = item;
+          },
+        ),
+        body: child,
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedFontSize: 12.0,
+          unselectedFontSize: 12.0,
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.grey,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          currentIndex: _getIndex(location),
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                context.goNamed(RiskScreen.routeName);
+                ref.read(appBarTitleProvider.notifier).state =
+                    RiskScreen.routeName;
+                break;
+              case 1:
+                context.goNamed(ChatScreen.routeName);
+                ref.read(appBarTitleProvider.notifier).state =
+                    ChatScreen.routeName;
+                break;
+              case 2:
+                context.goNamed(HomeScreen.routeName);
+                break;
+              case 3:
+                context.goNamed(AlarmScreen.routeName);
+                ref.read(appBarTitleProvider.notifier).state =
+                    AlarmScreen.routeName;
+                break;
+              case 4:
+                context.goNamed(MenualScreen.routeName);
+                ref.read(appBarTitleProvider.notifier).state =
+                    MenualScreen.routeName;
+                break;
+            }
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: Image.asset(Assets.image.menu.risk.path),
+              label: RiskScreen.routeName,
             ),
-          );
-        },
+            BottomNavigationBarItem(
+              icon: Image.asset(Assets.image.menu.chat.path),
+              label: ChatScreen.routeName,
+            ),
+            BottomNavigationBarItem(icon: SizedBox.shrink(), label: ''),
+            BottomNavigationBarItem(
+              icon: Image.asset(Assets.image.menu.alarm.path),
+              label: AlarmScreen.routeName,
+            ),
+            BottomNavigationBarItem(
+              icon: Image.asset(Assets.image.menu.manual.path),
+              label: MenualScreen.routeName,
+            ),
+          ],
+        ),
+        floatingActionButton: Align(
+          alignment: Alignment.bottomCenter,
+          child: IconButton(
+            onPressed: () => context.goNamed(HomeScreen.routeName),
+            padding: EdgeInsets.zero,
+            icon: Image.asset(Assets.image.menu.home.path),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
 
-  AppBar? renderAppBar(BuildContext context, String? title, bool isHome) {
-    // 타이틀이 빈 문자열이면 아예 텍스트 위젯도 안 넣기
-    if (title == null) return null;
+  AppBar renderAppBar(BuildContext context, WidgetRef ref) {
+    final title = ref.watch(appBarTitleProvider);
 
+    // 타이틀이 빈 문자열이면 아예 텍스트 위젯도 안 넣기
     return AppBar(
-      backgroundColor: isHome ? AppColors.darkBlueColor : Colors.white,
+      backgroundColor: Colors.white,
       // 홈일 때 색상 변경
-      foregroundColor: isHome ? Colors.white : Colors.black,
+      foregroundColor: Colors.black,
       // 글자색도 홈일 때 변경 가능
       elevation: 0.5,
       // 왼쪽: 뒤로가기 버튼 (뒤로갈 수 있을 때만)
-      leading: Navigator.canPop(context)
+      leading: context.canPop()
           ? IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.pop(context),
             )
           : null,
 
@@ -152,15 +151,5 @@ class DefaultLayout extends StatelessWidget {
     if (location.startsWith('/alarm')) return 3;
     if (location.startsWith('/menual')) return 4;
     return 2;
-  }
-
-  String _getAppBarTitle(String location) {
-    if (location.startsWith('/risk')) return '위험신고';
-    if (location.startsWith('/chat')) return '커뮤니케이션';
-    if (location.startsWith('/home')) return '홈';
-    if (location.startsWith('/alarm')) return '알림';
-    if (location.startsWith('/menual')) return '업무매뉴얼';
-    if (location.startsWith('/notice')) return '공지사항';
-    return '';
   }
 }

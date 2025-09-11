@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
-  static String get routeName => 'chat';
+  static String get routeName => '커뮤니케이션';
 
   const ChatScreen({super.key});
 
