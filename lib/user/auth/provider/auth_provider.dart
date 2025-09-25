@@ -32,35 +32,67 @@ class AuthProvider extends ChangeNotifier {
   // 로그인 스크린으로 보내줄지
   // 홈 스크린으로 보내줄지 확인하는 과정이 필요하다.
 
+  // FutureOr<String?> redirectLogic(BuildContext context, GoRouterState state) {
+  //   final UserModelBase? user = ref.read(userMeProvider);
+  //   final loggingIn = state.uri.path == '/login';
+  //   final redirectToHome = state.uri.path == '/';
+  //
+  //   if (redirectToHome) {
+  //     return '/home';
+  //   }
+  //
+  //   // 유저 정보가 없는데
+  //   // 로그인 중이면 그대로 로그인 페이지에 두고
+  //   // 만약에 로그인 중이 아니라면 로그인 페이지로 이동.
+  //   if (user == null) {
+  //     return loggingIn ? null : '/login';
+  //   }
+  //
+  //   // user 가 null이 아님
+  //
+  //   // UserModel
+  //   // 사용자 정보가 있는 상태면
+  //   // 로그인 중이거나 현재위치가 SplashScreen이면
+  //   // 홈으로 이동
+  //   if (user is UserModel) {
+  //     return loggingIn || state.uri.path == '/splash' ? '/home' : null;
+  //   }
+  //
+  //   if (user is UserModelError) {
+  //     return !loggingIn ? '/login' : null;
+  //   }
+  //   return null;
+  // }
+
+/// 임의 수정됨
   FutureOr<String?> redirectLogic(BuildContext context, GoRouterState state) {
-    final UserModelBase? user = ref.read(userMeProvider);
-    final loggingIn = state.uri.path == '/login';
-    final redirectToHome = state.uri.path == '/';
+    final user = ref.read(userMeProvider);
+    final path = state.uri.path;
 
-    if (redirectToHome) {
-      return '/home';
+    // 루트는 홈으로
+    if (path == '/') return '/home';
+
+    // 스플래시는 통과점: 로그인 여부에 따라 바로 보냄
+    if (path == '/splash') {
+      if (user is UserModel) return '/home';
+      if (user == null || user is UserModelError) return '/login';
+      return null;
     }
 
-    // 유저 정보가 없는데
-    // 로그인 중이면 그대로 로그인 페이지에 두고
-    // 만약에 로그인 중이 아니라면 로그인 페이지로 이동.
-    if (user == null) {
-      return loggingIn ? null : '/login';
+    // 로그인 없이 접근 가능한 공개 경로
+    const publicRoutes = {'/login', '/reset-password'};
+
+    // 비로그인: 공개 경로만 허용, 아니면 로그인으로
+    if (user == null || user is UserModelError) {
+      return publicRoutes.contains(path) ? null : '/login';
     }
 
-    // user 가 null이 아님
-
-    // UserModel
-    // 사용자 정보가 있는 상태면
-    // 로그인 중이거나 현재위치가 SplashScreen이면
-    // 홈으로 이동
+    // 로그인 상태: 로그인/재설정 페이지로 가면 홈으로 돌림
     if (user is UserModel) {
-      return loggingIn || state.uri.path == '/splash' ? '/home' : null;
+      if (path == '/login' || path == '/reset-password') return '/home';
+      return null;
     }
 
-    if (user is UserModelError) {
-      return !loggingIn ? '/login' : null;
-    }
     return null;
   }
 }

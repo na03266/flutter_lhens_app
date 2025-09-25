@@ -1,0 +1,10 @@
+flutter:
+  assets:
+    enabled: true
+    outputs:
+      - lib/gen/assets.gen.dart
+    style: snake_case
+  fonts:
+    enabled: true
+  colors:
+    enabled: true

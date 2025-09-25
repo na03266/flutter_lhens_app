@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../common/compornts/button/CustomButton.dart';
-import '../../common/compornts/input/CustomInput.dart';
-import '../../common/provider/go_router.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lhens_app/common/components/buttons/app_button.dart';
+import 'package:lhens_app/common/components/inputs/app_text_field.dart';
+import 'package:lhens_app/common/components/link_text.dart';
+import 'package:lhens_app/common/components/selector/app_checkbox.dart';
 import '../../gen/assets.gen.dart';
-import '../../home/view/home_screen.dart';
 import '../provider/user_me_provier.dart';
+import 'reset_password_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   static String get routeName => 'login';
@@ -18,15 +21,16 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _mbIdController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final id = TextEditingController();
+  final pw = TextEditingController();
 
-  bool _isLoading = false;
+  bool autoLogin = false;
+  bool rememberId = true;
 
   @override
   void dispose() {
-    _mbIdController.dispose();
-    _passwordController.dispose();
+    id.dispose();
+    pw.dispose();
     super.dispose();
   }
 
@@ -34,54 +38,115 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 70),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                Assets.image.common.logo.path,
-                width: 250, // 로고 크기 조정
-              ),
-              const SizedBox(height: 50), // 로고와 입력 폼 사이 간격
-              CustomInput(controller: _mbIdController, label: '사번'),
-              const SizedBox(height: 10),
-              CustomInput(
-                controller: _passwordController,
-                label: '비밀번호',
-                obscureText: true,
-              ),
-              const SizedBox(height: 15),
-              CustomButton(
-                text: '로그인',
-                onPressed: () async {
-                  _handleLogin(context, ref);
-                },
-              ),
-              const SizedBox(height: 23),
-              CustomButton(
-                text: '비밀번호 찾기',
-                color: Colors.white,
-                onPressed: () {
-                  // 비밀번호 찾기 누를시 관리 번호로 전화하도록 모달 표시
-                },
-              ),
-              // const ThemeModeSettingWidget(),
-            ],
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 16.w).add(
+                  EdgeInsets.only(
+                    bottom: MediaQuery.viewInsetsOf(context).bottom,
+                  ),
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                    maxWidth: 420.w,
+                  ),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // 로고
+                        Assets.logos.logoPrimary.svg(width: 214.w),
+                        SizedBox(height: 60.h),
+
+                        // 사번 입력
+                        AppTextField(
+                          hint: '사번',
+                          controller: id,
+                          keyboard: TextInputType.number,
+                          formatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(12),
+                            // 시번 글자 수에 맞춰 수정
+                          ],
+                          showClear: true,
+                          height: 56.h,
+                          textInputAction: TextInputAction.next,
+                        ),
+                        SizedBox(height: 12.h),
+
+                        // 비밀번호 입력
+                        AppTextField(
+                          hint: '비밀번호',
+                          controller: pw,
+                          isPassword: true,
+                          height: 56,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (_) => _handleLogin(context, ref),
+                        ),
+                        SizedBox(height: 16.h),
+
+                        // 비밀번호 재설정 링크
+                        LinkText(
+                          text: '비밀번호 재설정',
+                          onTap: () {
+                            context.pushNamed(ResetPasswordScreen.routeName);
+                          },
+                        ),
+                        SizedBox(height: 16.h),
+
+                        // 로그인 버튼
+                        AppButton(
+                          text: '로그인',
+                          onTap: () => _handleLogin(context, ref),
+                          type: AppButtonType.primary,
+                        ),
+                        SizedBox(height: 12.h),
+
+                        // 옵션 (자동 로그인 / 아이디 저장)
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 24.w,
+                          runSpacing: 8.h,
+                          children: [
+                            AppCheckbox(
+                              label: '자동 로그인',
+                              value: autoLogin,
+                              onChanged: (v) => setState(() => autoLogin = v),
+                            ),
+                            AppCheckbox(
+                              label: '아이디 저장',
+                              value: rememberId,
+                              onChanged: (v) => setState(() => rememberId = v),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 40.h),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
-      // appBar: AppBar(title: const Text('Login')),
-      // body: const Center(child: Text('로그인 화면')),
     );
   }
 
   Future<void> _handleLogin(BuildContext context, WidgetRef ref) async {
-    final mbId = _mbIdController.text.trim();
-    final mbPassword = _passwordController.text;
+    final username = id.text.trim();
+    final password = pw.text;
 
-    ref.read(userMeProvider.notifier).login(mbId: mbId, mbPassword: mbPassword);
+    ref
+        .read(userMeProvider.notifier)
+        .login(mbId: username, mbPassword: password);
   }
 }

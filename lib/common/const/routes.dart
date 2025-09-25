@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:lhens_app/user/view/reset_password_screen.dart';
 
 import '../../alarm/view/alarm_screen.dart';
 import '../../drawer/notice/view/board_screen.dart';
@@ -24,6 +25,11 @@ List<RouteBase> get routes => [
     name: LoginScreen.routeName,
     builder: (context, state) => LoginScreen(),
   ),
+  GoRoute(
+    path: '/reset-password',
+    name: ResetPasswordScreen.routeName,
+    builder: (context, state) => ResetPasswordScreen(),
+  ),
 
   // 네비게이션 있는 화면
   ShellRoute(
@@ -43,7 +49,7 @@ List<RouteBase> get routes => [
             path: '/my-page',
             name: MyPageScreen.routeName,
             builder: (context, state) => MyPageScreen(),
-            routes:[
+            routes: [
               GoRoute(
                 path: '/change-info',
                 name: ChangeInfoScreen.routeName,
@@ -51,7 +57,6 @@ List<RouteBase> get routes => [
               ),
             ],
           ),
-
         ],
       ),
       GoRoute(

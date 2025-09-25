@@ -1,79 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/home/component/event_section.dart';
+import 'package:lhens_app/home/component/notice_section.dart';
+import 'package:lhens_app/home/component/greeting_section.dart';
 
-import '../../common/compornts/board/board_img.dart';
-import '../../common/compornts/board/board_list.dart';
-import '../../drawer/notice/provider/notice_provider.dart';
-import 'mydata.dart';
-
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends ConsumerWidget {
   static String get routeName => 'home';
 
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      backgroundColor: AppColors.white,
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
+      body: CustomScrollView(
+        physics: const ClampingScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(
+            child: _HeaderShell(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const GreetingSection(),
+                  SizedBox(height: 12.h),
+                ],
+              ),
+            ),
+          ),
 
-  @override
-  Widget build(BuildContext context) {
-
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            MyData(),
-            HomeBoardList(),
-            SizedBox(height: 20),
-            HomeBoardImg(),
-          ],
-        ),
+          SliverToBoxAdapter(child: SizedBox(height: 14.h)),
+          const SliverToBoxAdapter(child: NoticeSection()),
+          SliverToBoxAdapter(child: SizedBox(height: 14.h)),
+          const SliverToBoxAdapter(child: EventSection()),
+          SliverToBoxAdapter(child: SizedBox(height: 20.h)),
+        ],
       ),
     );
   }
 }
 
-class HomeBoardList extends StatelessWidget {
+class _HeaderShell extends StatelessWidget {
+  final Widget child;
 
-  const HomeBoardList({super.key, });
-
-  @override
-  Widget build(BuildContext context) {
-
-    List<Map<String, dynamic>> listData = [];
-    return BoardList(title: '공지사항', listData: listData);
-  }
-}
-
-class HomeBoardImg extends StatelessWidget {
-  HomeBoardImg({super.key});
-
-  final List<Map<String, dynamic>> tempListData = [
-    {
-      'title': '2025 LH E&S교육',
-      'date': '2025.05.25 ~ 2025. 06.15',
-      'type': '교육',
-    },
-    {
-      'title': '2025 LH 행상 안내',
-      'date': '2025.05.25 ~ 2025. 06.15',
-      'type': '행사',
-    },
-    {
-      'title': '2025 LH 행상 안내',
-      'date': '2025.05.25 ~ 2025. 06.15',
-      'type': '행사',
-    },
-  ];
+  const _HeaderShell({required this.child});
 
   @override
   Widget build(BuildContext context) {
-    return BoardImg(title: '주요 일정', listData: tempListData);
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 16.h),
+      decoration: BoxDecoration(
+        color: AppColors.secondary,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
   }
 }

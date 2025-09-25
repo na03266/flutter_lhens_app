@@ -13,7 +13,9 @@ class MyPageScreen extends ConsumerWidget {
 
   // 정보 변경 페이지 이동
   routeChangeInfo(BuildContext context, WidgetRef ref) {
+    // 페이지 이동
     context.pushNamed(ChangeInfoScreen.routeName);
+    // 앱바에 제목만 변경
     ref.read(appBarTitleProvider.notifier).state = ChangeInfoScreen.routeName;
   }
 
