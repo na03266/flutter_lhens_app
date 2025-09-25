@@ -1,14 +1,35 @@
 import '../../drawer/notice/view/board_screen.dart';
-import '../../drawer/salary/view/salary_screen.dart';
-import '../model/menu_model.dart';
+import '../../chat/view/chat_screen.dart';
+import '../../risk/view/risk_screen.dart';
+import '../../menual/view/menual_screen.dart';
 
-final drawerMenus = [
-  MenuModel(label: '급여명세서', route: SalaryScreen.routeName),
-  MenuModel(label: '민원접수', route: '/civil'),
-  MenuModel(label: '공지사항', route: NoticeScreen.routeName),
-  MenuModel(label: '설문조사', route: '/survey'),
-  MenuModel(label: '교육행사정보', route: '/event'),
-  MenuModel(label: '위험신고', route: '/risk'),
-  MenuModel(label: '업무매뉴얼', route: '/menual'),
+class DrawerMenuItem {
+  final String label;
+  final String routeName;
+
+  const DrawerMenuItem(this.label, this.routeName);
+}
+
+class DrawerMenuGroup {
+  final String title;
+  final List<DrawerMenuItem> items;
+
+  const DrawerMenuGroup(this.title, this.items);
+}
+
+final drawerMenuGroups = <DrawerMenuGroup>[
+  DrawerMenuGroup('참여·신고', [
+    DrawerMenuItem('설문조사', 'survey'),
+    DrawerMenuItem('민원제안접수', 'civil'),
+    DrawerMenuItem('위험신고', RiskScreen.routeName),
+  ]),
+  DrawerMenuGroup('소통', [
+    DrawerMenuItem('커뮤니케이션', ChatScreen.routeName),
+    DrawerMenuItem('공지사항', NoticeScreen.routeName),
+  ]),
+  DrawerMenuGroup('업무·자료', [
+    DrawerMenuItem('급여명세서', 'salary'),
+    DrawerMenuItem('업무매뉴얼', MenualScreen.routeName),
+    DrawerMenuItem('교육행사정보', 'event'),
+  ]),
 ];
-

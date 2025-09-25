@@ -45,7 +45,7 @@ class _EventSectionState extends State<EventSection> {
       width: cardW,
       child: HomeEventCard(
         width: cardW,
-        title: '교육 예시입니다. 내용이 길어질 경우 줄바꿈 처리',
+        title: '교육 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
         periodText: '2025.06.02 ~ 2025.06.03',
         imagePath: Assets.images.event.path,
         onTap: () {},
@@ -56,7 +56,7 @@ class _EventSectionState extends State<EventSection> {
       width: cardW,
       child: HomeEventCard(
         width: cardW,
-        title: '교육 예시입니다. 내용이 길어질 경우 줄바꿈 처리',
+        title: '교육 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
         periodText: '2025.06.12 ~ 2025.06.12',
         imagePath: Assets.images.event.path,
         onTap: () {},
@@ -123,7 +123,7 @@ class _EventSectionState extends State<EventSection> {
 
           // 리스트 높이(3:2 이미지 + 텍스트 영역 여유)
           final imageH = cardW * 2 / 3;
-          final listH = imageH + 12.h + 66.h +12.h;
+          final listH = imageH + 12.h + 66.h + 12.h;
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,

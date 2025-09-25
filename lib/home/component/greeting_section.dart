@@ -1,4 +1,3 @@
-// home/component/greeting_section.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/common/components/label_value_line.dart';
@@ -7,7 +6,6 @@ import 'package:lhens_app/common/theme/app_shadows.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'home_nav_card.dart';
-// ⬇️ 공용 라벨-값 라인 위젯
 
 class GreetingSection extends StatelessWidget {
   const GreetingSection({super.key});
@@ -17,7 +15,13 @@ class GreetingSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const GreetingCard(),
+        const GreetingCard(
+          userName: '홍길동',
+          dept: '사업운영본부 경영기획팀',
+          position: '차장',
+          empNo: '100103',
+          joinDate: '2018.01.15',
+        ),
         SizedBox(height: 20.h),
         Row(
           children: [
@@ -52,7 +56,20 @@ class GreetingSection extends StatelessWidget {
 }
 
 class GreetingCard extends StatelessWidget {
-  const GreetingCard({super.key});
+  final String userName;
+  final String dept;
+  final String position;
+  final String empNo;
+  final String joinDate;
+
+  const GreetingCard({
+    super.key,
+    required this.userName,
+    required this.dept,
+    required this.position,
+    required this.empNo,
+    required this.joinDate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +93,7 @@ class GreetingCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '홍길동님',
+                  '$userName님',
                   style: AppTextStyles.jm18.copyWith(color: AppColors.white),
                 ),
                 SizedBox(height: 6.h),
@@ -85,20 +102,18 @@ class GreetingCard extends StatelessWidget {
                   style: AppTextStyles.jm16.copyWith(color: AppColors.white),
                 ),
                 SizedBox(height: gap),
-
-                // ⬇️ 두 쌍 라인 (기본 흰색 서식 유지)
-                const LabelValueLine.double(
+                LabelValueLine.double(
                   label1: '소속',
-                  value1: '사업운영본부 경영기획팀',
+                  value1: dept,
                   label2: '직급',
-                  value2: '차장',
+                  value2: position,
                 ),
                 SizedBox(height: 4.h),
-                const LabelValueLine.double(
+                LabelValueLine.double(
                   label1: '사번',
-                  value1: '100103',
+                  value1: empNo,
                   label2: '입사일',
-                  value2: '2018.01.15',
+                  value2: joinDate,
                 ),
               ],
             ),

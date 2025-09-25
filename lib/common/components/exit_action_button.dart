@@ -1,8 +1,11 @@
+// common/components/exit_action_button.dart
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 
 class ExitActionButton extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final Widget icon;
   final VoidCallback onTap;
 
   const ExitActionButton({
@@ -14,19 +17,21 @@ class ExitActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0), // 드로어/화면 하단 여백
-      child: SizedBox(
-        height: 48.0,
-        child: OutlinedButton.icon(
-          onPressed: onTap,
-          style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Color(0xFFE0E0E0)), // 회색 보더
-            foregroundColor: Colors.black,
-            backgroundColor: Colors.white,
+    return Align(
+      alignment: Alignment.centerRight,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label, style: AppTextStyles.psb14.copyWith(color: AppColors.text)),
+              const SizedBox(width: 6),
+              icon,
+            ],
           ),
-          icon: Icon(icon, size: 20),
-          label: Text(label),
         ),
       ),
     );
