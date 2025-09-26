@@ -16,6 +16,7 @@ class AppTextStyles {
   static final TextStyle pb16 = pb18.copyWith(fontSize: 16.sp);
   static final TextStyle pb15 = pb18.copyWith(fontSize: 15.sp);
   static final TextStyle pb14 = pb18.copyWith(fontSize: 14.sp);
+  static final TextStyle pb13 = pb18.copyWith(fontSize: 13.sp);
   static final TextStyle pb12 = pb18.copyWith(fontSize: 12.sp);
 
   // SemiBold

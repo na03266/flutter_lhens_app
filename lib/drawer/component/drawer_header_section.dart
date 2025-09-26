@@ -3,22 +3,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/buttons/app_button.dart';
-import 'package:lhens_app/common/components/label_value_line.dart';
 import 'package:lhens_app/common/components/icon_with_dot.dart';
+import 'package:lhens_app/common/components/label_value_line.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
-import 'package:lhens_app/home/my_page/change_info/view/change_info_screen.dart';
+import 'package:lhens_app/home/my_page/view/my_page_screen.dart';
 
 class DrawerHeaderSection extends StatelessWidget {
-  final String userName;
-  final String dept;
-  final String position;
-  final String empNo;
-  final String joinDate;
+  final String userName, dept, position, empNo, joinDate;
   final bool hasNewAlarm;
-  final VoidCallback onTapClose;
-  final VoidCallback onTapBell;
+  final VoidCallback onTapClose, onTapBell;
+  final ValueChanged<String> onPicked;
 
   const DrawerHeaderSection({
     super.key,
@@ -30,44 +26,54 @@ class DrawerHeaderSection extends StatelessWidget {
     required this.hasNewAlarm,
     required this.onTapClose,
     required this.onTapBell,
+    required this.onPicked,
   });
 
   @override
   Widget build(BuildContext context) {
     final topInset = MediaQuery.paddingOf(context).top;
-    const hit = 44.0;
+    final double hitSize = (44.w).clamp(44.0, double.infinity);
+    final double padL = 20.w, padRForX = 8.w, padTop = 12.h, padBottom = 16.h;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Container(
         color: AppColors.primary,
-        padding: EdgeInsets.fromLTRB(20, topInset + 12, 20, 16),
+        padding: EdgeInsets.fromLTRB(
+          padL,
+          topInset + padTop,
+          padRForX,
+          padBottom,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 상단 유저명 + 알림 + 닫기 버튼
             Row(
               children: [
                 Expanded(
                   child: Row(
                     children: [
-                      Text(
-                        '$userName님',
-                        style: AppTextStyles.pb18.copyWith(
-                          color: AppColors.white,
+                      Flexible(
+                        child: Text(
+                          '$userName님',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.pb18.copyWith(
+                            color: AppColors.white,
+                          ),
                         ),
                       ),
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: onTapBell,
                         child: SizedBox(
-                          width: hit,
-                          height: hit,
+                          width: hitSize,
+                          height: hitSize,
                           child: Center(
                             child: IconWithDot(
                               icon: Assets.icons.bell.svg(
-                                width: 20,
-                                height: 20,
+                                width: (20.w).clamp(18.0, 24.0),
+                                height: (20.w).clamp(18.0, 24.0),
                                 colorFilter: const ColorFilter.mode(
                                   AppColors.white,
                                   BlendMode.srcIn,
@@ -86,12 +92,12 @@ class DrawerHeaderSection extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   onTap: onTapClose,
                   child: SizedBox(
-                    width: hit,
-                    height: hit,
+                    width: hitSize,
+                    height: hitSize,
                     child: Center(
                       child: Assets.icons.close.svg(
-                        width: 24,
-                        height: 24,
+                        width: (24.w).clamp(20.0, 28.0),
+                        height: (24.w).clamp(20.0, 28.0),
                         colorFilter: const ColorFilter.mode(
                           AppColors.white,
                           BlendMode.srcIn,
@@ -102,35 +108,41 @@ class DrawerHeaderSection extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 4.h),
 
-            // 소속 / 직급
-            LabelValueLine.double(
-              label1: '소속',
-              value1: dept,
-              label2: '직급',
-              value2: position,
+            Padding(
+              padding: EdgeInsets.only(right: (20.w - padRForX).clamp(0, 40.w)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 4.h),
+                  LabelValueLine.double(
+                    label1: '소속',
+                    value1: dept,
+                    label2: '직급',
+                    value2: position,
+                  ),
+                  SizedBox(height: 4.h),
+                  LabelValueLine.double(
+                    label1: '사번',
+                    value1: empNo,
+                    label2: '입사일',
+                    value2: joinDate,
+                  ),
+                  SizedBox(height: 16.h),
+                  AppButton(
+                    text: '마이페이지',
+                    type: AppButtonType.plain,
+                    height: 48.h,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.goNamed(MyPageScreen.routeName);
+                      onPicked('마이페이지');
+                    },
+                  ),
+                  SizedBox(height: 10.h),
+                ],
+              ),
             ),
-            SizedBox(height: 4.h),
-
-            // 사번 / 입사일
-            LabelValueLine.double(
-              label1: '사번',
-              value1: empNo,
-              label2: '입사일',
-              value2: joinDate,
-            ),
-
-            SizedBox(height: 16.h),
-
-            // 마이페이지 버튼
-            AppButton(
-              text: '마이페이지',
-              type: AppButtonType.plain,
-              height: 48.h,
-              onTap: () => context.goNamed(ChangeInfoScreen.routeName),
-            ),
-            SizedBox(height: 10.h),
           ],
         ),
       ),

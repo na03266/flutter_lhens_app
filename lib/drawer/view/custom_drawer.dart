@@ -21,7 +21,6 @@ class CustomDrawer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 헤더 섹션
           DrawerHeaderSection(
             userName: '홍길동',
             dept: '사업운영본부 경영기획팀',
@@ -31,9 +30,9 @@ class CustomDrawer extends StatelessWidget {
             hasNewAlarm: hasNewAlarm,
             onTapClose: () => Navigator.of(context).maybePop(),
             onTapBell: () {},
+            onPicked: (label) => getTitle(label),
           ),
 
-          // 바디 섹션(메뉴 + 맨 아래 로그아웃 포함)
           Expanded(
             child: DrawerBodySection(
               onPicked: (label) => getTitle(label),

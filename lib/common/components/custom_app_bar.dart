@@ -41,7 +41,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         child: SafeArea(
           child: Container(
             height: preferredSize.height,
-            padding: EdgeInsets.symmetric(horizontal: 14.w),
+            padding: EdgeInsets.symmetric(horizontal: 8.w),
             child: Row(
               children: [
                 _IconButton(
@@ -99,11 +99,14 @@ class _IconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double minTouchSize = 44;
+
     return PressHighlight(
       onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.all(4.w),
-        child: child,
+      child: SizedBox(
+        width: minTouchSize,
+        height: minTouchSize,
+        child: Center(child: child),
       ),
     );
   }

@@ -23,8 +23,8 @@ class DefaultLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final location = GoRouterState.of(context).uri.toString();
-    final isHome = location.startsWith('/home');
+    final state = GoRouterState.of(context);
+    final isHome = state.matchedLocation == '/home';
     final title = ref.watch(appBarTitleProvider);
 
     return Scaffold(

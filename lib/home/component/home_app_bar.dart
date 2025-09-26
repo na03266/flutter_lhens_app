@@ -14,6 +14,8 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double minTouchSize = 44;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Container(
@@ -26,7 +28,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: SafeArea(
           child: Container(
             height: preferredSize.height,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            padding: EdgeInsets.only(left: 16.w, right: 8.w),
             child: Row(
               children: [
                 Assets.logos.logoSecondary.svg(height: 24.h),
@@ -36,14 +38,17 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                   onTap:
                       onTapMenu ??
                       () => Scaffold.maybeOf(context)?.openEndDrawer(),
-                  child: Padding(
-                    padding: EdgeInsets.all(4.w),
-                    child: Assets.icons.menu.svg(
-                      width: 24.w,
-                      height: 24.w,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.white,
-                        BlendMode.srcIn,
+                  child: SizedBox(
+                    width: minTouchSize,
+                    height: minTouchSize,
+                    child: Center(
+                      child: Assets.icons.menu.svg(
+                        width: 24.w,
+                        height: 24.w,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                   ),
