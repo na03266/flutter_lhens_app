@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/common/theme/app_shadows.dart';
 import 'package:lhens_app/home/component/event_section.dart';
 import 'package:lhens_app/home/component/notice_section.dart';
 import 'package:lhens_app/home/component/greeting_section.dart';
@@ -15,7 +16,6 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AppColors.white,
-
       body: CustomScrollView(
         physics: const ClampingScrollPhysics(),
         slivers: [
@@ -55,13 +55,7 @@ class _HeaderShell extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.secondary,
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: AppShadows.card,
       ),
       child: child,
     );

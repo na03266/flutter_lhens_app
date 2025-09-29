@@ -1,4 +1,3 @@
-// home/component/home_event_section.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
@@ -15,7 +14,6 @@ class EventSection extends StatefulWidget {
 }
 
 class _EventSectionState extends State<EventSection> {
-  // 상태
   HomeFilter _filter = HomeFilter.all;
   final _scroll = ScrollController();
 
@@ -25,8 +23,8 @@ class _EventSectionState extends State<EventSection> {
     super.dispose();
   }
 
-  // 필터 변경 시 스크롤을 맨 앞으로 자연스럽게 이동
   void _setFilter(HomeFilter f) {
+    if (_filter == f) return;
     setState(() => _filter = f);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) {
@@ -39,89 +37,83 @@ class _EventSectionState extends State<EventSection> {
     });
   }
 
-  // _cardsForFilter만 교체하세요.
-  List<Widget> _cardsForFilter(double cardW, double gap) {
-    final edu1 = SizedBox(
+  // 카드
+  Widget _buildCard(
+    double cardW, {
+    required String title,
+    required String period,
+  }) {
+    return SizedBox(
       width: cardW,
       child: HomeEventCard(
-        width: cardW,
-        title: '교육 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
-        periodText: '2025.06.02 ~ 2025.06.03',
+        title: title,
+        periodText: period,
         imagePath: Assets.images.event.path,
         onTap: () {},
       ),
     );
+  }
 
-    final edu2 = SizedBox(
-      width: cardW,
-      child: HomeEventCard(
-        width: cardW,
-        title: '교육 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
-        periodText: '2025.06.12 ~ 2025.06.12',
-        imagePath: Assets.images.event.path,
-        onTap: () {},
-      ),
+  // 간격
+  List<Widget> _withGap(List<Widget> items, double gap) {
+    if (items.isEmpty) return const [];
+    return [
+      for (int i = 0; i < items.length; i++) ...[
+        items[i],
+        if (i != items.length - 1) SizedBox(width: gap),
+      ],
+    ];
+  }
+
+  List<Widget> _cardsFor(double cardW, double gap) {
+    final edu1 = _buildCard(
+      cardW,
+      title: '교육 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
+      period: '2025.06.02 ~ 2025.06.03',
     );
-
-    final event1 = SizedBox(
-      width: cardW,
-      child: HomeEventCard(
-        width: cardW,
-        title: '행사 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
-        periodText: '2025.07.05 ~ 2025.07.06',
-        imagePath: Assets.images.event.path,
-        onTap: () {},
-      ),
+    final edu2 = _buildCard(
+      cardW,
+      title: '교육 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
+      period: '2025.06.12 ~ 2025.06.12',
     );
-
-    final event2 = SizedBox(
-      width: cardW,
-      child: HomeEventCard(
-        width: cardW,
-        title: '행사 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
-        periodText: '2025.07.15 ~ 2025.07.19',
-        imagePath: Assets.images.event.path,
-        onTap: () {},
-      ),
+    final event1 = _buildCard(
+      cardW,
+      title: '행사 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
+      period: '2025.07.05 ~ 2025.07.06',
+    );
+    final event2 = _buildCard(
+      cardW,
+      title: '행사 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
+      period: '2025.07.15 ~ 2025.07.19',
     );
 
     switch (_filter) {
       case HomeFilter.all:
-        return [
-          edu1,
-          SizedBox(width: gap),
-          edu2,
-          SizedBox(width: gap),
-          event1,
-          SizedBox(width: gap),
-          event2,
-        ];
+        return _withGap([edu1, edu2, event1, event2], gap);
       case HomeFilter.edu:
-        return [edu1, SizedBox(width: gap), edu2];
+        return _withGap([edu1, edu2], gap);
       case HomeFilter.event:
-        return [event1, SizedBox(width: gap), event2];
+        return _withGap([event1, event2], gap);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final horizontal = 16.w;
+    final hPad = 16.w;
     final gap = 16.w;
     final minW = 160.w;
     final maxW = 220.w;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: horizontal),
+      padding: EdgeInsets.symmetric(horizontal: hPad),
       child: LayoutBuilder(
-        builder: (context, constraints) {
-          final avail = constraints.maxWidth;
-
-          // 화면에 약 1.8장 보이도록 카드 너비 산출
-          const visibleCount = 1.8;
-          double cardW = (avail - gap) / visibleCount;
+        builder: (context, c) {
+          // 약 1.8장 보이도록 카드 폭 계산
+          const visible = 1.8;
+          double cardW = (c.maxWidth - gap) / visible;
           cardW = cardW.clamp(minW, maxW);
 
-          // 리스트 높이(3:2 이미지 + 텍스트 영역 여유)
+          // 리스트 높이: 3:2 이미지 + 텍스트 여유
           final imageH = cardW * 2 / 3;
           final listH = imageH + 12.h + 66.h + 12.h;
 
@@ -138,7 +130,7 @@ class _EventSectionState extends State<EventSection> {
                   controller: _scroll,
                   scrollDirection: Axis.horizontal,
                   padding: EdgeInsets.only(right: 16.w),
-                  children: _cardsForFilter(cardW, gap),
+                  children: _cardsFor(cardW, gap),
                 ),
               ),
             ],

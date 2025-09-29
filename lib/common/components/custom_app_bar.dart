@@ -1,20 +1,21 @@
-// common/components/app_bar/custom_app_bar.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:lhens_app/common/components/feedback/press_highlight.dart';
-import 'package:lhens_app/common/provider/app_bar_title_provider.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
-import '../../../gen/assets.gen.dart';
-import '../theme/app_colors.dart';
+import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/gen/assets.gen.dart';
 
 enum AppBarRightType { none, menu, settings }
 
-class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
+enum AppBarBottomBorder { none, thin }
+
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final AppBarRightType rightType;
+  final AppBarBottomBorder bottomBorder;
   final VoidCallback? onBack;
   final VoidCallback? onRightTap;
 
@@ -22,6 +23,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     super.key,
     this.title,
     this.rightType = AppBarRightType.menu,
+    this.bottomBorder = AppBarBottomBorder.thin,
     this.onBack,
     this.onRightTap,
   });
@@ -30,38 +32,51 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(56.h);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final injectedTitle = ref.watch(appBarTitleProvider);
-    final titleText = title ?? injectedTitle;
-
+  Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Container(
-        color: AppColors.white,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          border: Border(
+            bottom: bottomBorder == AppBarBottomBorder.thin
+                ? const BorderSide(color: AppColors.border, width: 1)
+                : BorderSide.none,
+          ),
+        ),
         child: SafeArea(
           child: Container(
             height: preferredSize.height,
             padding: EdgeInsets.symmetric(horizontal: 8.w),
             child: Row(
               children: [
+                // 왼쪽 버튼
                 _IconButton(
                   onTap:
                       onBack ??
-                      () async {
-                        final popped = await Navigator.of(context).maybePop();
-                        if (!popped) context.go('/home');
+                      () {
+                        final r = GoRouter.of(context);
+                        if (r.canPop()) {
+                          r.pop();
+                        } else {
+                          r.go('/home');
+                        }
                       },
                   child: Assets.icons.arrowLeft.svg(width: 24.w, height: 24.w),
                 ),
+
+                // 가운데 타이틀
                 Expanded(
                   child: Text(
-                    titleText,
+                    title ?? '',
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.pm18.copyWith(color: AppColors.text),
                   ),
                 ),
+
+                // 오른쪽 아이콘
                 _buildRight(context),
               ],
             ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/label_value_line.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_shadows.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'home_nav_card.dart';
 
@@ -15,21 +17,17 @@ class GreetingSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const GreetingCard(
-          userName: '홍길동',
-          dept: '사업운영본부 경영기획팀',
-          position: '차장',
-          empNo: '100103',
-          joinDate: '2018.01.15',
-        ),
+        const GreetingCard(),
         SizedBox(height: 20.h),
         Row(
           children: [
             Expanded(
               child: HomeNavCard(
                 title: '급여명세서',
-                imagePath: Assets.illustrations.payroll.path,
-                onTap: () {},
+                imagePath: Assets.illustrations.salary.path,
+                onTap: () {
+                  context.pushNamed(SalaryScreen.routeName);
+                },
               ),
             ),
             SizedBox(width: 14.w),
@@ -56,20 +54,7 @@ class GreetingSection extends StatelessWidget {
 }
 
 class GreetingCard extends StatelessWidget {
-  final String userName;
-  final String dept;
-  final String position;
-  final String empNo;
-  final String joinDate;
-
-  const GreetingCard({
-    super.key,
-    required this.userName,
-    required this.dept,
-    required this.position,
-    required this.empNo,
-    required this.joinDate,
-  });
+  const GreetingCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +78,7 @@ class GreetingCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '$userName님',
+                  '홍길동님',
                   style: AppTextStyles.jm18.copyWith(color: AppColors.white),
                 ),
                 SizedBox(height: 6.h),
@@ -104,16 +89,16 @@ class GreetingCard extends StatelessWidget {
                 SizedBox(height: gap),
                 LabelValueLine.double(
                   label1: '소속',
-                  value1: dept,
+                  value1: '사업운영본부 경영기획팀',
                   label2: '직급',
-                  value2: position,
+                  value2: '차장',
                 ),
                 SizedBox(height: 4.h),
                 LabelValueLine.double(
                   label1: '사번',
-                  value1: empNo,
+                  value1: '100103',
                   label2: '입사일',
-                  value2: joinDate,
+                  value2: '2018.01.15',
                 ),
               ],
             ),

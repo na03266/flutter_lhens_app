@@ -17,6 +17,9 @@ import 'package:vector_graphics/vector_graphics.dart' as _vg;
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
+  /// File path: assets/icons/arrow_down.svg
+  SvgGenImage get arrowDown => const SvgGenImage('assets/icons/arrow_down.svg');
+
   /// File path: assets/icons/arrow_left.svg
   SvgGenImage get arrowLeft => const SvgGenImage('assets/icons/arrow_left.svg');
 
@@ -101,6 +104,7 @@ class $AssetsIconsGen {
 
   /// List of all assets
   List<SvgGenImage> get values => [
+    arrowDown,
     arrowLeft,
     bell,
     calendar,
@@ -140,16 +144,16 @@ class $AssetsIllustrationsGen {
   AssetGenImage get mainGreeting =>
       const AssetGenImage('assets/illustrations/main_greeting.png');
 
-  /// File path: assets/illustrations/payroll.png
-  AssetGenImage get payroll =>
-      const AssetGenImage('assets/illustrations/payroll.png');
+  /// File path: assets/illustrations/salary.png
+  AssetGenImage get salary =>
+      const AssetGenImage('assets/illustrations/salary.png');
 
   /// File path: assets/illustrations/survey.png
   AssetGenImage get survey =>
       const AssetGenImage('assets/illustrations/survey.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [complaint, mainGreeting, payroll, survey];
+  List<AssetGenImage> get values => [complaint, mainGreeting, salary, survey];
 }
 
 class $AssetsImageGen {

@@ -21,6 +21,8 @@ class AppTextStyles {
 
   // SemiBold
   static final TextStyle psb18 = pb18.copyWith(fontWeight: FontWeight.w600);
+  static final TextStyle psb20 = psb18.copyWith(fontSize: 20.sp);
+  static final TextStyle psb16 = psb18.copyWith(fontSize: 16.sp);
   static final TextStyle psb14 = psb18.copyWith(fontSize: 14.sp);
   static final TextStyle psb13 = psb18.copyWith(fontSize: 13.sp);
   static final TextStyle psb12 = psb18.copyWith(fontSize: 12.sp);
@@ -38,6 +40,7 @@ class AppTextStyles {
   static final TextStyle pr16 = pr18.copyWith(fontSize: 16.sp);
   static final TextStyle pr15 = pr18.copyWith(fontSize: 15.sp);
   static final TextStyle pr14 = pr18.copyWith(fontSize: 14.sp);
+  static final TextStyle pr13 = pr18.copyWith(fontSize: 13.sp);
   static final TextStyle pr12 = pr18.copyWith(fontSize: 12.sp);
 
   // ---------------- The Jamsil ----------------

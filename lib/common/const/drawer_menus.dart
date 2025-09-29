@@ -1,7 +1,8 @@
-import '../../drawer/notice/view/board_screen.dart';
-import '../../chat/view/chat_screen.dart';
-import '../../risk/view/risk_screen.dart';
-import '../../menual/view/menual_screen.dart';
+import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
+import 'package:lhens_app/drawer/notice/view/board_screen.dart';
+import 'package:lhens_app/chat/view/chat_screen.dart';
+import 'package:lhens_app/manual/view/manual_screen.dart';
+import 'package:lhens_app/risk/view/risk_screen.dart';
 
 class DrawerMenuItem {
   final String label;
@@ -28,8 +29,8 @@ final drawerMenuGroups = <DrawerMenuGroup>[
     DrawerMenuItem('공지사항', NoticeScreen.routeName),
   ]),
   DrawerMenuGroup('업무·자료', [
-    DrawerMenuItem('급여명세서', 'salary'),
-    DrawerMenuItem('업무매뉴얼', MenualScreen.routeName),
+    DrawerMenuItem('급여명세서', SalaryScreen.routeName),
+    DrawerMenuItem('업무매뉴얼', ManualScreen.routeName),
     DrawerMenuItem('교육행사정보', 'event'),
   ]),
 ];

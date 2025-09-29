@@ -11,9 +11,8 @@ import '../../drawer/view/custom_drawer.dart';
 import '../../home/view/home_screen.dart';
 import '../../risk/view/risk_screen.dart';
 import '../../chat/view/chat_screen.dart';
-import '../../menual/view/menual_screen.dart';
+import '../../manual/view/manual_screen.dart';
 import '../../home/my_page/view/my_page_screen.dart';
-import '../provider/app_bar_title_provider.dart';
 
 class DefaultLayout extends ConsumerWidget {
   final Color? backgroundColor;
@@ -23,45 +22,79 @@ class DefaultLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = GoRouterState.of(context);
-    final isHome = state.matchedLocation == '/home';
-    final title = ref.watch(appBarTitleProvider);
+    final routeListenable = GoRouter.of(context).routerDelegate;
 
-    return Scaffold(
-      backgroundColor: backgroundColor ?? AppColors.white,
-      appBar: isHome ? HomeAppBar() : CustomAppBar(title: title),
-      endDrawer: CustomDrawer(
-        getTitle: (item) => ref.read(appBarTitleProvider.notifier).state = item,
-      ),
-      endDrawerEnableOpenDragGesture: false,
-      body: child,
-      bottomNavigationBar: AppBottomNav(
-        onTapLeft1: () => _go(context, ref, 0),
-        onTapLeft2: () => _go(context, ref, 1),
-        onTapRight1: () => _go(context, ref, 3),
-        onTapRight2: () => _go(context, ref, 4),
-        onTapCenter: () => _goHome(context),
-      ),
+    return AnimatedBuilder(
+      animation: routeListenable,
+      builder: (context, _) {
+        final state = GoRouterState.of(context);
+        final path = state.uri.path;
+        final isHome = path == '/home' || child is HomeScreen;
+
+        final title = _resolveTitle(path);
+        final rightType = _resolveRightType(path);
+
+        return Scaffold(
+          backgroundColor: backgroundColor ?? AppColors.white,
+          appBar: isHome
+              ? HomeAppBar()
+              : CustomAppBar(title: title, rightType: rightType),
+          endDrawer: const CustomDrawer(),
+          endDrawerEnableOpenDragGesture: false,
+          body: child,
+          bottomNavigationBar: AppBottomNav(
+            onTapLeft1: () => _go(context, 0),
+            onTapLeft2: () => _go(context, 1),
+            onTapRight1: () => _go(context, 3),
+            onTapRight2: () => _go(context, 4),
+            onTapCenter: () => _goHome(context),
+          ),
+        );
+      },
     );
   }
 
-  void _go(BuildContext context, WidgetRef ref, int index) {
+  // 타이틀
+  String _resolveTitle(String path) {
+    const map = {
+      '/home/notice': '공지사항',
+      '/home/salary': '급여명세서',
+      '/home/my-page': '마이페이지',
+      '/home/my-page/change-info': '정보변경',
+      '/chat': '커뮤니케이션',
+      '/risk': '위험신고',
+      '/alarm': '알림',
+      '/manual': '업무매뉴얼',
+    };
+    final hit = map[path];
+    if (hit != null) return hit;
+    for (final e in map.entries) {
+      if (path.startsWith('${e.key}/')) return e.value;
+    }
+    return '';
+  }
+
+  // 아이콘 타입
+  AppBarRightType _resolveRightType(String path) {
+    if (path == '/home/my-page/change-info') {
+      return AppBarRightType.none;
+    }
+    return AppBarRightType.menu;
+  }
+
+  void _go(BuildContext context, int index) {
     switch (index) {
       case 0:
         context.goNamed(RiskScreen.routeName);
-        ref.read(appBarTitleProvider.notifier).state = '위험신고';
         break;
       case 1:
         context.goNamed(ChatScreen.routeName);
-        ref.read(appBarTitleProvider.notifier).state = '커뮤니케이션';
         break;
       case 3:
-        context.goNamed(MenualScreen.routeName);
-        ref.read(appBarTitleProvider.notifier).state = '업무매뉴얼';
+        context.goNamed(ManualScreen.routeName);
         break;
       case 4:
         context.goNamed(MyPageScreen.routeName);
-        ref.read(appBarTitleProvider.notifier).state = '마이페이지';
         break;
     }
   }

@@ -6,14 +6,12 @@ class LinkText extends StatelessWidget {
   final String text;
   final VoidCallback? onTap;
   final TextAlign textAlign;
-  final Color? color;
 
   const LinkText({
     super.key,
     required this.text,
     this.onTap,
     this.textAlign = TextAlign.right,
-    this.color,
   });
 
   @override
@@ -32,7 +30,7 @@ class LinkText extends StatelessWidget {
         child: Text(
           text,
           textAlign: textAlign,
-          style: AppTextStyles.pr15.copyWith(color: color ?? AppColors.textSec),
+          style: AppTextStyles.pr15.copyWith(color: AppColors.textSec),
         ),
       ),
     );

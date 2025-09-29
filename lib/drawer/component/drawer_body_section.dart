@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/const/drawer_menus.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/common/components/exit_action_button.dart';
 
 class DrawerBodySection extends StatelessWidget {
-  final void Function(String label) onPicked;
   final VoidCallback onLogout;
 
   const DrawerBodySection({
     super.key,
-    required this.onPicked,
     required this.onLogout,
   });
 
@@ -28,7 +27,6 @@ class DrawerBodySection extends StatelessWidget {
           return _MenuGroupWidget(
             group: group,
             isFirst: i == 0,
-            onPicked: onPicked,
           );
         } else {
           return Padding(
@@ -48,12 +46,10 @@ class DrawerBodySection extends StatelessWidget {
 class _MenuGroupWidget extends StatelessWidget {
   final DrawerMenuGroup group;
   final bool isFirst;
-  final void Function(String label) onPicked;
 
   const _MenuGroupWidget({
     required this.group,
     required this.isFirst,
-    required this.onPicked,
   });
 
   @override
@@ -78,8 +74,27 @@ class _MenuGroupWidget extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           ...group.items.map(
-            (it) => InkWell(
-              onTap: () => onPicked(it.label),
+                (it) => InkWell(
+              onTap: () {
+                // 1) 드로어 닫기
+                Navigator.of(context).maybePop();
+
+                // 2) 라우팅 시도
+                Future.microtask(() {
+                  final router = GoRouter.of(context);
+                  try {
+                    router.goNamed(it.routeName);
+                  } catch (_) {
+                    // 라우트가 없을 경우 Snackbar 표시
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('해당 화면은 준비중입니다.'),
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                  }
+                });
+              },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Text(

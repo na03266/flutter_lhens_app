@@ -4,12 +4,10 @@ import 'package:lhens_app/drawer/component/drawer_body_section.dart';
 import '../../common/theme/app_colors.dart';
 
 class CustomDrawer extends StatelessWidget {
-  final Function(String) getTitle;
   final bool hasNewAlarm;
 
   const CustomDrawer({
     super.key,
-    required this.getTitle,
     this.hasNewAlarm = true,
   });
 
@@ -30,12 +28,9 @@ class CustomDrawer extends StatelessWidget {
             hasNewAlarm: hasNewAlarm,
             onTapClose: () => Navigator.of(context).maybePop(),
             onTapBell: () {},
-            onPicked: (label) => getTitle(label),
           ),
-
           Expanded(
             child: DrawerBodySection(
-              onPicked: (label) => getTitle(label),
               onLogout: () {
                 // TODO: 로그아웃 처리
               },

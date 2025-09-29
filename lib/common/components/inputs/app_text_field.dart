@@ -1,3 +1,4 @@
+// lib/common/components/inputs/app_text_field.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,6 +18,8 @@ class AppTextField extends StatefulWidget {
   final void Function(String)? onSubmitted;
   final void Function(String)? onChanged;
   final double? height;
+  final TextAlign textAlign;
+  final TextAlignVertical textAlignVertical;
 
   const AppTextField({
     super.key,
@@ -32,6 +35,8 @@ class AppTextField extends StatefulWidget {
     this.onChanged,
     this.readOnly = false,
     this.height,
+    this.textAlign = TextAlign.left,
+    this.textAlignVertical = TextAlignVertical.center,
   });
 
   @override
@@ -137,6 +142,9 @@ class _AppTextFieldState extends State<AppTextField> {
                   autocorrect: false,
                   enableSuggestions: false,
                   style: AppTextStyles.pr15.copyWith(color: AppColors.text),
+                  textAlign: widget.textAlign,
+                  textAlignVertical: widget.textAlignVertical,
+                  cursorColor: AppColors.secondary,
                   decoration: InputDecoration(
                     hintText: hint,
                     hintStyle: AppTextStyles.pr15.copyWith(

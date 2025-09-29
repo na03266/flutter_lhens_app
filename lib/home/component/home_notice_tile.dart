@@ -4,9 +4,9 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 
 class NoticeTile extends StatelessWidget {
-  final String title; // 공지 제목
-  final String date; // 공지 날짜
-  final bool isNew; // NEW 뱃지 표시 여부
+  final String title;
+  final String date;
+  final bool isNew;
 
   const NoticeTile({
     super.key,

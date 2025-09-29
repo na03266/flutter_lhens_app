@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/buttons/app_button.dart';
 import 'package:lhens_app/common/components/inputs/app_text_field.dart';
 import 'package:lhens_app/common/components/link_text.dart';
-import 'package:lhens_app/common/components/selector/app_checkbox.dart';
+import 'package:lhens_app/common/components/inputs/app_checkbox.dart';
 import '../../gen/assets.gen.dart';
 import '../provider/user_me_provier.dart';
 import 'reset_password_screen.dart';
@@ -72,7 +72,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           formatters: [
                             FilteringTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(12),
-                            // 시번 글자 수에 맞춰 수정
+                            // TODO: 시번 글자 수에 맞춰 수정
                           ],
                           showClear: true,
                           height: 56.h,
@@ -108,7 +108,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         SizedBox(height: 12.h),
 
-                        // 옵션 (자동 로그인 / 아이디 저장)
+                        // 자동 로그인 / 아이디 저장
                         Wrap(
                           alignment: WrapAlignment.center,
                           crossAxisAlignment: WrapCrossAlignment.center,

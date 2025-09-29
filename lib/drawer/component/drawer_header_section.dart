@@ -14,7 +14,6 @@ class DrawerHeaderSection extends StatelessWidget {
   final String userName, dept, position, empNo, joinDate;
   final bool hasNewAlarm;
   final VoidCallback onTapClose, onTapBell;
-  final ValueChanged<String> onPicked;
 
   const DrawerHeaderSection({
     super.key,
@@ -26,7 +25,6 @@ class DrawerHeaderSection extends StatelessWidget {
     required this.hasNewAlarm,
     required this.onTapClose,
     required this.onTapBell,
-    required this.onPicked,
   });
 
   @override
@@ -108,7 +106,6 @@ class DrawerHeaderSection extends StatelessWidget {
                 ),
               ],
             ),
-
             Padding(
               padding: EdgeInsets.only(right: (20.w - padRForX).clamp(0, 40.w)),
               child: Column(
@@ -136,7 +133,6 @@ class DrawerHeaderSection extends StatelessWidget {
                     onTap: () {
                       Navigator.of(context).pop();
                       context.goNamed(MyPageScreen.routeName);
-                      onPicked('마이페이지');
                     },
                   ),
                   SizedBox(height: 10.h),
