@@ -1,3 +1,4 @@
+import 'package:lhens_app/drawer/complaint/view/complaint_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/drawer/notice/view/board_screen.dart';
 import 'package:lhens_app/chat/view/chat_screen.dart';
@@ -21,7 +22,7 @@ class DrawerMenuGroup {
 final drawerMenuGroups = <DrawerMenuGroup>[
   DrawerMenuGroup('참여·신고', [
     DrawerMenuItem('설문조사', 'survey'),
-    DrawerMenuItem('민원제안접수', 'civil'),
+    DrawerMenuItem('민원제안접수', ComplaintScreen.routeName),
     DrawerMenuItem('위험신고', RiskScreen.routeName),
   ]),
   DrawerMenuGroup('소통', [

@@ -36,50 +36,66 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          border: Border(
-            bottom: bottomBorder == AppBarBottomBorder.thin
-                ? const BorderSide(color: AppColors.border, width: 1)
-                : BorderSide.none,
-          ),
-        ),
+        color: AppColors.white,
         child: SafeArea(
-          child: Container(
-            height: preferredSize.height,
-            padding: EdgeInsets.symmetric(horizontal: 8.w),
-            child: Row(
-              children: [
-                // 왼쪽 버튼
-                _IconButton(
-                  onTap:
-                      onBack ??
-                      () {
-                        final r = GoRouter.of(context);
-                        if (r.canPop()) {
-                          r.pop();
-                        } else {
-                          r.go('/home');
-                        }
-                      },
-                  child: Assets.icons.arrowLeft.svg(width: 24.w, height: 24.w),
-                ),
+          bottom: false,
+          child: Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.w),
+                child: SizedBox(
+                  height: preferredSize.height,
+                  child: Row(
+                    children: [
+                      // 왼쪽 버튼
+                      _IconButton(
+                        onTap:
+                            onBack ??
+                            () {
+                              final r = GoRouter.of(context);
+                              if (r.canPop()) {
+                                r.pop();
+                              } else {
+                                r.go('/home');
+                              }
+                            },
+                        child: Assets.icons.arrowLeft.svg(
+                          width: 24.w,
+                          height: 24.w,
+                        ),
+                      ),
 
-                // 가운데 타이틀
-                Expanded(
-                  child: Text(
-                    title ?? '',
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.pm18.copyWith(color: AppColors.text),
+                      // 가운데 타이틀
+                      Expanded(
+                        child: Text(
+                          title ?? '',
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.pm18.copyWith(
+                            color: AppColors.text,
+                          ),
+                        ),
+                      ),
+
+                      // 오른쪽 아이콘
+                      _buildRight(context),
+                    ],
                   ),
                 ),
+              ),
 
-                // 오른쪽 아이콘
-                _buildRight(context),
-              ],
-            ),
+              if (bottomBorder == AppBarBottomBorder.thin)
+                const Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: SizedBox(
+                    height: 1,
+                    child: ColoredBox(color: AppColors.border),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -101,7 +117,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: Assets.icons.settings.svg(width: 24.w, height: 24.w),
         );
       case AppBarRightType.none:
-        return SizedBox(width: 32.w);
+        return SizedBox(width: 44.w);
     }
   }
 }

@@ -47,11 +47,6 @@ flutter:
     - assets/illustrations/
     - assets/images/
     - assets/logos/
-    - assets/image/
-    - assets/image/home/
-    - assets/image/menu/
-    - assets/image/mypage/
-    - assets/image/common/
 
   fonts:
     - family: Pretendard

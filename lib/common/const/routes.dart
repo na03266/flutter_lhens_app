@@ -1,8 +1,12 @@
 import 'package:go_router/go_router.dart';
+import 'package:lhens_app/drawer/complaint/view/complaint_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_auth_screen.dart';
 import 'package:lhens_app/manual/view/manual_screen.dart';
+import 'package:lhens_app/risk/view/risk_form_screen.dart';
+import 'package:lhens_app/risk/view/risk_detail_screen.dart';
 import 'package:lhens_app/user/view/reset_password_screen.dart';
+import 'package:lhens_app/user/view/user_picker_screen.dart';
 
 import '../../alarm/view/alarm_screen.dart';
 import '../../drawer/notice/view/board_screen.dart';
@@ -58,6 +62,12 @@ List<RouteBase> get routes => [
             ],
           ),
           GoRoute(
+            path: 'complaint',
+            name: ComplaintScreen.routeName,
+            pageBuilder: (context, state) =>
+            const NoTransitionPage(child: ComplaintScreen()),
+          ),
+          GoRoute(
             path: 'notice',
             name: NoticeScreen.routeName,
             pageBuilder: (context, state) =>
@@ -90,6 +100,28 @@ List<RouteBase> get routes => [
         name: RiskScreen.routeName,
         pageBuilder: (context, state) =>
             const NoTransitionPage(child: RiskScreen()),
+        routes: [
+          GoRoute(
+            path: 'form',
+            name: RiskFormScreen.routeName,
+            pageBuilder: (context, state) =>
+            const NoTransitionPage(child: RiskFormScreen()),
+            routes: [
+              GoRoute(
+                path: 'user-picker',
+                name: UserPickerScreen.routeName,
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: UserPickerScreen()),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'detail',
+            name: RiskDetailScreen.routeName,
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: RiskDetailScreen()),
+          ),
+        ],
       ),
       GoRoute(
         path: '/alarm',

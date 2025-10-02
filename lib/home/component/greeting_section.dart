@@ -5,6 +5,7 @@ import 'package:lhens_app/common/components/label_value_line.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_shadows.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:lhens_app/drawer/complaint/view/complaint_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'home_nav_card.dart';
@@ -35,7 +36,9 @@ class GreetingSection extends StatelessWidget {
               child: HomeNavCard(
                 title: '민원제안접수',
                 imagePath: Assets.illustrations.complaint.path,
-                onTap: () {},
+                onTap: () {
+                  context.pushNamed(ComplaintScreen.routeName);
+                },
               ),
             ),
             SizedBox(width: 14.w),

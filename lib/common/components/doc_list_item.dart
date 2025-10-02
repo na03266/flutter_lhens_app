@@ -67,7 +67,7 @@ class DocListItem extends StatelessWidget {
                 _icon(
                   onTap: onDownload,
                   icon: Assets.icons.download.svg(width: 20.w, height: 20.w),
-                  bgColor: AppColors.primary10,
+                  bgColor: AppColors.primarySoft,
                 ),
               ],
             ),

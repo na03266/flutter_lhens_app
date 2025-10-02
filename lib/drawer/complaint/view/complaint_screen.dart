@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:lhens_app/common/components/app_segmented_tabs.dart';
 import 'package:lhens_app/common/components/buttons/fab_add_button.dart';
 import 'package:lhens_app/common/components/count_inline.dart';
 import 'package:lhens_app/common/components/pagination_bar.dart';
 import 'package:lhens_app/common/components/report_list_item.dart';
-import 'package:lhens_app/risk/view/risk_detail_screen.dart';
 import 'package:lhens_app/common/components/search/filter_search_bar.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_shadows.dart';
-import 'package:lhens_app/risk/view/risk_form_screen.dart';
 
-class RiskScreen extends ConsumerStatefulWidget {
-  static String get routeName => '위험신고';
+class ComplaintScreen extends ConsumerStatefulWidget {
+  static String get routeName => '민원제안접수';
 
-  const RiskScreen({super.key});
+  const ComplaintScreen({super.key});
 
   @override
-  ConsumerState<RiskScreen> createState() => _RiskScreenState();
+  ConsumerState<ComplaintScreen> createState() => _ComplaintScreenState();
 }
 
-class _RiskScreenState extends ConsumerState<RiskScreen> {
+class _ComplaintScreenState extends ConsumerState<ComplaintScreen> {
   // 상단 탭
   int _tabIndex = 0;
 
@@ -66,7 +63,7 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
   >
   _mockItems(int n) {
     const baseTitle =
-        '신고 제목이 표시되는 영역입니다. 신고 제목이 표시되는 영역입니다. 신고 제목이 표시되는 영역입니다.';
+        '민원 제목이 표시되는 영역입니다. 민원 제목이 표시되는 영역입니다. 민원 제목이 표시되는 영역입니다.';
     return List.generate(n, (i) {
       final mod = i % 6;
       final status = switch (mod) {
@@ -77,7 +74,7 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
       final secret = (i % 4 == 0);
       return (
         status: status,
-        typeName: '신고유형명',
+        typeName: '민원제안유형명',
         title: baseTitle,
         author: '조예빈(1001599)',
         dateText: '2025. 08. ${(i % 28 + 1).toString().padLeft(2, '0')}',
@@ -209,7 +206,7 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
             ),
             SizedBox(height: 16.h),
 
-            // 스크롤 영역: 건수 + 리스트 + 페이지네이션
+            // 스크롤 영역
             Expanded(
               child: NotificationListener<ScrollNotification>(
                 onNotification: (n) {
@@ -258,9 +255,7 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
                       dateText: e.dateText,
                       commentCount: e.comments,
                       secret: e.secret,
-                      onTap: () {
-                        context.pushNamed(RiskDetailScreen.routeName);
-                      },
+                      onTap: () {},
                     );
                   },
                 ),
@@ -270,12 +265,10 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
         ),
       ),
 
-      // FAB (우하단 고정)
+      // FAB
       floatingActionButton: Padding(
         padding: EdgeInsets.only(bottom: 20.h),
-        child: FabAddButton(onTap: () {
-          context.pushNamed(RiskFormScreen.routeName);
-        },),
+        child: FabAddButton(onTap: () {}),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );

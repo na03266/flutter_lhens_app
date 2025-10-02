@@ -9,7 +9,7 @@ class AppTextStyles {
     fontSize: 18.sp,
     fontWeight: FontWeight.w700,
     color: AppColors.text,
-    letterSpacing: -0.68,
+    letterSpacing: -0.28,
     height: 1.2,
   );
 
@@ -18,11 +18,13 @@ class AppTextStyles {
   static final TextStyle pb14 = pb18.copyWith(fontSize: 14.sp);
   static final TextStyle pb13 = pb18.copyWith(fontSize: 13.sp);
   static final TextStyle pb12 = pb18.copyWith(fontSize: 12.sp);
+  static final TextStyle pb11 = pb18.copyWith(fontSize: 11.sp);
 
   // SemiBold
   static final TextStyle psb18 = pb18.copyWith(fontWeight: FontWeight.w600);
   static final TextStyle psb20 = psb18.copyWith(fontSize: 20.sp);
   static final TextStyle psb16 = psb18.copyWith(fontSize: 16.sp);
+  static final TextStyle psb15 = psb18.copyWith(fontSize: 15.sp);
   static final TextStyle psb14 = psb18.copyWith(fontSize: 14.sp);
   static final TextStyle psb13 = psb18.copyWith(fontSize: 13.sp);
   static final TextStyle psb12 = psb18.copyWith(fontSize: 12.sp);

@@ -33,12 +33,19 @@ class DefaultLayout extends ConsumerWidget {
 
         final title = _resolveTitle(path);
         final rightType = _resolveRightType(path);
+        final hideBottomBorder = _shouldHideAppBarBottom(path);
 
         return Scaffold(
           backgroundColor: backgroundColor ?? AppColors.white,
           appBar: isHome
               ? HomeAppBar()
-              : CustomAppBar(title: title, rightType: rightType),
+              : CustomAppBar(
+                  title: title,
+                  rightType: rightType,
+                  bottomBorder: hideBottomBorder
+                      ? AppBarBottomBorder.none
+                      : AppBarBottomBorder.thin,
+                ),
           endDrawer: const CustomDrawer(),
           endDrawerEnableOpenDragGesture: false,
           body: child,
@@ -59,6 +66,7 @@ class DefaultLayout extends ConsumerWidget {
     const map = {
       '/home/notice': '공지사항',
       '/home/salary': '급여명세서',
+      '/home/complaint': '민원제안접수',
       '/home/my-page': '마이페이지',
       '/home/my-page/change-info': '정보변경',
       '/chat': '커뮤니케이션',
@@ -74,12 +82,24 @@ class DefaultLayout extends ConsumerWidget {
     return '';
   }
 
-  // 아이콘 타입
+  // 오른쪽 아이콘 타입
   AppBarRightType _resolveRightType(String path) {
-    if (path == '/home/my-page/change-info') {
+    if (path == '/home/my-page/change-info' ||
+        path == '/home/salary/auth' ||
+        path == '/risk/form') {
       return AppBarRightType.none;
     }
     return AppBarRightType.menu;
+  }
+
+  // 하단 보더
+  bool _shouldHideAppBarBottom(String path) {
+    // 목록 화면에서만 숨김 (정확히 일치)
+    const exactHide = <String>{
+      '/risk',
+      '/alarm', // 알림도 목록만 숨기려면 유지, 아니면 지우세요
+    };
+    return exactHide.contains(path);
   }
 
   void _go(BuildContext context, int index) {

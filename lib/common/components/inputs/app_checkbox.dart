@@ -1,63 +1,88 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/app_text_styles.dart';
+import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/common/theme/app_text_styles.dart';
+
+enum AppCheckboxStyle { primary, secondary }
 
 class AppCheckbox extends StatelessWidget {
   final String label;
+  final Widget? labelWidget;
   final bool value;
   final ValueChanged<bool> onChanged;
-  final double? size;
-  final double? spacing;
-  final TextStyle? labelStyle;
+  final AppCheckboxStyle style;
+  final double? size; // 아이콘 크기
+  final double? spacing; // 아이콘-라벨 간격
+  final bool compact; // 아이콘만 쓸 때 여백 최소화
 
   const AppCheckbox({
     super.key,
-    required this.label,
     required this.value,
     required this.onChanged,
+    this.label = '',
+    this.labelWidget,
+    this.style = AppCheckboxStyle.primary,
     this.size,
     this.spacing,
-    this.labelStyle,
+    this.compact = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final double effectiveSize = (size ?? 24.0).w;
-    final double effectiveSpacing = (spacing ?? 6.0).w;
+    final iconSize = (size ?? 24.0).w;
+    final gap = (spacing ?? 4.0).w;
+    final hasLabel = labelWidget != null || label.isNotEmpty;
+
+    final textStyle =
+        (style == AppCheckboxStyle.secondary
+                ? AppTextStyles.pm14
+                : AppTextStyles.pm16)
+            .copyWith(color: AppColors.textSec);
+
+    final icon = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 150),
+      transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
+      child: _buildIcon(iconSize),
+    );
+
+    final content = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        icon,
+        if (hasLabel) SizedBox(width: gap),
+        if (labelWidget != null)
+          labelWidget!
+        else if (label.isNotEmpty)
+          Text(label, style: textStyle),
+      ],
+    );
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () => onChanged(!value),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 150),
-              transitionBuilder: _fade,
-              child: (value ? Assets.icons.checked : Assets.icons.unchecked)
-                  .svg(
-                    key: ValueKey<bool>(value),
-                    width: effectiveSize,
-                    height: effectiveSize,
-                  ),
+      child: compact
+          // 아이콘만: 여백 최소
+          ? SizedBox(width: iconSize, height: iconSize, child: content)
+          // 기본: 터치타깃 40 유지
+          : ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+              child: content,
             ),
-            SizedBox(width: effectiveSpacing),
-            Text(
-              label,
-              style: (labelStyle ?? AppTextStyles.pm16).copyWith(
-                color: AppColors.textSec,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
-  static Widget _fade(Widget child, Animation<double> a) =>
-      FadeTransition(opacity: a, child: child);
+  Widget _buildIcon(double size) {
+    switch (style) {
+      case AppCheckboxStyle.secondary:
+        return (value ? Assets.icons.checkedSecondary : Assets.icons.unchecked)
+            .svg(key: ValueKey(value), width: size, height: size);
+      case AppCheckboxStyle.primary:
+        return (value ? Assets.icons.checked : Assets.icons.unchecked).svg(
+          key: ValueKey(value),
+          width: size,
+          height: size,
+        );
+    }
+  }
 }

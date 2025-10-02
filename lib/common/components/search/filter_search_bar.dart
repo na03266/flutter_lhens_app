@@ -168,7 +168,7 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
               cursorColor: AppColors.secondary,
               decoration: InputDecoration(
                 hintText: widget.hintText,
-                hintStyle: AppTextStyles.pr15.copyWith(
+                hintStyle: AppTextStyles.pr16.copyWith(
                   color: AppColors.placeholder,
                 ),
                 border: InputBorder.none,

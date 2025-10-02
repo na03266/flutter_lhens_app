@@ -36,11 +36,19 @@ class $AssetsIconsGen {
   /// File path: assets/icons/checked.svg
   SvgGenImage get checked => const SvgGenImage('assets/icons/checked.svg');
 
+  /// File path: assets/icons/checked_secondary.svg
+  SvgGenImage get checkedSecondary =>
+      const SvgGenImage('assets/icons/checked_secondary.svg');
+
   /// File path: assets/icons/clip.svg
   SvgGenImage get clip => const SvgGenImage('assets/icons/clip.svg');
 
   /// File path: assets/icons/close.svg
   SvgGenImage get close => const SvgGenImage('assets/icons/close.svg');
+
+  /// File path: assets/icons/close_secondary.svg
+  SvgGenImage get closeSecondary =>
+      const SvgGenImage('assets/icons/close_secondary.svg');
 
   /// File path: assets/icons/collapse.svg
   SvgGenImage get collapse => const SvgGenImage('assets/icons/collapse.svg');
@@ -110,8 +118,10 @@ class $AssetsIconsGen {
     calendar,
     checkCircle,
     checked,
+    checkedSecondary,
     clip,
     close,
+    closeSecondary,
     collapse,
     comment,
     document,
@@ -156,70 +166,6 @@ class $AssetsIllustrationsGen {
   List<AssetGenImage> get values => [complaint, mainGreeting, salary, survey];
 }
 
-class $AssetsImageGen {
-  const $AssetsImageGen();
-
-  /// File path: assets/image/alarm.png
-  AssetGenImage get alarm => const AssetGenImage('assets/image/alarm.png');
-
-  /// Directory path: assets/image/common
-  $AssetsImageCommonGen get common => const $AssetsImageCommonGen();
-
-  /// File path: assets/image/detail_view.png
-  AssetGenImage get detailView =>
-      const AssetGenImage('assets/image/detail_view.png');
-
-  /// File path: assets/image/download.png
-  AssetGenImage get download =>
-      const AssetGenImage('assets/image/download.png');
-
-  /// Directory path: assets/image/home
-  $AssetsImageHomeGen get home => const $AssetsImageHomeGen();
-
-  /// File path: assets/image/icon_lock.png
-  AssetGenImage get iconLock =>
-      const AssetGenImage('assets/image/icon_lock.png');
-
-  /// File path: assets/image/icon_msg.png
-  AssetGenImage get iconMsg => const AssetGenImage('assets/image/icon_msg.png');
-
-  /// File path: assets/image/logout.png
-  AssetGenImage get logout => const AssetGenImage('assets/image/logout.png');
-
-  /// Directory path: assets/image/menu
-  $AssetsImageMenuGen get menu => const $AssetsImageMenuGen();
-
-  /// Directory path: assets/image/mypage
-  $AssetsImageMypageGen get mypage => const $AssetsImageMypageGen();
-
-  /// File path: assets/image/plus.png
-  AssetGenImage get plus => const AssetGenImage('assets/image/plus.png');
-
-  /// File path: assets/image/top_back.png
-  AssetGenImage get topBack => const AssetGenImage('assets/image/top_back.png');
-
-  /// File path: assets/image/top_close.png
-  AssetGenImage get topClose =>
-      const AssetGenImage('assets/image/top_close.png');
-
-  /// File path: assets/image/top_menu.png
-  AssetGenImage get topMenu => const AssetGenImage('assets/image/top_menu.png');
-
-  /// List of all assets
-  List<AssetGenImage> get values => [
-    alarm,
-    detailView,
-    download,
-    iconLock,
-    iconMsg,
-    logout,
-    plus,
-    topBack,
-    topClose,
-    topMenu,
-  ];
-}
-
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
@@ -251,14 +197,6 @@ class $AssetsLogosGen {
 class $AssetsIconsFeaturesGen {
   const $AssetsIconsFeaturesGen();
 
-  /// File path: assets/icons/features/complaint.svg
-  SvgGenImage get complaint =>
-      const SvgGenImage('assets/icons/features/complaint.svg');
-
-  /// File path: assets/icons/features/payroll.svg
-  SvgGenImage get payroll =>
-      const SvgGenImage('assets/icons/features/payroll.svg');
-
   /// File path: assets/icons/features/report_doc.svg
   SvgGenImage get reportDoc =>
       const SvgGenImage('assets/icons/features/report_doc.svg');
@@ -267,23 +205,12 @@ class $AssetsIconsFeaturesGen {
   SvgGenImage get suggestionDoc =>
       const SvgGenImage('assets/icons/features/suggestion_doc.svg');
 
-  /// File path: assets/icons/features/survey.svg
-  SvgGenImage get survey =>
-      const SvgGenImage('assets/icons/features/survey.svg');
-
   /// File path: assets/icons/features/survey_doc.svg
   SvgGenImage get surveyDoc =>
       const SvgGenImage('assets/icons/features/survey_doc.svg');
 
   /// List of all assets
-  List<SvgGenImage> get values => [
-    complaint,
-    payroll,
-    reportDoc,
-    suggestionDoc,
-    survey,
-    surveyDoc,
-  ];
+  List<SvgGenImage> get values => [reportDoc, suggestionDoc, surveyDoc];
 }
 
 class $AssetsIconsTabsGen {
@@ -308,140 +235,12 @@ class $AssetsIconsTabsGen {
   List<SvgGenImage> get values => [chat, danger, home, manual, my];
 }
 
-class $AssetsImageCommonGen {
-  const $AssetsImageCommonGen();
-
-  /// File path: assets/image/common/logo.png
-  AssetGenImage get logo => const AssetGenImage('assets/image/common/logo.png');
-
-  /// File path: assets/image/common/splash.png
-  AssetGenImage get splash =>
-      const AssetGenImage('assets/image/common/splash.png');
-
-  /// List of all assets
-  List<AssetGenImage> get values => [logo, splash];
-}
-
-class $AssetsImageHomeGen {
-  const $AssetsImageHomeGen();
-
-  /// File path: assets/image/home/complaint.png
-  AssetGenImage get complaint =>
-      const AssetGenImage('assets/image/home/complaint.png');
-
-  /// File path: assets/image/home/icon_new.png
-  AssetGenImage get iconNew =>
-      const AssetGenImage('assets/image/home/icon_new.png');
-
-  /// File path: assets/image/home/logo.png
-  AssetGenImage get logo => const AssetGenImage('assets/image/home/logo.png');
-
-  /// File path: assets/image/home/pay_stub.png
-  AssetGenImage get payStub =>
-      const AssetGenImage('assets/image/home/pay_stub.png');
-
-  /// File path: assets/image/home/plus.png
-  AssetGenImage get plus => const AssetGenImage('assets/image/home/plus.png');
-
-  /// File path: assets/image/home/survey.png
-  AssetGenImage get survey =>
-      const AssetGenImage('assets/image/home/survey.png');
-
-  /// File path: assets/image/home/top_menu.png
-  AssetGenImage get topMenu =>
-      const AssetGenImage('assets/image/home/top_menu.png');
-
-  /// List of all assets
-  List<AssetGenImage> get values => [
-    complaint,
-    iconNew,
-    logo,
-    payStub,
-    plus,
-    survey,
-    topMenu,
-  ];
-}
-
-class $AssetsImageMenuGen {
-  const $AssetsImageMenuGen();
-
-  /// File path: assets/image/menu/alarm.png
-  AssetGenImage get alarm => const AssetGenImage('assets/image/menu/alarm.png');
-
-  /// File path: assets/image/menu/alarm_active.png
-  AssetGenImage get alarmActive =>
-      const AssetGenImage('assets/image/menu/alarm_active.png');
-
-  /// File path: assets/image/menu/chat.png
-  AssetGenImage get chat => const AssetGenImage('assets/image/menu/chat.png');
-
-  /// File path: assets/image/menu/chat_active.png
-  AssetGenImage get chatActive =>
-      const AssetGenImage('assets/image/menu/chat_active.png');
-
-  /// File path: assets/image/menu/home.png
-  AssetGenImage get home => const AssetGenImage('assets/image/menu/home.png');
-
-  /// File path: assets/image/menu/manual.png
-  AssetGenImage get manual =>
-      const AssetGenImage('assets/image/menu/manual.png');
-
-  /// File path: assets/image/menu/risk.png
-  AssetGenImage get risk => const AssetGenImage('assets/image/menu/risk.png');
-
-  /// List of all assets
-  List<AssetGenImage> get values => [
-    alarm,
-    alarmActive,
-    chat,
-    chatActive,
-    home,
-    manual,
-    risk,
-  ];
-}
-
-class $AssetsImageMypageGen {
-  const $AssetsImageMypageGen();
-
-  /// File path: assets/image/mypage/Icon_mail.png
-  AssetGenImage get iconMail =>
-      const AssetGenImage('assets/image/mypage/Icon_mail.png');
-
-  /// File path: assets/image/mypage/Icon_phone.png
-  AssetGenImage get iconPhone =>
-      const AssetGenImage('assets/image/mypage/Icon_phone.png');
-
-  /// File path: assets/image/mypage/complaint.png
-  AssetGenImage get complaint =>
-      const AssetGenImage('assets/image/mypage/complaint.png');
-
-  /// File path: assets/image/mypage/risk_report.png
-  AssetGenImage get riskReport =>
-      const AssetGenImage('assets/image/mypage/risk_report.png');
-
-  /// File path: assets/image/mypage/survey.png
-  AssetGenImage get survey =>
-      const AssetGenImage('assets/image/mypage/survey.png');
-
-  /// List of all assets
-  List<AssetGenImage> get values => [
-    iconMail,
-    iconPhone,
-    complaint,
-    riskReport,
-    survey,
-  ];
-}
-
 class Assets {
   const Assets._();
 
   static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsIllustrationsGen illustrations =
       $AssetsIllustrationsGen();
-  static const $AssetsImageGen image = $AssetsImageGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
   static const $AssetsLogosGen logos = $AssetsLogosGen();
 }
