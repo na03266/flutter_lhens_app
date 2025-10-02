@@ -11,7 +11,7 @@ class FilterSearchBar<T> extends StatefulWidget {
   final T selected;
   final ValueChanged<T> onSelected;
   final TextEditingController? controller;
-  final ValueChanged<String>? onSubmitted; // 검색 아이콘 눌렀을 때만 검색 실행
+  final ValueChanged<String>? onSubmitted; // 아이콘/키보드 제출 시 실행
   final String hintText;
 
   const FilterSearchBar({
@@ -35,8 +35,31 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
   OverlayEntry? _entry;
   bool _open = false;
 
-  double get _innerLPadding => 16.w; // 왼쪽 패딩만
-  double get _gapBelow => 2.h; // 트리거 아래 간격
+  late final FocusNode _focus;
+  TextEditingController? _internal; // widget.controller 없을 때만 사용
+
+  bool get _focused => _focus.hasFocus || _open;
+
+  double get _innerLPadding => 16.w;
+
+  double get _gapBelow => 2.h;
+
+  TextEditingController get _controller =>
+      widget.controller ?? (_internal ??= TextEditingController());
+
+  @override
+  void initState() {
+    super.initState();
+    _focus = FocusNode()..addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _hide(fromDispose: true);
+    _focus.dispose();
+    _internal?.dispose();
+    super.dispose();
+  }
 
   void _toggle() => _open ? _hide() : _show();
 
@@ -45,23 +68,15 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
       _entry?.remove();
     } catch (_) {}
     _entry = null;
-
-    if (fromDispose) {
-      _open = false;
-      return;
-    }
-    if (mounted && _open) {
-      setState(() => _open = false);
-    } else {
-      _open = false;
-    }
+    if (!fromDispose && mounted) setState(() => _open = false);
+    if (mounted) FocusScope.of(context).unfocus(); // 포커스/보더 상태 통일
   }
 
   void _show() {
     if (_open) return;
     final ctx = _anchorKey.currentContext;
     final overlay = Overlay.of(context);
-    if (ctx == null) return;
+    if (ctx == null || overlay == null) return;
 
     final box = ctx.findRenderObject() as RenderBox;
     final triggerSize = box.size;
@@ -96,25 +111,27 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
     setState(() => _open = true);
   }
 
-  @override
-  void dispose() {
-    _hide(fromDispose: true);
-    super.dispose();
+  void _submit(String v) {
+    widget.onSubmitted?.call(v.trim());
+    FocusScope.of(context).unfocus(); // 제출 후 키보드 닫기
   }
 
   @override
   Widget build(BuildContext context) {
     final label = widget.getLabel(widget.selected);
-    final controller = widget.controller ?? TextEditingController();
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 120),
       width: double.infinity,
       height: 48.h,
       padding: EdgeInsets.only(left: _innerLPadding),
       decoration: ShapeDecoration(
         color: Colors.white,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(width: 1, color: AppColors.border),
+          side: BorderSide(
+            width: 1,
+            color: _focused ? AppColors.primary : AppColors.border,
+          ),
           borderRadius: BorderRadius.circular(8.r),
         ),
       ),
@@ -157,12 +174,14 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
             ),
           ),
 
-          // 검색
+          // 검색 입력
           Expanded(
             child: TextField(
-              controller: controller,
-              onSubmitted: null,
-              textInputAction: TextInputAction.done,
+              focusNode: _focus,
+              controller: _controller,
+              autofocus: false,
+              textInputAction: TextInputAction.search,
+              onSubmitted: _submit,
               textAlignVertical: TextAlignVertical.center,
               style: AppTextStyles.pr15.copyWith(color: AppColors.text),
               cursorColor: AppColors.secondary,
@@ -174,8 +193,9 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
-                suffixIcon: InkWell(
-                  onTap: () => widget.onSubmitted?.call(controller.text.trim()),
+                suffixIcon: GestureDetector(
+                  onTap: () => _submit(_controller.text),
+                  behavior: HitTestBehavior.opaque,
                   child: Center(
                     child: SizedBox(
                       width: 24.w,

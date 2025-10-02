@@ -1,0 +1,139 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:lhens_app/gen/assets.gen.dart';
+import 'package:lhens_app/mock/comment/mock_comment_models.dart';
+import 'reply_tile.dart';
+
+class CommentTile extends StatelessWidget {
+  final CommentModel comment;
+  final VoidCallback? onTapDelete;
+  final VoidCallback? onTapReply;
+
+  const CommentTile({
+    super.key,
+    required this.comment,
+    this.onTapDelete,
+    this.onTapReply,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final avatar = Container(
+      width: 36.w,
+      height: 36.w,
+      decoration: BoxDecoration(
+        color: AppColors.border,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Center(
+        child: Assets.icons.user.svg(width: 20.w, height: 20.w),
+      ),
+    );
+
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppColors.subtle, width: 1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 16.h, right: 6.w, bottom: 16.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                avatar,
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              comment.user,
+                              style: AppTextStyles.psb14.copyWith(
+                                color: AppColors.textSec,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: onTapDelete,
+                            behavior: HitTestBehavior.opaque,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 4.w,
+                                vertical: 2.h,
+                              ),
+                              child: Text(
+                                '삭제',
+                                style: AppTextStyles.pr14.copyWith(
+                                  color: AppColors.textTer,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 6.h),
+                      Text(
+                        comment.text,
+                        style: AppTextStyles.pr15.copyWith(
+                          color: AppColors.text,
+                          height: 1.35,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Row(
+                        children: [
+                          Text(
+                            comment.time,
+                            style: AppTextStyles.pl14.copyWith(
+                              color: AppColors.textTer,
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          GestureDetector(
+                            onTap: onTapReply,
+                            behavior: HitTestBehavior.opaque,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 4.w,
+                                vertical: 2.h,
+                              ),
+                              child: Text(
+                                '답글쓰기',
+                                style: AppTextStyles.pr14.copyWith(
+                                  color: AppColors.textTer,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          if (comment.hasReplies)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final r in comment.replies)
+                  Padding(
+                    padding: EdgeInsets.only(left: 32.w),
+                    child: ReplyTile(comment: r),
+                  ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}

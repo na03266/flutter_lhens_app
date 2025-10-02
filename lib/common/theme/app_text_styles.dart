@@ -31,6 +31,7 @@ class AppTextStyles {
 
   // Medium
   static final TextStyle pm18 = pb18.copyWith(fontWeight: FontWeight.w500);
+  static final TextStyle pm17 = pm18.copyWith(fontSize: 17.sp);
   static final TextStyle pm16 = pm18.copyWith(fontSize: 16.sp);
   static final TextStyle pm15 = pm18.copyWith(fontSize: 15.sp);
   static final TextStyle pm14 = pm18.copyWith(fontSize: 14.sp);
@@ -44,6 +45,10 @@ class AppTextStyles {
   static final TextStyle pr14 = pr18.copyWith(fontSize: 14.sp);
   static final TextStyle pr13 = pr18.copyWith(fontSize: 13.sp);
   static final TextStyle pr12 = pr18.copyWith(fontSize: 12.sp);
+
+  // Light
+  static final TextStyle pl18 = pb18.copyWith(fontWeight: FontWeight.w300);
+  static final TextStyle pl14 = pl18.copyWith(fontSize: 14.sp);
 
   // ---------------- The Jamsil ----------------
   // Bold
