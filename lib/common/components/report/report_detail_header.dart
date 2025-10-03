@@ -5,12 +5,12 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
-class RiskDetailHeader extends StatelessWidget {
+class ReportDetailHeader extends StatelessWidget {
   final String typeName;
   final String title;
   final VoidCallback? onMoreTap;
 
-  const RiskDetailHeader({
+  const ReportDetailHeader({
     super.key,
     required this.typeName,
     required this.title,

@@ -69,24 +69,28 @@ class DefaultLayout extends ConsumerWidget {
       '/home/complaint': '민원제안접수',
       '/home/my-page': '마이페이지',
       '/home/my-page/change-info': '정보변경',
+      '/home/my-page/my-risk': '내 위험신고 내역',
+      '/home/my-page/my-complaint': '내 민원제안 내역',
       '/chat': '커뮤니케이션',
       '/risk': '위험신고',
       '/alarm': '알림',
       '/manual': '업무매뉴얼',
     };
-    final hit = map[path];
-    if (hit != null) return hit;
-    for (final e in map.entries) {
-      if (path.startsWith('${e.key}/')) return e.value;
-    }
-    return '';
+
+    if (map.containsKey(path)) return map[path]!;
+    final candidates = map.keys.where((k) => path.startsWith('$k/')).toList()
+      ..sort((a, b) => b.length.compareTo(a.length));
+    return candidates.isNotEmpty ? map[candidates.first]! : '';
   }
 
   // 오른쪽 아이콘 타입
   AppBarRightType _resolveRightType(String path) {
     if (path == '/home/my-page/change-info' ||
         path == '/home/salary/auth' ||
-        path == '/risk/form') {
+        path == '/risk/form' ||
+        path.startsWith('/home/my-page/my-risk/form') ||
+        path == '/home/complaint/form' ||
+        path.startsWith('/home/my-page/my-complaint/form')) {
       return AppBarRightType.none;
     }
     return AppBarRightType.menu;
@@ -94,10 +98,13 @@ class DefaultLayout extends ConsumerWidget {
 
   // 하단 보더
   bool _shouldHideAppBarBottom(String path) {
-    // 목록 화면에서만 숨김 (정확히 일치)
     const exactHide = <String>{
       '/risk',
-      '/alarm', // 알림도 목록만 숨기려면 유지, 아니면 지우세요
+      '/alarm',
+      '/home/notice',
+      '/home/my-page/my-risk',
+      '/home/complaint',
+      '/home/my-page/my-complaint',
     };
     return exactHide.contains(path);
   }

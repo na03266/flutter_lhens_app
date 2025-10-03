@@ -51,9 +51,21 @@ class MyPageScreen extends StatelessWidget {
                   ]),
                   _divider(),
                   _buildNavRow([
-                    (Assets.icons.features.surveyDoc.svg(), '내 설문조사\n내역'),
-                    (Assets.icons.features.suggestionDoc.svg(), '내 민원제안\n내역'),
-                    (Assets.icons.features.reportDoc.svg(), '내 위험신고\n내역'),
+                    (
+                      Assets.icons.features.surveyDoc.svg(),
+                      '내 설문조사\n내역',
+                      () {},
+                    ),
+                    (
+                      Assets.icons.features.suggestionDoc.svg(),
+                      '내 민원제안\n내역',
+                      () => context.pushNamed('내 민원제안 내역'),
+                    ),
+                    (
+                      Assets.icons.features.reportDoc.svg(),
+                      '내 위험신고\n내역',
+                      () => context.pushNamed('내 위험신고 내역'),
+                    ),
                   ]),
                 ],
               ),
@@ -88,11 +100,11 @@ class MyPageScreen extends StatelessWidget {
     ],
   );
 
-  static Widget _buildNavRow(List<(Widget, String)> items) {
+  static Widget _buildNavRow(List<(Widget, String, VoidCallback)> items) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: items
-          .map((it) => MyNavCard(icon: it.$1, title: it.$2, onTap: () {}))
+          .map((it) => MyNavCard(icon: it.$1, title: it.$2, onTap: it.$3))
           .toList(),
     );
   }

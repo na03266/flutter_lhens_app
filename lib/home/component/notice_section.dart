@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lhens_app/drawer/notice/view/notice_screen.dart';
 import 'package:lhens_app/home/component/home_notice_tile.dart';
 import 'package:lhens_app/home/component/home_section_header.dart';
 
@@ -15,7 +17,9 @@ class NoticeSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HomeSectionHeader(title: '공지사항', onTap: onTapPlus ?? () {}),
+          HomeSectionHeader(title: '공지사항', onTap: onTapPlus ?? () {
+            context.pushNamed(NoticeScreen.routeName);
+          }),
           SizedBox(height: 8.h),
 
           const NoticeTile(

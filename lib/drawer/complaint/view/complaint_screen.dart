@@ -1,276 +1,90 @@
+// lib/features/complaint/view/complaint_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:lhens_app/common/components/app_segmented_tabs.dart';
-import 'package:lhens_app/common/components/buttons/fab_add_button.dart';
-import 'package:lhens_app/common/components/count_inline.dart';
-import 'package:lhens_app/common/components/pagination_bar.dart';
-import 'package:lhens_app/common/components/report_list_item.dart';
-import 'package:lhens_app/common/components/search/filter_search_bar.dart';
-import 'package:lhens_app/common/theme/app_colors.dart';
-import 'package:lhens_app/common/theme/app_shadows.dart';
+import 'package:lhens_app/common/components/report/report_list_scaffold.dart';
+import 'package:lhens_app/common/components/report/report_list_config.dart';
+import 'package:lhens_app/common/components/report/base_report_item_props.dart';
 
-class ComplaintScreen extends ConsumerStatefulWidget {
+import 'package:lhens_app/mock/complaint/mock_complaint_models.dart';
+import 'package:lhens_app/mock/complaint/mock_complaint_data.dart';
+
+class ComplaintScreen extends ConsumerWidget {
   static String get routeName => '민원제안접수';
 
-  const ComplaintScreen({super.key});
+  final bool mineOnly; // 내 글만 보기
+  final bool showFab; // 작성 버튼 노출
+  const ComplaintScreen({
+    super.key,
+    this.mineOnly = false,
+    this.showFab = true,
+  });
+
+  static const String _currentUser = '조예빈(1001599)';
 
   @override
-  ConsumerState<ComplaintScreen> createState() => _ComplaintScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final config = ReportListConfig<ComplaintItem>(
+      tabs: const ['공개', '요청(비공개)'],
+      filters: const ['전체', '작성자', '유형명'],
 
-class _ComplaintScreenState extends ConsumerState<ComplaintScreen> {
-  // 상단 탭
-  int _tabIndex = 0;
+      emptyMessage: (tab, {required bool mineOnly}) => switch (tab) {
+        1 => mineOnly ? '등록한 공개 제안이 없습니다.' : '등록된 공개 제안이 없습니다.',
+        2 => mineOnly ? '등록한 비공개 제안이 없습니다.' : '등록된 비공개 제안이 없습니다.',
+        _ => mineOnly ? '등록한 제안이 없습니다.' : '등록된 제안이 없습니다.',
+      },
 
-  // 검색
-  final _query = TextEditingController();
-  String _selectedFilter = '전체';
-  final _filters = const ['전체', '작성자', '유형명'];
-  String _appliedQuery = '';
+      showFab: showFab,
+      detailRouteName: '민원제안 상세',
+      // GoRouter에 등록 예정
+      myDetailRouteName: '내 민원제안 상세',
+      // 필요 없으면 null
+      formRouteName: '민원제안 작성',
 
-  // 페이지네이션
-  int _page = 1;
-  final int _pageSize = 10;
-
-  bool _scrolled = false;
-
-  // 임의 데이터
-  late final List<
-    ({
-      ReportStatus status,
-      String typeName,
-      String title,
-      String author,
-      String dateText,
-      int comments,
-      bool secret,
-    })
-  >
-  _items = _mockItems(120);
-
-  List<
-    ({
-      ReportStatus status,
-      String typeName,
-      String title,
-      String author,
-      String dateText,
-      int comments,
-      bool secret,
-    })
-  >
-  _mockItems(int n) {
-    const baseTitle =
-        '민원 제목이 표시되는 영역입니다. 민원 제목이 표시되는 영역입니다. 민원 제목이 표시되는 영역입니다.';
-    return List.generate(n, (i) {
-      final mod = i % 6;
-      final status = switch (mod) {
-        0 || 3 => ReportStatus.received,
-        1 || 4 => ReportStatus.processing,
-        _ => ReportStatus.done,
-      };
-      final secret = (i % 4 == 0);
-      return (
-        status: status,
-        typeName: '민원제안유형명',
-        title: baseTitle,
-        author: '조예빈(1001599)',
-        dateText: '2025. 08. ${(i % 28 + 1).toString().padLeft(2, '0')}',
-        comments: (i % 7),
-        secret: secret,
-      );
-    });
-  }
-
-  List<
-    ({
-      ReportStatus status,
-      String typeName,
-      String title,
-      String author,
-      String dateText,
-      int comments,
-      bool secret,
-    })
-  >
-  get _filtered {
-    final q = _appliedQuery.toLowerCase();
-
-    bool secretAllowed(bool isSecret) {
-      if (_tabIndex == 1 && isSecret) return false; // 공개
-      if (_tabIndex == 2 && !isSecret) return false; // 비공개
-      return true;
-    }
-
-    bool matchesQuery(e) {
-      if (q.isEmpty) return true;
-      return switch (_selectedFilter) {
-        '작성자' => e.author.toLowerCase().contains(q),
-        '유형명' => e.typeName.toLowerCase().contains(q),
-        _ =>
-          e.title.toLowerCase().contains(q) ||
-              e.typeName.toLowerCase().contains(q) ||
-              e.author.toLowerCase().contains(q),
-      };
-    }
-
-    return _items
-        .where((e) => secretAllowed(e.secret))
-        .where(matchesQuery)
-        .toList();
-  }
-
-  int get _totalPages {
-    final len = _filtered.length;
-    if (len == 0) return 1;
-    return ((len - 1) ~/ _pageSize) + 1;
-  }
-
-  List<
-    ({
-      ReportStatus status,
-      String typeName,
-      String title,
-      String author,
-      String dateText,
-      int comments,
-      bool secret,
-    })
-  >
-  get _visiblePage {
-    final clampedPage = _page.clamp(1, _totalPages);
-    final start = (clampedPage - 1) * _pageSize;
-    final end = (start + _pageSize).clamp(0, _filtered.length);
-    if (start >= _filtered.length) return const [];
-    return _filtered.sublist(start, end);
-  }
-
-  void _resetToFirstPage() => _page = 1;
-
-  @override
-  void dispose() {
-    _query.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final hpad = 16.w;
-    final filtered = _filtered;
-    final visible = _visiblePage;
-
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // 상단 탭 (고정)
-            AppSegmentedTabs(
-              index: _tabIndex,
-              onChanged: (i) => setState(() {
-                _tabIndex = i;
-                _resetToFirstPage();
-              }),
-              rightTabs: const ['공개', '요청(비공개)'],
-            ),
-            SizedBox(height: 16.h),
-
-            // 검색바 (고정) + 하단 그림자
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                boxShadow: _scrolled ? AppShadows.stickyBar : null,
-              ),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(hpad, 0, hpad, 12.h),
-                child: FilterSearchBar<String>(
-                  items: _filters,
-                  selected: _selectedFilter,
-                  getLabel: (v) => v,
-                  onSelected: (v) => setState(() {
-                    _selectedFilter = v;
-                    _resetToFirstPage();
-                  }),
-                  controller: _query,
-                  onSubmitted: (_) => setState(() {
-                    _appliedQuery = _query.text.trim();
-                    _resetToFirstPage();
-                  }),
-                ),
-              ),
-            ),
-            SizedBox(height: 16.h),
-
-            // 스크롤 영역
-            Expanded(
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (n) {
-                  if (n is ScrollUpdateNotification) {
-                    final atTop = n.metrics.pixels <= 0;
-                    if (_scrolled == atTop) setState(() => _scrolled = !atTop);
-                  }
-                  return false;
-                },
-                child: ListView.separated(
-                  physics: const ClampingScrollPhysics(),
-                  padding: EdgeInsets.symmetric(horizontal: hpad),
-                  itemCount: visible.length + 2,
-                  // 0: 건수, 마지막: 페이지네이션
-                  separatorBuilder: (_, __) => SizedBox(height: 8.h),
-                  itemBuilder: (_, i) {
-                    if (i == 0) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          left: 2.w,
-                          right: 2.w,
-                          bottom: 8.h,
-                        ),
-                        child: CountInline(label: '전체', count: filtered.length),
-                      );
-                    }
-                    if (i == visible.length + 1) {
-                      return Padding(
-                        padding: EdgeInsets.only(top: 12.h, bottom: 72.h),
-                        child: Center(
-                          child: PaginationBar(
-                            currentPage: _page.clamp(1, _totalPages),
-                            totalPages: _totalPages,
-                            onPageChanged: (p) => setState(() => _page = p),
-                          ),
-                        ),
-                      );
-                    }
-
-                    final e = visible[i - 1];
-                    return ReportListItem(
-                      status: e.status,
-                      typeName: e.typeName,
-                      title: e.title,
-                      author: e.author,
-                      dateText: e.dateText,
-                      commentCount: e.comments,
-                      secret: e.secret,
-                      onTap: () {},
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
+      // GoRouter에 등록 예정
+      load: () async => generateComplaintItems(
+        40,
+        secretRatio: 0.25,
+        authorA: _currentUser,
+        authorB: '홍길동(1002001)',
       ),
 
-      // FAB
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: 20.h),
-        child: FabAddButton(onTap: () {}),
+      tabPredicate: (e, tab) => switch (tab) {
+        1 => !e.secret, // 공개
+        2 => e.secret, // 비공개
+        _ => true,
+      },
+
+      searchPredicate: (e, f, q) {
+        if (q.isEmpty) return true;
+        final title = e.title.toLowerCase();
+        final author = e.author.toLowerCase();
+        final type = e.typeName.toLowerCase();
+        return switch (f) {
+          '작성자' => author.contains(q),
+          '유형명' => type.contains(q),
+          _ => title.contains(q) || author.contains(q) || type.contains(q),
+        };
+      },
+
+      mapToProps: (e) => ReportListItemProps(
+        status: e.status,
+        // ItemStatus?
+        typeName: e.typeName,
+        title: e.title,
+        author: e.author,
+        dateText: e.dateText,
+        commentCount: e.comments,
+        secret: e.secret,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+
+      mineOnlyPredicate: (e) => e.author == _currentUser,
+      // onItemTap: (ctx, item) => ctx.pushNamed('민원제안 상세', extra: item),
+    );
+
+    return ReportListScaffold<ComplaintItem>(
+      config: config,
+      mineOnly: mineOnly,
     );
   }
 }

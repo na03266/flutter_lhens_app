@@ -6,10 +6,10 @@ import 'package:lhens_app/common/theme/app_text_styles.dart';
 class PaginationBar extends StatelessWidget {
   final int currentPage; // 1-based
   final int totalPages;
-  final ValueChanged<int> onPageChanged; // 페이지 변경 콜백
+  final ValueChanged<int> onPageChanged;
   final int window; // 보여줄 숫자 버튼 개수
-  final double? spacing; // 아이템 간 간격
-  final bool showFirstLast; // 처음/마지막 이동 버튼
+  final double? spacing;
+  final bool showFirstLast;
 
   const PaginationBar({
     super.key,
@@ -23,12 +23,11 @@ class PaginationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (totalPages <= 1) return const SizedBox.shrink();
-
     final gap = spacing ?? 12.w;
     final cur = currentPage.clamp(1, totalPages);
+    final win = window.clamp(1, totalPages);
 
-    final range = _calcWindow(cur, totalPages, window);
+    final range = _calcWindow(cur, totalPages, win);
     final start = range.$1;
     final end = range.$2;
 
@@ -80,15 +79,8 @@ class PaginationBar extends StatelessWidget {
   (int, int) _calcWindow(int cur, int total, int win) {
     if (win <= 1) return (cur, cur);
 
-    if (win == 2) {
-      if (total == 2) return (1, 2);
-      if (cur <= 2) return (1, 2);
-      if (cur >= total) return ((total - 1), total);
-      return (cur - 1, cur);
-    }
-
-    final half = win ~/ 2;
-    int start = (cur - half).clamp(1, (total - win + 1).clamp(1, total));
+    int start = cur - (win ~/ 2);
+    start = start.clamp(1, (total - win + 1).clamp(1, total));
     int end = (start + win - 1).clamp(1, total);
     if (end - start + 1 < win) start = (end - win + 1).clamp(1, total);
     return (start, end);
@@ -111,7 +103,7 @@ class _NumberBtn extends StatelessWidget {
     final size = 44.w;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: onTap,
+      onTap: selected ? null : onTap, // ✅ 현재 페이지면 탭 비활성화(선택)
       child: Container(
         width: size,
         height: size,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../../gen/assets.gen.dart';
@@ -10,6 +11,7 @@ class FilterSearchBar<T> extends StatefulWidget {
   final String Function(T) getLabel;
   final T selected;
   final ValueChanged<T> onSelected;
+
   final TextEditingController? controller;
   final ValueChanged<String>? onSubmitted; // 아이콘/키보드 제출 시 실행
   final String hintText;
@@ -36,7 +38,7 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
   bool _open = false;
 
   late final FocusNode _focus;
-  TextEditingController? _internal; // widget.controller 없을 때만 사용
+  TextEditingController? _internalController; // 외부 controller 없을 때만 생성
 
   bool get _focused => _focus.hasFocus || _open;
 
@@ -45,7 +47,7 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
   double get _gapBelow => 2.h;
 
   TextEditingController get _controller =>
-      widget.controller ?? (_internal ??= TextEditingController());
+      widget.controller ?? (_internalController ??= TextEditingController());
 
   @override
   void initState() {
@@ -55,28 +57,39 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
 
   @override
   void dispose() {
-    _hide(fromDispose: true);
+    try {
+      _entry?.remove();
+    } catch (_) {}
+    _entry = null;
+
     _focus.dispose();
-    _internal?.dispose();
+    _internalController?.dispose();
     super.dispose();
   }
 
   void _toggle() => _open ? _hide() : _show();
 
-  void _hide({bool fromDispose = false}) {
+  void _hide() {
     try {
       _entry?.remove();
     } catch (_) {}
     _entry = null;
-    if (!fromDispose && mounted) setState(() => _open = false);
-    if (mounted) FocusScope.of(context).unfocus(); // 포커스/보더 상태 통일
+
+    if (mounted && _open) {
+      setState(() => _open = false);
+    } else {
+      _open = false;
+    }
+
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   void _show() {
     if (_open) return;
+
     final ctx = _anchorKey.currentContext;
     final overlay = Overlay.of(context);
-    if (ctx == null || overlay == null) return;
+    if (ctx == null) return;
 
     final box = ctx.findRenderObject() as RenderBox;
     final triggerSize = box.size;
@@ -84,6 +97,7 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
     _entry = OverlayEntry(
       builder: (_) => Stack(
         children: [
+          // 바깥 탭 시 닫힘
           Positioned.fill(child: GestureDetector(onTap: _hide)),
           CompositedTransformFollower(
             link: _link,
@@ -113,7 +127,7 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
 
   void _submit(String v) {
     widget.onSubmitted?.call(v.trim());
-    FocusScope.of(context).unfocus(); // 제출 후 키보드 닫기
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   @override
