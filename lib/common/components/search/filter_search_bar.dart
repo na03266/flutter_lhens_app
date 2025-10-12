@@ -11,7 +11,6 @@ class FilterSearchBar<T> extends StatefulWidget {
   final String Function(T) getLabel;
   final T selected;
   final ValueChanged<T> onSelected;
-
   final TextEditingController? controller;
   final ValueChanged<String>? onSubmitted; // 아이콘/키보드 제출 시 실행
   final String hintText;

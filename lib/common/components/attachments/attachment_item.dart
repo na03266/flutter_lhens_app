@@ -6,7 +6,7 @@ import 'package:lhens_app/gen/assets.gen.dart';
 
 class AttachmentItem extends StatelessWidget {
   final String filename;
-  final VoidCallback onRemove;
+  final VoidCallback? onRemove;
 
   const AttachmentItem({
     super.key,

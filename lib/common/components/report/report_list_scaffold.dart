@@ -21,10 +21,13 @@ class ReportListScaffold<T> extends ConsumerStatefulWidget {
   final ReportListConfig<T> config;
   final bool mineOnly;
 
+  final Widget Function(BuildContext context, T item)? itemBuilder;
+
   const ReportListScaffold({
     super.key,
     required this.config,
     this.mineOnly = false,
+    this.itemBuilder,
   });
 
   @override
@@ -32,8 +35,7 @@ class ReportListScaffold<T> extends ConsumerStatefulWidget {
       _ReportListScaffoldState<T>();
 }
 
-class _ReportListScaffoldState<T>
-    extends ConsumerState<ReportListScaffold<T>> {
+class _ReportListScaffoldState<T> extends ConsumerState<ReportListScaffold<T>> {
   final _query = TextEditingController();
 
   late String _selectedFilter;
@@ -49,6 +51,10 @@ class _ReportListScaffoldState<T>
   void initState() {
     super.initState();
     assert(widget.config.filters.isNotEmpty);
+    assert(
+      widget.config.mapToProps != null || widget.itemBuilder != null,
+      'Provide either itemBuilder or mapToProps in ReportListConfig.',
+    );
     _selectedFilter = widget.config.filters.first;
     _load();
   }
@@ -94,6 +100,9 @@ class _ReportListScaffoldState<T>
     if (start >= _filtered.length) return const [];
     return _filtered.sublist(start, end);
   }
+
+  String _emptyIconPath(ReportListConfig<T> cfg) =>
+      cfg.emptyIconPath ?? Assets.icons.document.path;
 
   Widget _emptyTop(String iconPath, String message) {
     return Column(
@@ -177,80 +186,83 @@ class _ReportListScaffoldState<T>
                 },
                 child: noData
                     ? _emptyTop(
-                  Assets.icons.document.path,
-                  cfg.emptyMessage(_tabIndex, mineOnly: widget.mineOnly),
-                )
+                        _emptyIconPath(cfg),
+                        cfg.emptyMessage(_tabIndex, mineOnly: widget.mineOnly),
+                      )
                     : searchNoResult
-                    ? _emptyTop(
-                  Assets.icons.search.path,
-                  '검색어와 일치하는 결과가 없습니다.',
-                )
+                    ? _emptyTop(Assets.icons.search.path, '검색어와 일치하는 결과가 없습니다.')
                     : tabNoResult
                     ? _emptyTop(
-                  Assets.icons.document.path,
-                  cfg.emptyMessage(_tabIndex,
-                      mineOnly: widget.mineOnly),
-                )
+                        _emptyIconPath(cfg),
+                        cfg.emptyMessage(_tabIndex, mineOnly: widget.mineOnly),
+                      )
                     : ListView.separated(
-                  physics: const ClampingScrollPhysics(),
-                  padding:
-                  EdgeInsets.symmetric(horizontal: hpad),
-                  itemCount: visible.length + 2,
-                  separatorBuilder: (_, __) =>
-                      SizedBox(height: 8.h),
-                  itemBuilder: (_, i) {
-                    if (i == 0) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                            left: 2.w, right: 2.w, bottom: 8.h),
-                        child: CountInline(
-                          label: '전체',
-                          count: filtered.length,
-                        ),
-                      );
-                    }
-                    if (i == visible.length + 1) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                            top: 12.h, bottom: 72.h),
-                        child: Center(
-                          child: PaginationBar(
-                            currentPage:
-                            _page.clamp(1, _totalPages),
-                            totalPages: _totalPages,
-                            onPageChanged: (p) =>
-                                setState(() => _page = p),
-                          ),
-                        ),
-                      );
-                    }
+                        physics: const ClampingScrollPhysics(),
+                        padding: EdgeInsets.symmetric(horizontal: hpad),
+                        itemCount: visible.length + 2,
+                        separatorBuilder: (_, __) => SizedBox(height: 8.h),
+                        itemBuilder: (_, i) {
+                          if (i == 0) {
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                left: 2.w,
+                                right: 2.w,
+                                bottom: 8.h,
+                              ),
+                              child: CountInline(
+                                label: '전체',
+                                count: filtered.length,
+                              ),
+                            );
+                          }
+                          if (i == visible.length + 1) {
+                            return Padding(
+                              padding: EdgeInsets.only(top: 12.h, bottom: 72.h),
+                              child: Center(
+                                child: PaginationBar(
+                                  currentPage: _page.clamp(1, _totalPages),
+                                  totalPages: _totalPages,
+                                  onPageChanged: (p) =>
+                                      setState(() => _page = p),
+                                ),
+                              ),
+                            );
+                          }
 
-                    final ReportListItemProps props =
-                    cfg.mapToProps(visible[i - 1]);
-                    final routeName = widget.mineOnly &&
-                        cfg.myDetailRouteName != null
-                        ? cfg.myDetailRouteName!
-                        : cfg.detailRouteName;
+                          final item = visible[i - 1];
 
-                    return BaseListItem(
-                      status: props.status,
-                      typeName: props.typeName,
-                      title: props.title,
-                      author: props.author,
-                      dateText: props.dateText,
-                      commentCount: props.commentCount,
-                      secret: props.secret,
-                      onTap: () {
-                        if (cfg.onItemTap != null) {
-                          cfg.onItemTap!(
-                              context, visible[i - 1]);
-                        } else {
-                          context.pushNamed(routeName);
-                        }
-                      },
-                    );
-                  },
-                ),
+                          // 커스텀 빌더 우선
+                          if (widget.itemBuilder != null) {
+                            return widget.itemBuilder!(context, item);
+                          }
+
+                          // 기본 BaseListItem
+                          final ReportListItemProps props = cfg.mapToProps!(
+                            item,
+                          );
+                          final routeName =
+                              widget.mineOnly && cfg.myDetailRouteName != null
+                              ? cfg.myDetailRouteName!
+                              : cfg.detailRouteName;
+
+                          return BaseListItem(
+                            status: props.status,
+                            typeName: props.typeName,
+                            title: props.title,
+                            author: props.author,
+                            dateText: props.dateText,
+                            commentCount: props.commentCount,
+                            secret: props.secret,
+                            onTap: () {
+                              if (cfg.onItemTap != null) {
+                                cfg.onItemTap!(context, item);
+                              } else {
+                                context.pushNamed(routeName);
+                              }
+                            },
+                          );
+                        },
+                      ),
               ),
             ),
           ],
@@ -260,11 +272,11 @@ class _ReportListScaffoldState<T>
       // FAB
       floatingActionButton: cfg.showFab
           ? Padding(
-        padding: EdgeInsets.only(bottom: 20.h),
-        child: FabAddButton(
-          onTap: () => context.pushNamed(cfg.formRouteName),
-        ),
-      )
+              padding: EdgeInsets.only(bottom: 20.h),
+              child: FabAddButton(
+                onTap: () => context.pushNamed(cfg.formRouteName),
+              ),
+            )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );

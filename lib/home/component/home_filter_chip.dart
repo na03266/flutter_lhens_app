@@ -66,8 +66,8 @@ class _Chip extends StatelessWidget {
           color: AppColors.white,
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
-            color: selected ? AppColors.secondary : AppColors.textTer,
-            width: 1.5,
+            color: selected ? AppColors.secAccent : AppColors.textTer,
+            width: 1.75,
           ),
         ),
         child: Text(

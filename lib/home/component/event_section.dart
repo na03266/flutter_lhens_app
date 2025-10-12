@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
+import 'package:lhens_app/drawer/edu_event/view/edu_event_screen.dart';
 
 import 'home_section_header.dart';
 import 'home_filter_chip.dart';
@@ -26,6 +28,8 @@ class _EventSectionState extends State<EventSection> {
   void _setFilter(HomeFilter f) {
     if (_filter == f) return;
     setState(() => _filter = f);
+
+    // 필터 변경 시 리스트 맨 앞으로 스크롤
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) {
         _scroll.animateTo(
@@ -37,24 +41,20 @@ class _EventSectionState extends State<EventSection> {
     });
   }
 
-  // 카드
-  Widget _buildCard(
-    double cardW, {
-    required String title,
-    required String period,
-  }) {
+  void _goEduEvent() => context.pushNamed(EduEventScreen.routeName);
+
+  Widget _card(double cardW, {required String title, required String period}) {
     return SizedBox(
       width: cardW,
       child: HomeEventCard(
         title: title,
         periodText: period,
         imagePath: Assets.images.event.path,
-        onTap: () {},
+        onTap: _goEduEvent,
       ),
     );
   }
 
-  // 간격
   List<Widget> _withGap(List<Widget> items, double gap) {
     if (items.isEmpty) return const [];
     return [
@@ -66,22 +66,22 @@ class _EventSectionState extends State<EventSection> {
   }
 
   List<Widget> _cardsFor(double cardW, double gap) {
-    final edu1 = _buildCard(
+    final edu1 = _card(
       cardW,
       title: '교육 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
       period: '2025.06.02 ~ 2025.06.03',
     );
-    final edu2 = _buildCard(
+    final edu2 = _card(
       cardW,
       title: '교육 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
       period: '2025.06.12 ~ 2025.06.12',
     );
-    final event1 = _buildCard(
+    final event1 = _card(
       cardW,
       title: '행사 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
       period: '2025.07.05 ~ 2025.07.06',
     );
-    final event2 = _buildCard(
+    final event2 = _card(
       cardW,
       title: '행사 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
       period: '2025.07.15 ~ 2025.07.19',
@@ -100,6 +100,7 @@ class _EventSectionState extends State<EventSection> {
   @override
   Widget build(BuildContext context) {
     final hPad = 16.w;
+    const visibleCards = 1.8; // 약 1.8장 보이도록
     final gap = 16.w;
     final minW = 160.w;
     final maxW = 220.w;
@@ -108,9 +109,7 @@ class _EventSectionState extends State<EventSection> {
       padding: EdgeInsets.symmetric(horizontal: hPad),
       child: LayoutBuilder(
         builder: (context, c) {
-          // 약 1.8장 보이도록 카드 폭 계산
-          const visible = 1.8;
-          double cardW = (c.maxWidth - gap) / visible;
+          double cardW = (c.maxWidth - gap) / visibleCards;
           cardW = cardW.clamp(minW, maxW);
 
           // 리스트 높이: 3:2 이미지 + 텍스트 여유
@@ -120,7 +119,7 @@ class _EventSectionState extends State<EventSection> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const HomeSectionHeader(title: '교육·행사 정보'),
+              HomeSectionHeader(title: '교육·행사 정보', onTap: _goEduEvent),
               SizedBox(height: 12.h),
               HomeFilterChip(selected: _filter, onChanged: _setFilter),
               SizedBox(height: 16.h),

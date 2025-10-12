@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lhens_app/common/components/report/report_list_scaffold.dart';
 import 'package:lhens_app/common/components/report/report_list_config.dart';
 import 'package:lhens_app/common/components/report/base_report_item_props.dart';
-
+import 'package:lhens_app/drawer/complaint/view/complaint_form_screen.dart';
 import 'package:lhens_app/mock/complaint/mock_complaint_models.dart';
 import 'package:lhens_app/mock/complaint/mock_complaint_data.dart';
 
@@ -39,7 +39,7 @@ class ComplaintScreen extends ConsumerWidget {
       // GoRouter에 등록 예정
       myDetailRouteName: '내 민원제안 상세',
       // 필요 없으면 null
-      formRouteName: '민원제안 작성',
+      formRouteName: ComplaintFormScreen.routeName, // '민원제안 등록'
 
       // GoRouter에 등록 예정
       load: () async => generateComplaintItems(

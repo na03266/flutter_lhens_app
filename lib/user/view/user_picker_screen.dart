@@ -45,10 +45,10 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
     super.dispose();
   }
 
-  // ===== Mock 데이터 =====
+  // mock 데이터
   List<Department> get _data => kMockDepartments;
 
-  // ===== Helper =====
+  // helper
   Department? _findDept(String name) {
     for (final d in _data) {
       if (d.name == name) return d;
@@ -173,7 +173,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
     }
   }
 
-  // ===== 검색 필터 =====
+  // 검색 필터
   List<Department> _filter(List<Department> src, String q) {
     if (q.isEmpty) return src;
     final lower = q.toLowerCase();
@@ -216,7 +216,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // 상단 검색바 (sticky + shadow)
+              // 상단 검색바
               Container(
                 decoration: BoxDecoration(
                   color: AppColors.white,
@@ -236,7 +236,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
               ),
               SizedBox(height: 16.h),
 
-              // 리스트 / 빈상태 (스크롤 상태 감지)
+              // 리스트 or 빈상태
               Expanded(
                 child: NotificationListener<ScrollNotification>(
                   onNotification: (n) {

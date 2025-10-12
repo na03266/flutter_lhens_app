@@ -6,9 +6,10 @@ import 'package:lhens_app/common/theme/app_shadows.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 
 class FabAddButton extends StatelessWidget {
-  const FabAddButton({super.key, required this.onTap});
+  const FabAddButton({super.key, required this.onTap, this.label = '등록'});
 
   final VoidCallback onTap;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,7 @@ class FabAddButton extends StatelessWidget {
             Icon(Icons.add, size: 18.w, color: AppColors.white),
             SizedBox(width: 6.w),
             Text(
-              '등록',
+              label,
               style: AppTextStyles.pb16.copyWith(color: AppColors.white),
             ),
           ],

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:lhens_app/common/components/base_list_item.dart'
     show ItemStatus;
+import 'package:lhens_app/mock/comment/mock_comment_data.dart';
 import 'package:lhens_app/mock/risk/mock_risk_models.dart';
 
 List<RiskItem> generateRiskItems(
@@ -10,7 +11,8 @@ List<RiskItem> generateRiskItems(
   String authorB = '작성자B', // 타인 글
 }) {
   final rng = Random(42);
-  const baseTitle = '신고 제목이 표시되는 영역입니다. 신고 제목이 표시되는 영역입니다. 신고 제목이 표시되는 영역입니다.';
+  const baseTitle = '신고 제목이 표시되는 영역입니다. 신고 제목이 표시되는 영역입니다.';
+  final totalComments = mockTotalCommentCount;
 
   return List<RiskItem>.generate(n, (i) {
     final status = switch (i % 3) {
@@ -28,7 +30,7 @@ List<RiskItem> generateRiskItems(
       title: baseTitle,
       author: author,
       dateText: '2025. 08. $day',
-      comments: i % 5,
+      comments: totalComments,
       secret: isSecret,
     );
   });

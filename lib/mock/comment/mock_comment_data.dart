@@ -31,3 +31,16 @@ const mockComments = <CommentModel>[
     ],
   ),
 ];
+
+// 전체 댓글 수 계산 (임시)
+int get mockTotalCommentCount {
+  int countReplies(CommentModel c) {
+    int total = 1;
+    for (final r in c.replies) {
+      total += countReplies(r);
+    }
+    return total;
+  }
+
+  return mockComments.fold<int>(0, (sum, c) => sum + countReplies(c));
+}

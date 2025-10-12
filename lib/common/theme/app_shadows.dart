@@ -27,4 +27,18 @@ class AppShadows {
       offset: const Offset(0, 4),
     ),
   ];
+
+  static List<BoxShadow> get soft => [
+    BoxShadow(
+      color: AppColors.secondary.withValues(alpha: 0.02),
+      blurRadius: 3,
+      spreadRadius: 1,
+      offset: const Offset(0, 2),
+    ),
+    BoxShadow(
+      color: AppColors.secondary.withValues(alpha: 0.01),
+      blurRadius: 5,
+      offset: const Offset(0, 4),
+    ),
+  ];
 }

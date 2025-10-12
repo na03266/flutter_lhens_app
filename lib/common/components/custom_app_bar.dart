@@ -112,9 +112,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         );
       case AppBarRightType.settings:
-        return _IconButton(
-          onTap: onRightTap ?? () {},
-          child: Assets.icons.settings.svg(width: 24.w, height: 24.w),
+        return Builder(
+          builder: (c) => _IconButton(
+            onTap: onRightTap ?? () => Scaffold.of(c).openEndDrawer(),
+            child: Assets.icons.settings.svg(width: 24.w, height: 24.w),
+          ),
         );
       case AppBarRightType.none:
         return SizedBox(width: 44.w);

@@ -4,10 +4,10 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 
 class AppSegmentedTabs extends StatelessWidget {
-  final int index; // 0 전체
+  final int index; // 0: 전체
   final ValueChanged<int> onChanged;
   final List<String> rightTabs;
-  final int? badgeCount;
+  final int? badgeCount; // 미확인 건수(전체 탭 배지)
   final double? horizontalPadding;
   final double? height;
   final double? underlineWidth;
@@ -40,6 +40,12 @@ class AppSegmentedTabs extends StatelessWidget {
       final selected = index == i;
       final base = selected ? AppTextStyles.psb15 : AppTextStyles.pm15;
 
+      final isWholeTab = i == 0;
+      final badgeVisible = showBadge && (badgeCount ?? 0) > 0 && isWholeTab;
+      final badgeActive = isWholeTab && index == 0;
+      final badgeBg = AppColors.secondary.withOpacity(badgeActive ? 1.0 : 0.35);
+      final badgeFg = AppColors.white.withOpacity(badgeActive ? 1.0 : 0.6);
+
       return Expanded(
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -56,7 +62,7 @@ class AppSegmentedTabs extends StatelessWidget {
                       color: selected ? AppColors.text : AppColors.textSec,
                     ),
                   ),
-                  if (showBadge && (badgeCount ?? 0) > 0) ...[
+                  if (badgeVisible) ...[
                     SizedBox(width: 6.w),
                     Container(
                       padding: EdgeInsets.symmetric(
@@ -64,14 +70,12 @@ class AppSegmentedTabs extends StatelessWidget {
                         vertical: 2.h,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.secondary,
+                        color: badgeBg,
                         borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Text(
                         '${badgeCount!}',
-                        style: AppTextStyles.pb12.copyWith(
-                          color: AppColors.white,
-                        ),
+                        style: AppTextStyles.pb12.copyWith(color: badgeFg),
                       ),
                     ),
                   ],
@@ -87,14 +91,12 @@ class AppSegmentedTabs extends StatelessWidget {
       height: h,
       child: Stack(
         children: [
-          // 기본선
           Positioned.fill(
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Container(height: 1, color: AppColors.border),
             ),
           ),
-          // 탭 라벨 영역
           Padding(
             padding: EdgeInsets.symmetric(horizontal: pad),
             child: Row(
@@ -105,7 +107,6 @@ class AppSegmentedTabs extends StatelessWidget {
               ],
             ),
           ),
-          // 강조선
           Positioned(
             left: ulLeft,
             bottom: 0,

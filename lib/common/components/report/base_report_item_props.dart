@@ -6,7 +6,7 @@ class ReportListItemProps {
   final String title;
   final String author;
   final String dateText;
-  final int commentCount;
+  final int? commentCount;
   final bool secret;
 
   const ReportListItemProps({
@@ -15,7 +15,7 @@ class ReportListItemProps {
     required this.title,
     required this.author,
     required this.dateText,
-    required this.commentCount,
+    this.commentCount,
     required this.secret,
   });
 }

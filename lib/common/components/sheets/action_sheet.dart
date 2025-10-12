@@ -34,7 +34,7 @@ class _Sheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(12.r);
 
-    Widget _card(Widget child) => DecoratedBox(
+    Widget card(Widget child) => DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: radius,
@@ -54,7 +54,7 @@ class _Sheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _card(
+          card(
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -80,7 +80,7 @@ class _Sheet extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8.h),
-          _card(
+          card(
             PressScale(
               onTap: () => Navigator.pop(context, null),
               child: Container(

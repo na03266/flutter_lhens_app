@@ -8,6 +8,7 @@ import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/drawer/complaint/view/complaint_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
+import 'package:lhens_app/drawer/survey/view/survey_screen.dart';
 import 'home_nav_card.dart';
 
 class GreetingSection extends StatelessWidget {
@@ -46,7 +47,9 @@ class GreetingSection extends StatelessWidget {
               child: HomeNavCard(
                 title: '설문조사',
                 imagePath: Assets.illustrations.survey.path,
-                onTap: () {},
+                onTap: () {
+                  context.pushNamed(SurveyScreen.routeName);
+                },
               ),
             ),
           ],

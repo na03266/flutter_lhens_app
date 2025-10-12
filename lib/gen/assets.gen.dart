@@ -146,9 +146,17 @@ class $AssetsIconsGen {
 class $AssetsIllustrationsGen {
   const $AssetsIllustrationsGen();
 
+  /// File path: assets/illustrations/bg_complete.png
+  AssetGenImage get bgComplete =>
+      const AssetGenImage('assets/illustrations/bg_complete.png');
+
   /// File path: assets/illustrations/complaint.png
   AssetGenImage get complaint =>
       const AssetGenImage('assets/illustrations/complaint.png');
+
+  /// File path: assets/illustrations/illust_complete.png
+  AssetGenImage get illustComplete =>
+      const AssetGenImage('assets/illustrations/illust_complete.png');
 
   /// File path: assets/illustrations/main_greeting.png
   AssetGenImage get mainGreeting =>
@@ -163,20 +171,33 @@ class $AssetsIllustrationsGen {
       const AssetGenImage('assets/illustrations/survey.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [complaint, mainGreeting, salary, survey];
+  List<AssetGenImage> get values => [
+    bgComplete,
+    complaint,
+    illustComplete,
+    mainGreeting,
+    salary,
+    survey,
+  ];
 }
 
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
+  /// File path: assets/images/chat.png
+  AssetGenImage get chat => const AssetGenImage('assets/images/chat.png');
+
   /// File path: assets/images/event.png
   AssetGenImage get event => const AssetGenImage('assets/images/event.png');
+
+  /// File path: assets/images/notice.png
+  AssetGenImage get notice => const AssetGenImage('assets/images/notice.png');
 
   /// File path: assets/images/splash.png
   AssetGenImage get splash => const AssetGenImage('assets/images/splash.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [event, splash];
+  List<AssetGenImage> get values => [chat, event, notice, splash];
 }
 
 class $AssetsLogosGen {

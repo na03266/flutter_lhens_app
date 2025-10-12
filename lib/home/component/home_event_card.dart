@@ -4,6 +4,11 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 
 class HomeEventCard extends StatelessWidget {
+  final String title;
+  final String periodText;
+  final String imagePath;
+  final VoidCallback? onTap;
+
   const HomeEventCard({
     super.key,
     required this.title,
@@ -11,11 +16,6 @@ class HomeEventCard extends StatelessWidget {
     required this.imagePath,
     this.onTap,
   });
-
-  final String title;
-  final String periodText;
-  final String imagePath;
-  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

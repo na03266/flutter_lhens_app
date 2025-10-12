@@ -13,6 +13,7 @@ import '../../risk/view/risk_screen.dart';
 import '../../chat/view/chat_screen.dart';
 import '../../manual/view/manual_screen.dart';
 import '../../home/my_page/view/my_page_screen.dart';
+import '../../chat/component/chat_settings_drawer.dart';
 
 class DefaultLayout extends ConsumerWidget {
   final Color? backgroundColor;
@@ -46,7 +47,9 @@ class DefaultLayout extends ConsumerWidget {
                       ? AppBarBottomBorder.none
                       : AppBarBottomBorder.thin,
                 ),
-          endDrawer: const CustomDrawer(),
+          endDrawer: _isChatDetail(path)
+              ? const ChatSettingsDrawer()
+              : const CustomDrawer(),
           endDrawerEnableOpenDragGesture: false,
           body: child,
           bottomNavigationBar: AppBottomNav(
@@ -67,12 +70,15 @@ class DefaultLayout extends ConsumerWidget {
       '/home/notice': '공지사항',
       '/home/salary': '급여명세서',
       '/home/complaint': '민원제안접수',
+      '/home/edu-event': '교육행사정보',
       '/home/my-page': '마이페이지',
       '/home/my-page/change-info': '정보변경',
       '/home/my-page/my-risk': '내 위험신고 내역',
       '/home/my-page/my-complaint': '내 민원제안 내역',
+      '/home/my-page/my-survey': '내 설문조사 내역',
       '/chat': '커뮤니케이션',
       '/risk': '위험신고',
+      '/survey': '설문조사',
       '/alarm': '알림',
       '/manual': '업무매뉴얼',
     };
@@ -93,18 +99,26 @@ class DefaultLayout extends ConsumerWidget {
         path.startsWith('/home/my-page/my-complaint/form')) {
       return AppBarRightType.none;
     }
+    if (path == '/chat/detail') {
+      return AppBarRightType.settings;
+    }
     return AppBarRightType.menu;
   }
+
+  bool _isChatDetail(String path) => path == '/chat/detail';
 
   // 하단 보더
   bool _shouldHideAppBarBottom(String path) {
     const exactHide = <String>{
       '/risk',
+      '/survey',
       '/alarm',
       '/home/notice',
+      '/home/edu-event',
       '/home/my-page/my-risk',
       '/home/complaint',
       '/home/my-page/my-complaint',
+      '/home/my-page/my-survey',
     };
     return exactHide.contains(path);
   }

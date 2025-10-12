@@ -8,6 +8,7 @@ class CountInline extends StatelessWidget {
   final String suffix;
   final Color? labelColor;
   final Color? countColor;
+  final bool showSuffix;
 
   const CountInline({
     super.key,
@@ -16,6 +17,7 @@ class CountInline extends StatelessWidget {
     this.suffix = '건',
     this.labelColor,
     this.countColor,
+    this.showSuffix = true,
   });
 
   @override
@@ -34,7 +36,7 @@ class CountInline extends StatelessWidget {
             text: '$count',
             style: baseStyle.copyWith(color: countColor ?? AppColors.navy),
           ),
-          if (suffix.isNotEmpty) TextSpan(text: suffix),
+          if (showSuffix && suffix.isNotEmpty) TextSpan(text: suffix),
         ],
       ),
     );

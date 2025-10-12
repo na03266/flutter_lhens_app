@@ -8,39 +8,42 @@ enum AppButtonType { primary, secondary, outlined, plain }
 
 class AppButton extends StatelessWidget {
   final String text;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final AppButtonType type;
   final double? height;
 
   const AppButton({
     super.key,
     required this.text,
-    required this.onTap,
+    this.onTap,
     this.type = AppButtonType.primary,
     this.height,
   });
 
   @override
   Widget build(BuildContext context) {
+    final enabled = onTap != null;
+
     Color bg = AppColors.white;
     Color textColor = AppColors.text;
     Color borderColor = Colors.transparent;
 
     switch (type) {
       case AppButtonType.primary:
-        bg = AppColors.primary;
+        bg = enabled ? AppColors.primary : AppColors.border;
         textColor = AppColors.white;
         break;
       case AppButtonType.secondary:
-        bg = AppColors.secondary;
+        bg = enabled ? AppColors.secondary : AppColors.border;
         textColor = AppColors.white;
         break;
       case AppButtonType.outlined:
         bg = AppColors.white;
-        textColor = AppColors.text;
-        borderColor = AppColors.secondary;
+        textColor = enabled ? AppColors.text : AppColors.placeholder;
+        borderColor = enabled ? AppColors.secondary : AppColors.border;
         break;
       case AppButtonType.plain:
+        textColor = enabled ? AppColors.text : AppColors.placeholder;
         break;
     }
 

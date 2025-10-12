@@ -137,7 +137,6 @@ class _SelectorState<G> extends State<Selector<G>> {
                   ),
                 ),
               ),
-              // 오른쪽 아이콘
               SizedBox(
                 width: 40.w,
                 height: 48.h,

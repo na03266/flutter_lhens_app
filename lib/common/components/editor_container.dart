@@ -1,14 +1,22 @@
+// lib/common/components/editor_container.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 
 class EditorContainer extends StatefulWidget {
-  final double height; // 고정 높이
+  final double height;
   final Widget child;
   final bool showCounter;
   final String? counterText;
   final EdgeInsets? contentPadding;
+
+  /// 입력/터치/드래그 차단
+  final bool locked;
+
+  /// 잠금 시 배경색/불투명도 적용 여부
+  final bool dimOnLocked;
 
   const EditorContainer({
     super.key,
@@ -17,6 +25,8 @@ class EditorContainer extends StatefulWidget {
     this.showCounter = false,
     this.counterText,
     this.contentPadding,
+    this.locked = false,
+    this.dimOnLocked = true, // 기본은 흐리게
   });
 
   @override
@@ -30,7 +40,18 @@ class _EditorContainerState extends State<EditorContainer> {
   @override
   void initState() {
     super.initState();
-    _scope = FocusScopeNode()..addListener(_onFocus);
+    _scope = FocusScopeNode(canRequestFocus: !widget.locked)
+      ..addListener(_onFocus);
+  }
+
+  @override
+  void didUpdateWidget(covariant EditorContainer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _scope.canRequestFocus = !widget.locked;
+    if (oldWidget.locked != widget.locked) {
+      ContextMenuController.removeAny();
+      if (widget.locked && _scope.hasFocus) _scope.unfocus();
+    }
   }
 
   void _onFocus() => setState(() => _focused = _scope.hasFocus);
@@ -38,6 +59,7 @@ class _EditorContainerState extends State<EditorContainer> {
   @override
   void dispose() {
     _scope.removeListener(_onFocus);
+    ContextMenuController.removeAny();
     _scope.dispose();
     super.dispose();
   }
@@ -46,39 +68,55 @@ class _EditorContainerState extends State<EditorContainer> {
   Widget build(BuildContext context) {
     final pad =
         widget.contentPadding ?? EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 4.h);
+    final showFocus = _focused && !widget.locked;
+    final borderColor = showFocus ? AppColors.primary : AppColors.border;
+
+    // 🔸 배경/불투명도 조절 가능
+    final bg = widget.dimOnLocked && widget.locked
+        ? AppColors.surface
+        : AppColors.white;
+    final opacity = widget.locked ? 0.6 : 1.0;
+
     return SizedBox(
       height: widget.height.h,
-      child: AnimatedContainer(
+      child: AnimatedOpacity(
         duration: const Duration(milliseconds: 120),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(8.r),
-          border: Border.all(
-            color: _focused ? AppColors.primary : AppColors.border,
-            width: 1,
+        opacity: opacity,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 120),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(8.r),
+            border: Border.all(color: borderColor, width: 1),
           ),
-        ),
-        child: FocusScope(
-          node: _scope,
-          child: Column(
-            children: [
-              Expanded(
-                child: Padding(padding: pad, child: widget.child),
-              ),
-              if (widget.showCounter)
-                Padding(
-                  padding: EdgeInsets.only(right: 15.w, bottom: 15.h),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      widget.counterText ?? '',
-                      style: AppTextStyles.pr13.copyWith(
-                        color: AppColors.placeholder,
-                      ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: FocusScope(
+              node: _scope,
+              child: IgnorePointer(
+                ignoring: widget.locked,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Padding(padding: pad, child: widget.child),
                     ),
-                  ),
+                    if (widget.showCounter)
+                      Padding(
+                        padding: EdgeInsets.only(right: 15.w, bottom: 15.h),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            widget.counterText ?? '',
+                            style: AppTextStyles.pr13.copyWith(
+                              color: AppColors.placeholder,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
+              ),
+            ),
           ),
         ),
       ),

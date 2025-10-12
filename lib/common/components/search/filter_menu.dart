@@ -4,6 +4,13 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 
 class FilterMenu<T> extends StatelessWidget {
+  final double width;
+  final List<T> items;
+  final T? selected;
+  final String Function(T) getLabel;
+  final ValueChanged<T> onSelected;
+  final double? maxHeight;
+
   const FilterMenu({
     super.key,
     required this.width,
@@ -13,13 +20,6 @@ class FilterMenu<T> extends StatelessWidget {
     required this.onSelected,
     this.maxHeight,
   });
-
-  final double width;
-  final List<T> items;
-  final T? selected;
-  final String Function(T) getLabel;
-  final ValueChanged<T> onSelected;
-  final double? maxHeight;
 
   @override
   Widget build(BuildContext context) {

@@ -54,7 +54,7 @@ class MyPageScreen extends StatelessWidget {
                     (
                       Assets.icons.features.surveyDoc.svg(),
                       '내 설문조사\n내역',
-                      () {},
+                      () => context.pushNamed('내 설문조사 내역'),
                     ),
                     (
                       Assets.icons.features.suggestionDoc.svg(),
