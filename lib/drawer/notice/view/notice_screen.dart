@@ -17,12 +17,11 @@ class NoticeScreen extends ConsumerWidget {
     final config = ReportListConfig<_NoticeItem>(
       tabs: const ['내부 공지사항', '외부 공지사항'],
       filters: const ['전체'],
-      emptyMessage: (tab, {required bool mineOnly}) {
-        return switch (tab) {
-          1 => '등록된 내부 공지사항이 없습니다.',
-          2 => '등록된 외부 공지사항이 없습니다.',
-          _ => '등록된 공지사항이 없습니다.',
-        };
+      // empty 문구
+      emptyMessage: (tab, {required bool mineOnly}) => switch (tab) {
+        1 => mineOnly ? '등록한 공개 제안이 없습니다.' : '등록된 공개 제안이 없습니다.',
+        2 => mineOnly ? '등록한 비공개 제안이 없습니다.' : '등록된 비공개 제안이 없습니다.',
+        _ => mineOnly ? '등록한 제안이 없습니다.' : '등록된 제안이 없습니다.',
       },
       showFab: false,
       detailRouteName: NoticeDetailScreen.routeName,

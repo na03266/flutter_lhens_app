@@ -3,15 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:lhens_app/alarm/view/alarm_screen.dart';
 import 'package:lhens_app/drawer/component/drawer_header_section.dart';
 import 'package:lhens_app/drawer/component/drawer_body_section.dart';
-import '../../common/theme/app_colors.dart';
+import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
+import 'package:lhens_app/user/view/login_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
   final bool hasNewAlarm;
 
-  const CustomDrawer({
-    super.key,
-    this.hasNewAlarm = true,
-  });
+  const CustomDrawer({super.key, this.hasNewAlarm = true});
 
   @override
   Widget build(BuildContext context) {
@@ -29,17 +28,30 @@ class CustomDrawer extends StatelessWidget {
             joinDate: '2018.01.15',
             hasNewAlarm: hasNewAlarm,
             onTapClose: () => Navigator.of(context).maybePop(),
-            onTapBell: () {
-              // 1) 드로어 닫기
+            onTapBell: () async {
               Navigator.of(context).maybePop();
-              // 2) 알림 화면으로 이동
-              Future.microtask(() => GoRouter.of(context).goNamed(AlarmScreen.routeName));
+              await Future.delayed(const Duration(milliseconds: 10));
+              if (!context.mounted) return;
+              GoRouter.of(context).goNamed(AlarmScreen.routeName);
             },
           ),
           Expanded(
             child: DrawerBodySection(
-              onLogout: () {
-                // TODO: 로그아웃 처리
+              onLogout: () async {
+                final ok = await ConfirmDialog.show(
+                  context,
+                  title: '로그아웃',
+                  message: '로그아웃 하시겠습니까?',
+                  destructive: true,
+                  confirmText: '로그아웃',
+                );
+
+                if (!context.mounted) return;
+
+                if (ok == true) {
+                  Navigator.of(context).maybePop();
+                  // TODO: authProvider.logout();
+                }
               },
             ),
           ),

@@ -16,53 +16,45 @@ class SurveyCompleteScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background image
-          Image.asset(
-            Assets.illustrations.bgComplete.path,
-            fit: BoxFit.cover,
-          ),
-
-          // Foreground content
+          // 배경
+          Image.asset(Assets.images.bgComplete4.path, fit: BoxFit.cover),
           SafeArea(
-            child: Stack(
-              children: [
-                // Top app bar spacer (DefaultLayout app bar will render above; we keep content centered)
-                // Center content
-                Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Illustration
-                        Image.asset(
-                          Assets.illustrations.illustComplete.path,
-                          width: 214.w,
-                          fit: BoxFit.contain,
-                        ),
-                        SizedBox(height: 24.h),
-                        // Title
-                        Text(
-                          '설문조사 완료',
-                          textAlign: TextAlign.center,
-                          style: AppTextStyles.jb26.copyWith(
-                            color: AppColors.white,
-                          ),
-                        ),
-                        SizedBox(height: 16.h),
-                        // Subtitle
-                        Text(
-                          '설문에 참여해주셔서 감사합니다',
-                          textAlign: TextAlign.center,
-                          style: AppTextStyles.jm18.copyWith(
-                            color: AppColors.white,
-                          ),
-                        ),
-                      ],
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 일러스트
+                    Image.asset(
+                      Assets.illustrations.illustComplete.path,
+                      width: 80.w,
+                      fit: BoxFit.contain,
                     ),
-                  ),
+                    SizedBox(height: 24.h),
+
+                    // 제목
+                    Text(
+                      '설문조사 완료',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.jb22.copyWith(
+                        color: AppColors.white,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+
+                    // 안내 문구
+                    Text(
+                      '설문에 참여해주셔서 감사합니다',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.psb15.copyWith(
+                        color: AppColors.white,
+                      ),
+                    ),
+                    SizedBox(height: 72.h),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ],

@@ -15,18 +15,17 @@ import 'package:lhens_app/drawer/survey/view/survey_detail_screen.dart';
 import 'package:lhens_app/drawer/survey/view/survey_complete_screen.dart';
 import 'package:lhens_app/drawer/edu_event/view/edu_event_screen.dart';
 import 'package:lhens_app/drawer/edu_event/view/edu_event_detail_screen.dart';
-
-import '../../alarm/view/alarm_screen.dart';
-import '../../drawer/notice/view/notice_screen.dart';
-import '../../chat/view/chat_screen.dart';
-import '../../chat/view/chat_detail_screen.dart';
-import '../../home/my_page/change_info/view/change_info_screen.dart';
-import '../../home/my_page/view/my_page_screen.dart';
-import '../../risk/view/risk_screen.dart';
-import '../../user/view/login_screen.dart';
-import '../layout/default_layout.dart';
-import '../../home/view/home_screen.dart';
-import '../view/splash_screen.dart';
+import 'package:lhens_app/alarm/view/alarm_screen.dart';
+import 'package:lhens_app/drawer/notice/view/notice_screen.dart';
+import 'package:lhens_app/chat/view/chat_screen.dart';
+import 'package:lhens_app/chat/view/chat_detail_screen.dart';
+import 'package:lhens_app/home/my_page/change_info/view/change_info_screen.dart';
+import 'package:lhens_app/home/my_page/view/my_page_screen.dart';
+import 'package:lhens_app/risk/view/risk_screen.dart';
+import 'package:lhens_app/user/view/login_screen.dart';
+import 'package:lhens_app/common/layout/default_layout.dart';
+import 'package:lhens_app/home/view/home_screen.dart';
+import 'package:lhens_app/common/view/splash_screen.dart';
 
 List<RouteBase> get routes => [
   // 네비게이션 없는 화면
@@ -74,25 +73,25 @@ List<RouteBase> get routes => [
             path: 'complaint',
             name: ComplaintScreen.routeName,
             pageBuilder: (context, state) =>
-            const NoTransitionPage(child: ComplaintScreen()),
+                const NoTransitionPage(child: ComplaintScreen()),
             routes: [
               GoRoute(
                 path: 'form',
                 name: ComplaintFormScreen.routeName, // '민원제안 작성'
                 pageBuilder: (context, state) =>
-                const NoTransitionPage(child: ComplaintFormScreen()),
+                    const NoTransitionPage(child: ComplaintFormScreen()),
               ),
               GoRoute(
                 path: 'edit',
                 name: '민원제안 수정',
                 pageBuilder: (context, state) =>
-                const NoTransitionPage(child: ComplaintFormScreen()),
+                    const NoTransitionPage(child: ComplaintFormScreen()),
               ),
               GoRoute(
                 path: 'detail',
                 name: ComplaintDetailScreen.routeName,
                 pageBuilder: (context, state) =>
-                const NoTransitionPage(child: ComplaintDetailScreen()),
+                    const NoTransitionPage(child: ComplaintDetailScreen()),
               ),
             ],
           ),
@@ -128,13 +127,13 @@ List<RouteBase> get routes => [
             path: 'my-page',
             name: MyPageScreen.routeName,
             pageBuilder: (_, __) =>
-            const NoTransitionPage(child: MyPageScreen()),
+                const NoTransitionPage(child: MyPageScreen()),
             routes: [
               GoRoute(
                 path: 'change-info',
                 name: ChangeInfoScreen.routeName,
                 pageBuilder: (_, __) =>
-                const NoTransitionPage(child: ChangeInfoScreen()),
+                    const NoTransitionPage(child: ChangeInfoScreen()),
               ),
               GoRoute(
                 path: 'my-risk',
@@ -147,13 +146,13 @@ List<RouteBase> get routes => [
                     path: 'detail',
                     name: '내 위험신고 상세',
                     pageBuilder: (_, __) =>
-                    const NoTransitionPage(child: RiskDetailScreen()),
+                        const NoTransitionPage(child: RiskDetailScreen()),
                   ),
                   GoRoute(
                     path: 'form',
                     name: '내 위험신고 수정',
                     pageBuilder: (_, __) =>
-                    const NoTransitionPage(child: RiskFormScreen()),
+                        const NoTransitionPage(child: RiskFormScreen()),
                   ),
                 ],
               ),
@@ -181,9 +180,8 @@ List<RouteBase> get routes => [
               GoRoute(
                 path: 'my-survey',
                 name: '내 설문조사 내역',
-                pageBuilder: (_, __) => const NoTransitionPage(
-                  child: SurveyScreen(mineOnly: true),
-                ),
+                pageBuilder: (_, __) =>
+                    const NoTransitionPage(child: SurveyScreen(mineOnly: true)),
               ),
             ],
           ),
@@ -207,27 +205,26 @@ List<RouteBase> get routes => [
         path: '/risk',
         name: RiskScreen.routeName,
         pageBuilder: (context, state) =>
-        const NoTransitionPage(child: RiskScreen()),
+            const NoTransitionPage(child: RiskScreen()),
         routes: [
           GoRoute(
             path: 'form', // '위험신고 등록'
             name: RiskFormScreen.routeName,
             pageBuilder: (context, state) =>
-            const NoTransitionPage(child: RiskFormScreen()),
-            routes: [
-            ],
+                const NoTransitionPage(child: RiskFormScreen()),
+            routes: [],
           ),
           GoRoute(
             path: 'edit',
             name: '위험신고 수정',
             pageBuilder: (context, state) =>
-            const NoTransitionPage(child: RiskFormScreen()),
+                const NoTransitionPage(child: RiskFormScreen()),
             routes: [
               GoRoute(
                 path: 'user-picker',
                 name: '위험신고수정-사용자선택',
                 pageBuilder: (context, state) =>
-                const NoTransitionPage(child: UserPickerScreen()),
+                    const NoTransitionPage(child: UserPickerScreen()),
               ),
             ],
           ),
@@ -236,7 +233,7 @@ List<RouteBase> get routes => [
             path: 'detail',
             name: RiskDetailScreen.routeName,
             pageBuilder: (context, state) =>
-            const NoTransitionPage(child: RiskDetailScreen()),
+                const NoTransitionPage(child: RiskDetailScreen()),
           ),
         ],
       ),

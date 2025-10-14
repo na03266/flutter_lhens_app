@@ -25,7 +25,7 @@ class HomeNavCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         height: cardHeight,
-        padding: EdgeInsets.fromLTRB(18.w, 18.w, 8.w, 8.w),
+        padding: EdgeInsets.fromLTRB(16.w, 18.w, 8.w, 8.w),
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16.r),

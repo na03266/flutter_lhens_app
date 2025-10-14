@@ -15,7 +15,7 @@ class AppColors {
   static const Color surface = Color(0xFFF5F6F7); // 카드 배경
   static const Color border = Color(0xFFE0E0E0); // 테두리
   static const Color borderStrong = Color(0xFFD9D9D9); // 강한 테두리
-  static const Color danger = Color(0xFFF6393E); // 경고
+  static const Color danger = Color(0xFFED5155); // 경고
 
   static const Color primarySoft = Color(0xFFF6FAEB); // 연두 연한 배경
   static const Color primaryText = Color(0xFF6C9C01); // 연두 텍스트

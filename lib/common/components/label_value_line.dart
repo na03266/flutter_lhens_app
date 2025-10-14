@@ -85,7 +85,7 @@ class LabelValueLine extends StatelessWidget {
     );
   }
 
-  // double: 라벨–값 2쌍을 RichText로 한 줄에 표시
+  // double: 라벨–값 2쌍을 한 줄에 표시
   Widget _buildDouble() {
     final gap = (gapBetween ?? 4).w;
     final side = (sideGap ?? 8).w;

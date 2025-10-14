@@ -1,6 +1,4 @@
-// lib/common/components/editor_container.dart
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
@@ -11,12 +9,8 @@ class EditorContainer extends StatefulWidget {
   final bool showCounter;
   final String? counterText;
   final EdgeInsets? contentPadding;
-
-  /// 입력/터치/드래그 차단
-  final bool locked;
-
-  /// 잠금 시 배경색/불투명도 적용 여부
-  final bool dimOnLocked;
+  final bool locked; // 입력/터치 차단
+  final bool dimOnLocked; // 잠금 시 톤다운 여부
 
   const EditorContainer({
     super.key,
@@ -26,7 +20,7 @@ class EditorContainer extends StatefulWidget {
     this.counterText,
     this.contentPadding,
     this.locked = false,
-    this.dimOnLocked = true, // 기본은 흐리게
+    this.dimOnLocked = true,
   });
 
   @override
@@ -71,7 +65,6 @@ class _EditorContainerState extends State<EditorContainer> {
     final showFocus = _focused && !widget.locked;
     final borderColor = showFocus ? AppColors.primary : AppColors.border;
 
-    // 🔸 배경/불투명도 조절 가능
     final bg = widget.dimOnLocked && widget.locked
         ? AppColors.surface
         : AppColors.white;

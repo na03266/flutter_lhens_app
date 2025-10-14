@@ -37,7 +37,7 @@ class AlarmListItem extends StatelessWidget {
             // 카테고리
             Text(
               category,
-              style: AppTextStyles.pb15.copyWith(
+              style: AppTextStyles.pb14.copyWith(
                 color: muted ? AppColors.placeholder : AppColors.secAccent,
               ),
             ),

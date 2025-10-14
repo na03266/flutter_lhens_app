@@ -33,6 +33,10 @@ class $AssetsIconsGen {
   SvgGenImage get checkCircle =>
       const SvgGenImage('assets/icons/check_circle.svg');
 
+  /// File path: assets/icons/check_circle_primary.svg
+  SvgGenImage get checkCirclePrimary =>
+      const SvgGenImage('assets/icons/check_circle_primary.svg');
+
   /// File path: assets/icons/checked.svg
   SvgGenImage get checked => const SvgGenImage('assets/icons/checked.svg');
 
@@ -117,6 +121,7 @@ class $AssetsIconsGen {
     bell,
     calendar,
     checkCircle,
+    checkCirclePrimary,
     checked,
     checkedSecondary,
     clip,
@@ -146,10 +151,6 @@ class $AssetsIconsGen {
 class $AssetsIllustrationsGen {
   const $AssetsIllustrationsGen();
 
-  /// File path: assets/illustrations/bg_complete.png
-  AssetGenImage get bgComplete =>
-      const AssetGenImage('assets/illustrations/bg_complete.png');
-
   /// File path: assets/illustrations/complaint.png
   AssetGenImage get complaint =>
       const AssetGenImage('assets/illustrations/complaint.png');
@@ -172,7 +173,6 @@ class $AssetsIllustrationsGen {
 
   /// List of all assets
   List<AssetGenImage> get values => [
-    bgComplete,
     complaint,
     illustComplete,
     mainGreeting,
@@ -183,6 +183,22 @@ class $AssetsIllustrationsGen {
 
 class $AssetsImagesGen {
   const $AssetsImagesGen();
+
+  /// File path: assets/images/bg_complete.png
+  AssetGenImage get bgComplete =>
+      const AssetGenImage('assets/images/bg_complete.png');
+
+  /// File path: assets/images/bg_complete2.png
+  AssetGenImage get bgComplete2 =>
+      const AssetGenImage('assets/images/bg_complete2.png');
+
+  /// File path: assets/images/bg_complete3.png
+  AssetGenImage get bgComplete3 =>
+      const AssetGenImage('assets/images/bg_complete3.png');
+
+  /// File path: assets/images/bg_complete4.png
+  AssetGenImage get bgComplete4 =>
+      const AssetGenImage('assets/images/bg_complete4.png');
 
   /// File path: assets/images/chat.png
   AssetGenImage get chat => const AssetGenImage('assets/images/chat.png');
@@ -197,7 +213,16 @@ class $AssetsImagesGen {
   AssetGenImage get splash => const AssetGenImage('assets/images/splash.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [chat, event, notice, splash];
+  List<AssetGenImage> get values => [
+    bgComplete,
+    bgComplete2,
+    bgComplete3,
+    bgComplete4,
+    chat,
+    event,
+    notice,
+    splash,
+  ];
 }
 
 class $AssetsLogosGen {

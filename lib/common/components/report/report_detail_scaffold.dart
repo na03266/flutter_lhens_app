@@ -161,13 +161,12 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
                         Container(
                           width: double.infinity,
                           padding: EdgeInsets.symmetric(
-                            horizontal: 8.w,
-                            vertical: 20.h,
+                            horizontal: 6.w,
+                            vertical: 4.h,
                           ),
                           child: DefaultTextStyle.merge(
                             style: AppTextStyles.pr16.copyWith(
                               fontSize: (16.0 * _scale).sp,
-                              color: AppColors.text,
                               height: 1.5,
                             ),
                             child: cfg.body,
@@ -185,22 +184,18 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
                           ),
                           SizedBox(height: 8.h),
                         ],
+                        SizedBox(height: 16.h),
+                        const Divider(
+                          color: AppColors.border,
+                          thickness: 1,
+                          height: 1,
+                        ),
+                        SizedBox(height: 16.h),
                       ],
                     ),
                   ),
 
                   if (cfg.showComments) ...[
-                    SizedBox(height: 24.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: const Divider(
-                        color: AppColors.border,
-                        thickness: 1,
-                        height: 1,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-
                     // 댓글
                     CommentsSection(
                       comments: mockComments,

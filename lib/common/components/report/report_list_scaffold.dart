@@ -37,14 +37,12 @@ class ReportListScaffold<T> extends ConsumerStatefulWidget {
 
 class _ReportListScaffoldState<T> extends ConsumerState<ReportListScaffold<T>> {
   final _query = TextEditingController();
-
   late String _selectedFilter;
   String _appliedQuery = '';
   int _tabIndex = 0;
   int _page = 1;
   static const int _pageSize = 10;
   bool _scrolled = false;
-
   List<T> _items = const [];
 
   @override
@@ -217,7 +215,7 @@ class _ReportListScaffoldState<T> extends ConsumerState<ReportListScaffold<T>> {
                           }
                           if (i == visible.length + 1) {
                             return Padding(
-                              padding: EdgeInsets.only(top: 12.h, bottom: 72.h),
+                              padding: EdgeInsets.only(top: 12.h, bottom: 80.h),
                               child: Center(
                                 child: PaginationBar(
                                   currentPage: _page.clamp(1, _totalPages),

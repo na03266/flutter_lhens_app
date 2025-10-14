@@ -61,7 +61,7 @@ class AppTextStyles {
     height: 1,
   );
 
-  static final TextStyle jb26 = jb18.copyWith(fontSize: 26.sp);
+  static final TextStyle jb22 = jb18.copyWith(fontSize: 22.sp);
   static final TextStyle jb14 = jb18.copyWith(fontSize: 14.sp);
 
   // Medium

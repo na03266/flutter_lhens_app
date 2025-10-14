@@ -1,17 +1,12 @@
-// lib/common/components/text_editor_adapter.dart
 import 'package:flutter/material.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
-import '../theme/app_colors.dart';
+import 'package:lhens_app/common/theme/app_colors.dart';
 
 class TextEditorAdapter extends StatelessWidget {
   final TextEditingController controller;
   final String? hint;
   final ValueChanged<String>? onChanged;
-
-  /// 입력/터치/드래그 잠금
   final bool locked;
-
-  /// 잠금 시 텍스트색까지 흐리게 할지 여부 (false면 텍스트색 유지, 불투명도만 적용)
   final bool dimOnLocked;
 
   const TextEditorAdapter({
@@ -23,7 +18,8 @@ class TextEditorAdapter extends StatelessWidget {
     this.dimOnLocked = true,
   });
 
-  Widget _noMenu(BuildContext _, EditableTextState __) => const SizedBox.shrink();
+  Widget _noMenu(BuildContext _, EditableTextState __) =>
+      const SizedBox.shrink();
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +33,9 @@ class TextEditorAdapter extends StatelessWidget {
       enableInteractiveSelection: !locked,
       contextMenuBuilder: locked ? _noMenu : null,
       showCursor: !locked,
+      cursorColor: AppColors.secondary,
+      cursorWidth: 1.4,
+      cursorHeight: 18,
       style: AppTextStyles.pr15.copyWith(
         color: locked
             ? (dimOnLocked ? AppColors.textTer : AppColors.text)

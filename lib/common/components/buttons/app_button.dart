@@ -11,6 +11,7 @@ class AppButton extends StatelessWidget {
   final VoidCallback? onTap;
   final AppButtonType type;
   final double? height;
+  final double? width;
 
   const AppButton({
     super.key,
@@ -18,6 +19,7 @@ class AppButton extends StatelessWidget {
     this.onTap,
     this.type = AppButtonType.primary,
     this.height,
+    this.width,
   });
 
   @override
@@ -50,7 +52,7 @@ class AppButton extends StatelessWidget {
     return PressScale(
       onTap: onTap,
       child: Container(
-        width: double.infinity,
+        width: width ?? double.infinity,
         height: height ?? 56.h,
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         alignment: Alignment.center,

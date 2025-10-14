@@ -38,7 +38,7 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
 
   void _submit() {
     if (newPassword.text != confirmPassword.text) {
-      _snack('새 비밀번호가 일치하지 않습니다.');
+      _snack('비밀번호가 일치하지 않습니다.');
       return;
     }
     _snack('정보가 저장되었습니다.');
@@ -93,6 +93,7 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
                         textInputAction: TextInputAction.next,
                       ),
                       SizedBox(height: 16.h),
+
                       AppTextField(
                         label: '새 비밀번호 확인',
                         controller: confirmPassword,
@@ -101,6 +102,7 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
                         onSubmitted: (_) => _submit(),
                       ),
                       SizedBox(height: 24.h),
+
                       AppTextField(
                         label: '사무전화',
                         controller: officePhone,
@@ -109,6 +111,7 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
                         showClear: true,
                       ),
                       SizedBox(height: 16.h),
+
                       AppTextField(
                         label: '휴대전화',
                         controller: mobilePhone,
@@ -117,6 +120,7 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
                         showClear: true,
                       ),
                       SizedBox(height: 16.h),
+
                       AppTextField(
                         label: '이메일',
                         controller: email,
@@ -124,12 +128,14 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
                         showClear: true,
                       ),
                       SizedBox(height: 24.h),
+
                       AppButton(
                         text: '저장',
                         onTap: _submit,
                         type: AppButtonType.secondary,
                       ),
                       SizedBox(height: 12.h),
+
                       LinkText(
                         text: '회원탈퇴',
                         textAlign: TextAlign.right,

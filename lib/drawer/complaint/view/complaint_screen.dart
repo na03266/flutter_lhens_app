@@ -1,4 +1,3 @@
-// lib/features/complaint/view/complaint_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,9 +10,9 @@ import 'package:lhens_app/mock/complaint/mock_complaint_data.dart';
 
 class ComplaintScreen extends ConsumerWidget {
   static String get routeName => '민원제안접수';
+  final bool mineOnly; // 내 민원제안 내역
+  final bool showFab; // 작성(FAB) 버튼
 
-  final bool mineOnly; // 내 글만 보기
-  final bool showFab; // 작성 버튼 노출
   const ComplaintScreen({
     super.key,
     this.mineOnly = false,
@@ -28,20 +27,36 @@ class ComplaintScreen extends ConsumerWidget {
       tabs: const ['공개', '요청(비공개)'],
       filters: const ['전체', '작성자', '유형명'],
 
-      emptyMessage: (tab, {required bool mineOnly}) => switch (tab) {
-        1 => mineOnly ? '등록한 공개 제안이 없습니다.' : '등록된 공개 제안이 없습니다.',
-        2 => mineOnly ? '등록한 비공개 제안이 없습니다.' : '등록된 비공개 제안이 없습니다.',
-        _ => mineOnly ? '등록한 제안이 없습니다.' : '등록된 제안이 없습니다.',
+      // empty 문구
+      emptyMessage: (tab, {required bool mineOnly}) {
+        if (mineOnly) {
+          switch (tab) {
+            case 1:
+              return '등록한 공개 제안이 없습니다.';
+            case 2:
+              return '등록한 비공개 제안이 없습니다.';
+            default:
+              return '등록한 제안이 없습니다.';
+          }
+        } else {
+          switch (tab) {
+            case 1:
+              return '등록된 공개 제안이 없습니다.';
+            case 2:
+              return '등록된 비공개 제안이 없습니다.';
+            default:
+              return '등록된 제안이 없습니다.';
+          }
+        }
       },
 
+      // FAB 및 라우팅 이름
       showFab: showFab,
+      formRouteName: ComplaintFormScreen.routeName,
       detailRouteName: '민원제안 상세',
-      // GoRouter에 등록 예정
       myDetailRouteName: '내 민원제안 상세',
-      // 필요 없으면 null
-      formRouteName: ComplaintFormScreen.routeName, // '민원제안 등록'
 
-      // GoRouter에 등록 예정
+      // 데이터 로드 (mock 데이터)
       load: () async => generateComplaintItems(
         40,
         secretRatio: 0.25,
@@ -49,27 +64,38 @@ class ComplaintScreen extends ConsumerWidget {
         authorB: '홍길동(1002001)',
       ),
 
-      tabPredicate: (e, tab) => switch (tab) {
-        1 => !e.secret, // 공개
-        2 => e.secret, // 비공개
-        _ => true,
+      // 탭 필터
+      tabPredicate: (e, tab) {
+        switch (tab) {
+          case 1:
+            return !e.secret; // 공개
+          case 2:
+            return e.secret; // 비공개
+          default:
+            return true; // 전체
+        }
       },
 
-      searchPredicate: (e, f, q) {
+      // 검색 필터
+      searchPredicate: (e, selected, q) {
         if (q.isEmpty) return true;
         final title = e.title.toLowerCase();
         final author = e.author.toLowerCase();
         final type = e.typeName.toLowerCase();
-        return switch (f) {
-          '작성자' => author.contains(q),
-          '유형명' => type.contains(q),
-          _ => title.contains(q) || author.contains(q) || type.contains(q),
-        };
+
+        switch (selected) {
+          case '작성자':
+            return author.contains(q);
+          case '유형명':
+            return type.contains(q);
+          default:
+            return title.contains(q) || author.contains(q) || type.contains(q);
+        }
       },
 
+      // 리스트 아이템 표시용 DTO 매핑
       mapToProps: (e) => ReportListItemProps(
         status: e.status,
-        // ItemStatus?
         typeName: e.typeName,
         title: e.title,
         author: e.author,
@@ -78,8 +104,16 @@ class ComplaintScreen extends ConsumerWidget {
         secret: e.secret,
       ),
 
+      // 내 글 필터 조건
       mineOnlyPredicate: (e) => e.author == _currentUser,
-      // onItemTap: (ctx, item) => ctx.pushNamed('민원제안 상세', extra: item),
+
+      // 상세 화면으로 데이터 전달이 필요한 경우에 사용
+      // 지정하면 기본 pushNamed 대신 이 콜백이 실행
+      //
+      // onItemTap: (ctx, item) => ctx.pushNamed(
+      //   '민원제안 상세',
+      //   extra: item, // ← API 연동 후 실제 데이터 전달
+      // ),
     );
 
     return ReportListScaffold<ComplaintItem>(

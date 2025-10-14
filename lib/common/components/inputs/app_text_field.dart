@@ -1,4 +1,3 @@
-// lib/common/components/inputs/app_text_field.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,7 +10,7 @@ class AppTextField extends StatefulWidget {
   final bool isPassword;
   final bool showClear;
   final bool locked; // 입력/터치 차단
-  final bool dimOnLocked; // 🔸 잠금 시 톤다운 여부 (배경/텍스트 or 투명도만)
+  final bool dimOnLocked; // 잠금 시 톤다운 여부
 
   final TextEditingController? controller;
   final List<TextInputFormatter>? formatters;
@@ -98,13 +97,14 @@ class _AppTextFieldState extends State<AppTextField> {
         if (widget.isPassword)
           _iconButton(
             _obscure ? Icons.visibility_off : Icons.visibility,
-                () => setState(() => _obscure = !_obscure),
+            () => setState(() => _obscure = !_obscure),
           ),
       ],
     );
   }
 
-  Widget _noMenu(BuildContext _, EditableTextState __) => const SizedBox.shrink();
+  Widget _noMenu(BuildContext _, EditableTextState __) =>
+      const SizedBox.shrink();
 
   @override
   Widget build(BuildContext context) {
@@ -113,18 +113,18 @@ class _AppTextFieldState extends State<AppTextField> {
     _focus.canRequestFocus = !locked;
 
     final hasText = _c.text.isNotEmpty;
-    final showClearNow = widget.showClear && _focus.hasFocus && hasText && !locked;
-    final borderColor =
-    (_focus.hasFocus && !locked) ? AppColors.primary : AppColors.border;
+    final showClearNow =
+        widget.showClear && _focus.hasFocus && hasText && !locked;
+    final borderColor = (_focus.hasFocus && !locked)
+        ? AppColors.primary
+        : AppColors.border;
     final hint = widget.hint ?? widget.label;
     final h = widget.height ?? 48.h;
 
-    // 🔸 배경/텍스트/투명도 조정
+    // 배경/텍스트/투명도 조정
     final bgColor = (locked && dim) ? AppColors.surface : AppColors.white;
     final textColor = (locked && dim) ? AppColors.textTer : AppColors.text;
-    final opacity = locked
-        ? (dim ? 0.6 : 0.6) // dimOnLocked=false → 투명도만 낮춤
-        : 1.0;
+    final opacity = locked ? (dim ? 0.6 : 0.6) : 1.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
