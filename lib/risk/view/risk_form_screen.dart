@@ -35,9 +35,9 @@ class RiskFormScreen extends StatelessWidget {
         showTargets: true,
         fixedTargets: const ['안전보건팀', '임의지사'],
         onPickTargets: () async {
-          final res = await context.pushNamed<UserPickResult>(
-            userPickerRouteName,
-          );
+          // 현재 위치 기준으로 상대경로 이동
+          final base = GoRouterState.of(context).matchedLocation; // /risk/form 또는 /risk/edit
+          final res = await context.push<UserPickResult>('$base/user-picker');
           if (res == null) return null;
           return (depts: res.departments, users: res.members);
         },
@@ -67,7 +67,8 @@ class RiskFormScreen extends StatelessWidget {
 
           // 페이지 닫기
           Navigator.pop(context);
-        },      ),
+        },
+      ),
     );
   }
 }

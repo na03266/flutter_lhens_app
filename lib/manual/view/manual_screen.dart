@@ -22,8 +22,7 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
 
   String _category = '전체';
   final List<String> _categories = const ['전체'];
-  String _appliedQuery = ''; // 검색 아이콘 눌러 확정된 값
-
+  String _appliedQuery = '';
   bool _scrolled = false; // 스크롤 시 검색바 하단 그림자
 
   final List<({String cat, String title})> _all = List.generate(

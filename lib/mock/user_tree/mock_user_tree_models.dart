@@ -13,7 +13,7 @@ class Employee {
 }
 
 class Team {
-  final String name;
+  final String name; // 빈 문자열("")이면 팀 헤더 숨김
   final List<Employee> members;
 
   const Team({required this.name, required this.members});

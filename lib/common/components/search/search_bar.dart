@@ -35,6 +35,8 @@ class _SearchBarState extends State<SearchBar> {
     super.dispose();
   }
 
+  void _submit() => widget.onSubmitted?.call(widget.controller.text.trim());
+
   @override
   Widget build(BuildContext context) {
     final focused = _focus.hasFocus;
@@ -42,7 +44,7 @@ class _SearchBarState extends State<SearchBar> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 120),
       height: 48.h,
-      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      padding: EdgeInsets.only(left: 16.w, right: 6.w),
       decoration: ShapeDecoration(
         color: Colors.white,
         shape: RoundedRectangleBorder(
@@ -53,38 +55,36 @@ class _SearchBarState extends State<SearchBar> {
           borderRadius: BorderRadius.circular(8.r),
         ),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              focusNode: _focus,
-              controller: widget.controller,
-              onSubmitted: widget.onSubmitted,
-              textInputAction: TextInputAction.search,
-              textAlignVertical: TextAlignVertical.center,
-              style: AppTextStyles.pr15.copyWith(color: AppColors.text),
-              cursorColor: AppColors.secondary,
-              decoration: InputDecoration(
-                hintText: widget.hintText,
-                hintStyle: AppTextStyles.pr16.copyWith(
-                  color: AppColors.placeholder,
-                ),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
+      child: TextField(
+        focusNode: _focus,
+        controller: widget.controller,
+        onSubmitted: (_) => _submit(),
+        textInputAction: TextInputAction.search,
+        textAlignVertical: TextAlignVertical.center,
+        style: AppTextStyles.pr15.copyWith(color: AppColors.text),
+        cursorColor: AppColors.secondary,
+        decoration: InputDecoration(
+          hintText: widget.hintText,
+          hintStyle: AppTextStyles.pr15.copyWith(color: AppColors.placeholder),
+          border: InputBorder.none,
+          isDense: true,
+          contentPadding: EdgeInsets.zero,
+          suffixIcon: GestureDetector(
+            onTap: _submit,
+            behavior: HitTestBehavior.opaque,
+            child: Center(
+              child: SizedBox(
+                width: 24.w,
+                height: 24.w,
+                child: Assets.icons.search.svg(),
               ),
             ),
           ),
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () =>
-                widget.onSubmitted?.call(widget.controller.text.trim()),
-            child: Padding(
-              padding: EdgeInsets.all(8.w),
-              child: Assets.icons.search.svg(width: 20.w, height: 20.w),
-            ),
+          suffixIconConstraints: BoxConstraints.tightFor(
+            width: 36.w,
+            height: 44.w,
           ),
-        ],
+        ),
       ),
     );
   }

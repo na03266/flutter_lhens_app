@@ -137,7 +137,7 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
       duration: const Duration(milliseconds: 120),
       width: double.infinity,
       height: 48.h,
-      padding: EdgeInsets.only(left: _innerLPadding),
+      padding: EdgeInsets.only(left: _innerLPadding, right: 6.w),
       decoration: ShapeDecoration(
         color: Colors.white,
         shape: RoundedRectangleBorder(
@@ -168,9 +168,7 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
                         label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.pr15.copyWith(
-                          color: AppColors.text,
-                        ),
+                        style: AppTextStyles.pr15.copyWith(),
                       ),
                     ),
                     SizedBox(width: 6.w),
@@ -200,7 +198,7 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
               cursorColor: AppColors.secondary,
               decoration: InputDecoration(
                 hintText: widget.hintText,
-                hintStyle: AppTextStyles.pr16.copyWith(
+                hintStyle: AppTextStyles.pr15.copyWith(
                   color: AppColors.placeholder,
                 ),
                 border: InputBorder.none,
@@ -218,7 +216,7 @@ class _FilterSearchBarState<T> extends State<FilterSearchBar<T>> {
                   ),
                 ),
                 suffixIconConstraints: BoxConstraints.tightFor(
-                  width: 44.w,
+                  width: 36.w,
                   height: 44.w,
                 ),
               ),

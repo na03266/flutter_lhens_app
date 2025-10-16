@@ -66,6 +66,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/download.svg
   SvgGenImage get download => const SvgGenImage('assets/icons/download.svg');
 
+  /// File path: assets/icons/edit.svg
+  SvgGenImage get edit => const SvgGenImage('assets/icons/edit.svg');
+
   /// File path: assets/icons/expand.svg
   SvgGenImage get expand => const SvgGenImage('assets/icons/expand.svg');
 
@@ -131,6 +134,7 @@ class $AssetsIconsGen {
     comment,
     document,
     download,
+    edit,
     expand,
     file,
     lock,

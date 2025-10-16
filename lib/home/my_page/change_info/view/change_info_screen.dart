@@ -20,11 +20,29 @@ class ChangeInfoScreen extends ConsumerStatefulWidget {
 }
 
 class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
+  // 초기값(서버에서 내려온 값이라 가정)
+  final _initOffice = '055-000-0000';
+  final _initMobile = '010-0000-0000';
+  final _initEmail = 'lh@test.com';
+
   final newPassword = TextEditingController();
   final confirmPassword = TextEditingController();
-  final officePhone = TextEditingController(text: '055-000-0000');
-  final mobilePhone = TextEditingController(text: '010-0000-0000');
-  final email = TextEditingController(text: 'lh@test.com');
+  final officePhone = TextEditingController();
+  final mobilePhone = TextEditingController();
+  final email = TextEditingController();
+
+  final _pwFocus = FocusNode();
+  final _pw2Focus = FocusNode();
+
+  String? _pwError; // 비번 불일치 인라인 에러
+
+  @override
+  void initState() {
+    super.initState();
+    officePhone.text = _initOffice;
+    mobilePhone.text = _initMobile;
+    email.text = _initEmail;
+  }
 
   @override
   void dispose() {
@@ -33,15 +51,48 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
     officePhone.dispose();
     mobilePhone.dispose();
     email.dispose();
+    _pwFocus.dispose();
+    _pw2Focus.dispose();
     super.dispose();
   }
 
+  // 어떤 값이라도 바뀌었는지
+  bool get _anyProfileChanged =>
+      officePhone.text != _initOffice ||
+      mobilePhone.text != _initMobile ||
+      email.text != _initEmail ||
+      newPassword.text.isNotEmpty ||
+      confirmPassword.text.isNotEmpty;
+
+  // 비번 입력 시에는 두 칸 모두 채움+일치 필요
+  bool get _passwordValid {
+    final a = newPassword.text;
+    final b = confirmPassword.text;
+    if (a.isEmpty && b.isEmpty) return true; // 비번 미변경
+    if (a.isEmpty || b.isEmpty) return false; // 하나만 입력
+    return a == b; // 둘 다 입력 시 일치
+  }
+
+  bool get _canSubmit => _anyProfileChanged && _passwordValid;
+
+  void _syncPwErrorInline() {
+    final a = newPassword.text;
+    final b = confirmPassword.text;
+    final next = (b.isEmpty) ? null : (a == b ? null : '새 비밀번호가 일치하지 않습니다.');
+    if (next != _pwError) setState(() => _pwError = next);
+  }
+
   void _submit() {
-    if (newPassword.text != confirmPassword.text) {
-      _snack('비밀번호가 일치하지 않습니다.');
+    // 최종 검증
+    if (!_passwordValid) {
+      setState(() => _pwError = '새 비밀번호가 일치하지 않습니다.');
+      _pw2Focus.requestFocus();
       return;
     }
-    _snack('정보가 저장되었습니다.');
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('정보가 저장되었습니다.')));
     if (context.canPop()) context.pop();
   }
 
@@ -55,13 +106,18 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
       message: '회원을 탈퇴하시겠습니까?',
       destructive: true,
     );
-
     if (result == true) {
-      print('회원탈퇴 확인');
-    } else {
-      print('회원탈퇴 취소');
+      // 탈퇴 처리 호출 위치
+      _snack('탈퇴 요청이 접수되었습니다.');
     }
   }
+
+  //   if (result == true) {
+  //   print('회원탈퇴 확인');
+  //   } else {
+  //   print('회원탈퇴 취소');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -86,20 +142,32 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // 비밀번호 변경은 옵션
                       AppTextField(
                         label: '새 비밀번호',
                         controller: newPassword,
+                        focusNode: _pwFocus,
                         isPassword: true,
                         textInputAction: TextInputAction.next,
+                        onChanged: (_) {
+                          _syncPwErrorInline();
+                          setState(() {}); // 버튼 갱신
+                        },
                       ),
                       SizedBox(height: 16.h),
-
                       AppTextField(
                         label: '새 비밀번호 확인',
                         controller: confirmPassword,
+                        focusNode: _pw2Focus,
                         isPassword: true,
                         textInputAction: TextInputAction.done,
+                        error: _pwError != null,
+                        errorText: _pwError,
                         onSubmitted: (_) => _submit(),
+                        onChanged: (_) {
+                          _syncPwErrorInline();
+                          setState(() {}); // 버튼 갱신
+                        },
                       ),
                       SizedBox(height: 24.h),
 
@@ -109,6 +177,7 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
                         keyboard: TextInputType.phone,
                         formatters: [TelFormatter()],
                         showClear: true,
+                        onChanged: (_) => setState(() {}),
                       ),
                       SizedBox(height: 16.h),
 
@@ -118,6 +187,7 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
                         keyboard: TextInputType.phone,
                         formatters: [TelFormatter()],
                         showClear: true,
+                        onChanged: (_) => setState(() {}),
                       ),
                       SizedBox(height: 16.h),
 
@@ -126,12 +196,13 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
                         controller: email,
                         keyboard: TextInputType.emailAddress,
                         showClear: true,
+                        onChanged: (_) => setState(() {}),
                       ),
                       SizedBox(height: 24.h),
 
                       AppButton(
                         text: '저장',
-                        onTap: _submit,
+                        onTap: _canSubmit ? _submit : null,
                         type: AppButtonType.secondary,
                       ),
                       SizedBox(height: 12.h),

@@ -5,13 +5,13 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
-/// 상태 구분 (필요한 경우만 사용)
+// 상태 구분 (필요한 경우만 사용)
 enum ItemStatus { received, processing, done }
 
 class BaseListItem extends StatelessWidget {
   final ItemStatus? status; // 상태칩 (선택)
   final String typeName; // 유형명
-  final String title; // 제목
+  final String title;
   final String author; // 작성자
   final String dateText; // 등록일
   final int? commentCount; // 댓글 수 (선택)

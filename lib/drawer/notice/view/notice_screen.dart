@@ -17,7 +17,6 @@ class NoticeScreen extends ConsumerWidget {
     final config = ReportListConfig<_NoticeItem>(
       tabs: const ['내부 공지사항', '외부 공지사항'],
       filters: const ['전체'],
-      // empty 문구
       emptyMessage: (tab, {required bool mineOnly}) => switch (tab) {
         1 => mineOnly ? '등록한 공개 제안이 없습니다.' : '등록된 공개 제안이 없습니다.',
         2 => mineOnly ? '등록한 비공개 제안이 없습니다.' : '등록된 비공개 제안이 없습니다.',

@@ -10,10 +10,12 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_shadows.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
-import 'package:lhens_app/mock/user_tree/mock_user_tree_data.dart';
 import 'package:lhens_app/mock/user_tree/mock_user_tree_models.dart';
 import 'package:lhens_app/user/component/user_tree.dart';
 import 'package:lhens_app/user/model/user_pick_result.dart';
+
+import 'package:lhens_app/mock/user_tree/mock_org_adapter.dart'
+    show kMockDepartments;
 
 class UserPickerScreen extends ConsumerStatefulWidget {
   static String get routeName => '알림 대상 선택';
@@ -25,19 +27,33 @@ class UserPickerScreen extends ConsumerStatefulWidget {
 }
 
 class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
-  // 검색어 입력 / 확정값
+  // 검색
   final _query = TextEditingController();
   String _appliedQuery = '';
 
   // 펼침/선택 상태
-  final _expandedDepts = <String>{'기획조정실'};
-  final _expandedTeams = <String>{'기획조정실/경영기획팀'};
+  final _expandedDepts = <String>{};
+  final _expandedTeams = <String>{};
   final _selDepts = <String>{};
   final _selTeams = <String>{};
   final _selectedMemberIds = <String>{};
 
-  // sticky shadow 플래그
   bool _scrolled = false;
+
+  // 데이터
+  List<Department> get _data => kMockDepartments;
+
+  // 선택 가능 여부
+  bool get _canSubmit =>
+      _selectedMemberIds.isNotEmpty ||
+      _selDepts.isNotEmpty ||
+      _selTeams.isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_data.isNotEmpty) _expandedDepts.add(_data.first.name);
+  }
 
   @override
   void dispose() {
@@ -45,10 +61,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
     super.dispose();
   }
 
-  // mock 데이터
-  List<Department> get _data => kMockDepartments;
-
-  // helper
+  // 헬퍼
   Department? _findDept(String name) {
     for (final d in _data) {
       if (d.name == name) return d;
@@ -216,7 +229,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // 상단 검색바
+              // 검색바
               Container(
                 decoration: BoxDecoration(
                   color: AppColors.white,
@@ -227,16 +240,15 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                   child: SearchBar(
                     controller: _query,
                     hintText: '검색어를 입력하세요',
-                    // 엔터/아이콘으로만 검색 확정
                     onSubmitted: (_) => setState(() {
                       _appliedQuery = _query.text.trim();
                     }),
                   ),
                 ),
               ),
-              SizedBox(height: 16.h),
+              SizedBox(height: 4.h),
 
-              // 리스트 or 빈상태
+              // 리스트
               Expanded(
                 child: NotificationListener<ScrollNotification>(
                   onNotification: (n) {
@@ -268,7 +280,6 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                       ] else ...[
                         UserTree<Department, Team, Employee>(
                           data: filtered,
-
                           // 부서
                           deptName: (d) => d.name,
                           teamsOf: (d) => d.teams,
@@ -283,7 +294,6 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                           onToggleDeptSelected: (d, v) => setState(() {
                             _applyDeptSelection(d.name, v);
                           }),
-
                           // 팀
                           teamName: (t) => t.name,
                           membersOf: (t) => t.members,
@@ -301,7 +311,6 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                           onToggleTeamSelected: (d, t, v) => setState(() {
                             _applyTeamSelection(d.name, t.name, v);
                           }),
-
                           // 멤버
                           isMemberSelected: (e) =>
                               _selectedMemberIds.contains(e.id),
@@ -316,27 +325,30 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                           memberTitle: (e) => e.name,
                           memberSubTitle: (e) => '${e.id} ${e.position}',
                         ),
-                        SizedBox(height: 32.h),
+                        SizedBox(height: 24.h),
                       ],
 
-                      // 선택 완료 버튼
+                      // 완료 버튼
                       AppButton(
                         text: '선택완료',
                         type: AppButtonType.secondary,
-                        onTap: () {
-                          final memberLabels = _selectedMemberIds
-                              .map(_employeeById)
-                              .whereType<Employee>()
-                              .map((e) => e.label)
-                              .toList();
-                          final deptNames = _selDepts.toList();
-                          context.pop<UserPickResult>(
-                            UserPickResult(
-                              departments: deptNames,
-                              members: memberLabels,
-                            ),
-                          );
-                        },
+                        onTap: _canSubmit
+                            ? () {
+                                final memberLabels = _selectedMemberIds
+                                    .map(_employeeById)
+                                    .whereType<Employee>()
+                                    .map((e) => e.label)
+                                    .toList();
+                                final deptNames = _selDepts.toList();
+
+                                context.pop<UserPickResult>(
+                                  UserPickResult(
+                                    departments: deptNames,
+                                    members: memberLabels,
+                                  ),
+                                );
+                              }
+                            : null,
                       ),
                       SizedBox(height: 24.h),
                     ],

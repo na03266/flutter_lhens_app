@@ -11,8 +11,8 @@ class AppTextField extends StatefulWidget {
   final bool showClear;
   final bool locked; // 입력/터치 차단
   final bool dimOnLocked; // 잠금 시 톤다운 여부
-
   final TextEditingController? controller;
+  final FocusNode? focusNode; // 외부 포커스 노드 허용
   final List<TextInputFormatter>? formatters;
   final TextInputType? keyboard;
   final TextInputAction? textInputAction;
@@ -21,6 +21,8 @@ class AppTextField extends StatefulWidget {
   final double? height;
   final TextAlign textAlign;
   final TextAlignVertical textAlignVertical;
+  final bool error;
+  final String? errorText;
 
   const AppTextField({
     super.key,
@@ -29,6 +31,7 @@ class AppTextField extends StatefulWidget {
     this.isPassword = false,
     this.showClear = false,
     this.controller,
+    this.focusNode,
     this.formatters,
     this.keyboard,
     this.textInputAction,
@@ -39,6 +42,8 @@ class AppTextField extends StatefulWidget {
     this.height,
     this.textAlign = TextAlign.left,
     this.textAlignVertical = TextAlignVertical.center,
+    this.error = false,
+    this.errorText,
   });
 
   @override
@@ -48,14 +53,20 @@ class AppTextField extends StatefulWidget {
 class _AppTextFieldState extends State<AppTextField> {
   late final TextEditingController _c;
   late final FocusNode _focus;
+  bool _ownController = false;
+  bool _ownFocus = false;
   bool _obscure = false;
 
   @override
   void initState() {
     super.initState();
+    _ownController = widget.controller == null;
+    _ownFocus = widget.focusNode == null;
+
     _c = widget.controller ?? TextEditingController();
-    _focus = FocusNode();
+    _focus = widget.focusNode ?? FocusNode();
     _obscure = widget.isPassword;
+
     _c.addListener(_markDirty);
     _focus.addListener(_markDirty);
   }
@@ -64,8 +75,8 @@ class _AppTextFieldState extends State<AppTextField> {
   void dispose() {
     _c.removeListener(_markDirty);
     _focus.removeListener(_markDirty);
-    if (widget.controller == null) _c.dispose();
-    _focus.dispose();
+    if (_ownController) _c.dispose();
+    if (_ownFocus) _focus.dispose();
     super.dispose();
   }
 
@@ -115,13 +126,15 @@ class _AppTextFieldState extends State<AppTextField> {
     final hasText = _c.text.isNotEmpty;
     final showClearNow =
         widget.showClear && _focus.hasFocus && hasText && !locked;
-    final borderColor = (_focus.hasFocus && !locked)
-        ? AppColors.primary
-        : AppColors.border;
+
+    final borderColor = widget.error
+        ? AppColors.danger
+        : ((_focus.hasFocus && !locked) ? AppColors.primary : AppColors.border);
+
     final hint = widget.hint ?? widget.label;
     final h = widget.height ?? 48.h;
 
-    // 배경/텍스트/투명도 조정
+    // 배경/텍스트/투명도
     final bgColor = (locked && dim) ? AppColors.surface : AppColors.white;
     final textColor = (locked && dim) ? AppColors.textTer : AppColors.text;
     final opacity = locked ? (dim ? 0.6 : 0.6) : 1.0;
@@ -132,7 +145,12 @@ class _AppTextFieldState extends State<AppTextField> {
         if (widget.label != null)
           Padding(
             padding: EdgeInsets.only(bottom: 8.h),
-            child: Text(widget.label!, style: AppTextStyles.pm14),
+            child: Text(
+              widget.label!,
+              style: AppTextStyles.pm14.copyWith(
+                color: widget.error ? AppColors.danger : null,
+              ),
+            ),
           ),
         AnimatedOpacity(
           duration: const Duration(milliseconds: 150),
@@ -187,6 +205,15 @@ class _AppTextFieldState extends State<AppTextField> {
             ),
           ),
         ),
+        // 에러 문구
+        if (widget.errorText?.isNotEmpty == true)
+          Padding(
+            padding: EdgeInsets.only(top: 6.h, left: 2.w),
+            child: Text(
+              widget.errorText!,
+              style: AppTextStyles.pr12.copyWith(color: AppColors.danger),
+            ),
+          ),
       ],
     );
   }

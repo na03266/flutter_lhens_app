@@ -5,6 +5,7 @@ import 'package:lhens_app/common/components/report/report_list_scaffold.dart';
 import 'package:lhens_app/common/components/report/report_list_config.dart';
 import 'package:lhens_app/common/components/report/base_report_item_props.dart';
 import 'package:lhens_app/drawer/complaint/view/complaint_form_screen.dart';
+import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/mock/complaint/mock_complaint_models.dart';
 import 'package:lhens_app/mock/complaint/mock_complaint_data.dart';
 
@@ -49,6 +50,7 @@ class ComplaintScreen extends ConsumerWidget {
           }
         }
       },
+      emptyIconPath: Assets.icons.features.suggestionDoc.path,
 
       // FAB 및 라우팅 이름
       showFab: showFab,
@@ -57,6 +59,7 @@ class ComplaintScreen extends ConsumerWidget {
       myDetailRouteName: '내 민원제안 상세',
 
       // 데이터 로드 (mock 데이터)
+      // load: () async => <ComplaintItem>[],
       load: () async => generateComplaintItems(
         40,
         secretRatio: 0.25,

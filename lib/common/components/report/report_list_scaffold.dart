@@ -21,13 +21,10 @@ class ReportListScaffold<T> extends ConsumerStatefulWidget {
   final ReportListConfig<T> config;
   final bool mineOnly;
 
-  final Widget Function(BuildContext context, T item)? itemBuilder;
-
   const ReportListScaffold({
     super.key,
     required this.config,
     this.mineOnly = false,
-    this.itemBuilder,
   });
 
   @override
@@ -50,7 +47,7 @@ class _ReportListScaffoldState<T> extends ConsumerState<ReportListScaffold<T>> {
     super.initState();
     assert(widget.config.filters.isNotEmpty);
     assert(
-      widget.config.mapToProps != null || widget.itemBuilder != null,
+      widget.config.mapToProps != null || widget.config.itemBuilder != null,
       'Provide either itemBuilder or mapToProps in ReportListConfig.',
     );
     _selectedFilter = widget.config.filters.first;
@@ -230,8 +227,8 @@ class _ReportListScaffoldState<T> extends ConsumerState<ReportListScaffold<T>> {
                           final item = visible[i - 1];
 
                           // 커스텀 빌더 우선
-                          if (widget.itemBuilder != null) {
-                            return widget.itemBuilder!(context, item);
+                          if (cfg.itemBuilder != null) {
+                            return cfg.itemBuilder!(context, item);
                           }
 
                           // 기본 BaseListItem

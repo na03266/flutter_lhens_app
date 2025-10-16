@@ -37,11 +37,11 @@ class AlarmListItem extends StatelessWidget {
             // 카테고리
             Text(
               category,
-              style: AppTextStyles.pb14.copyWith(
+              style: AppTextStyles.pb13.copyWith(
                 color: muted ? AppColors.placeholder : AppColors.secAccent,
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 6.h),
             // 제목
             Text(
               title,

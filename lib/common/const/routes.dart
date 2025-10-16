@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:lhens_app/chat/view/chat_name_screen.dart';
 import 'package:lhens_app/drawer/complaint/view/complaint_detail_screen.dart';
 import 'package:lhens_app/drawer/complaint/view/complaint_form_screen.dart';
 import 'package:lhens_app/drawer/complaint/view/complaint_screen.dart';
@@ -194,6 +195,24 @@ List<RouteBase> get routes => [
             const NoTransitionPage(child: ChatScreen()),
         routes: [
           GoRoute(
+            path: 'info',
+            name: ChatNameScreen.routeName,
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ChatNameScreen()),
+          ),
+          GoRoute(
+            path: 'user-picker',
+            name: '커뮤니케이션-사용자선택',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: UserPickerScreen()),
+          ),
+          GoRoute(
+            path: 'invite',
+            name: '커뮤니케이션-사용자초대',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: UserPickerScreen()),
+          ),
+          GoRoute(
             path: 'detail',
             name: ChatDetailScreen.routeName,
             pageBuilder: (context, state) =>
@@ -208,11 +227,18 @@ List<RouteBase> get routes => [
             const NoTransitionPage(child: RiskScreen()),
         routes: [
           GoRoute(
-            path: 'form', // '위험신고 등록'
+            path: 'form',
             name: RiskFormScreen.routeName,
-            pageBuilder: (context, state) =>
+            pageBuilder: (c, s) =>
                 const NoTransitionPage(child: RiskFormScreen()),
-            routes: [],
+            routes: [
+              GoRoute(
+                path: 'user-picker',
+                name: '위험신고등록-사용자선택',
+                pageBuilder: (c, s) =>
+                    const NoTransitionPage(child: UserPickerScreen()),
+              ),
+            ],
           ),
           GoRoute(
             path: 'edit',

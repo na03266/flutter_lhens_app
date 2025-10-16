@@ -54,11 +54,7 @@ class SurveyScreen extends ConsumerWidget {
         };
       },
       mineOnlyPredicate: (e) => e.participated,
-    );
 
-    return ReportListScaffold<SurveyItem>(
-      config: config,
-      mineOnly: mineOnly,
       itemBuilder: (ctx, item) => SurveyListItem(
         status: item.status,
         nameType: item.nameType,
@@ -70,5 +66,7 @@ class SurveyScreen extends ConsumerWidget {
         onTap: () => ctx.pushNamed('설문 상세'),
       ),
     );
+
+    return ReportListScaffold<SurveyItem>(config: config, mineOnly: mineOnly);
   }
 }

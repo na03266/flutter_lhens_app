@@ -15,7 +15,6 @@ class UserTree<D, T, M> extends StatelessWidget {
   final List<T> Function(D) teamsOf;
   final bool Function(D) isDeptExpanded;
   final void Function(D) onToggleDept;
-  // 부서 선택(옵션)
   final bool Function(D)? isDeptSelected;
   final void Function(D, bool)? onToggleDeptSelected;
 
@@ -24,7 +23,6 @@ class UserTree<D, T, M> extends StatelessWidget {
   final List<M> Function(T) membersOf;
   final bool Function(D, T) isTeamExpanded;
   final void Function(D, T) onToggleTeam;
-  // 팀 선택(옵션)
   final bool Function(D, T)? isTeamSelected;
   final void Function(D, T, bool)? onToggleTeamSelected;
 
@@ -42,38 +40,34 @@ class UserTree<D, T, M> extends StatelessWidget {
   const UserTree({
     super.key,
     required this.data,
-    // dept
     required this.deptName,
     required this.teamsOf,
     required this.isDeptExpanded,
     required this.onToggleDept,
     this.isDeptSelected,
     this.onToggleDeptSelected,
-    // team
     required this.teamName,
     required this.membersOf,
     required this.isTeamExpanded,
     required this.onToggleTeam,
     this.isTeamSelected,
     this.onToggleTeamSelected,
-    // member
     required this.isMemberSelected,
     required this.onToggleMember,
     this.memberTitle,
     this.memberSubTitle,
-    // spacing
-    this.gapBetweenGroups = 16,
-    this.gapDeptTeam = 3,
+    this.gapBetweenGroups = 8,
+    this.gapDeptTeam = 4,
     this.gapTeamMember = 0,
   });
 
   @override
   Widget build(BuildContext context) {
-    bool _deptSel(D d) => isDeptSelected?.call(d) ?? false;
-    void _toggleDeptSel(D d, bool v) => onToggleDeptSelected?.call(d, v);
+    bool deptSel(D d) => isDeptSelected?.call(d) ?? false;
+    void toggleDeptSel(D d, bool v) => onToggleDeptSelected?.call(d, v);
 
-    bool _teamSel(D d, T t) => isTeamSelected?.call(d, t) ?? false;
-    void _toggleTeamSel(D d, T t, bool v) => onToggleTeamSelected?.call(d, t, v);
+    bool teamSel(D d, T t) => isTeamSelected?.call(d, t) ?? false;
+    void toggleTeamSel(D d, T t, bool v) => onToggleTeamSelected?.call(d, t, v);
 
     return Column(
       children: [
@@ -81,31 +75,88 @@ class UserTree<D, T, M> extends StatelessWidget {
           _DeptTile(
             name: deptName(d),
             expanded: isDeptExpanded(d),
-            selected: _deptSel(d),
+            selected: deptSel(d),
             onToggle: () => onToggleDept(d),
-            onChanged: (v) => _toggleDeptSel(d, v),
+            onChanged: (v) => toggleDeptSel(d, v),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                for (final t in teamsOf(d)) ...[
+                for (int i = 0; i < teamsOf(d).length; i++) ...[
                   SizedBox(height: gapDeptTeam.h),
-                  _TeamTile(
-                    name: teamName(t),
-                    expanded: isTeamExpanded(d, t),
-                    selected: _teamSel(d, t),
-                    onToggle: () => onToggleTeam(d, t),
-                    onChanged: (v) => _toggleTeamSel(d, t, v),
-                    children: [
-                      for (final m in membersOf(t)) ...[
-                        SizedBox(height: gapTeamMember.h),
-                        _MemberRow(
-                          title: memberTitle?.call(m) ?? '',
-                          subtitle: memberSubTitle?.call(m) ?? '',
-                          selected: isMemberSelected(m),
-                          onChanged: (v) => onToggleMember(m, v),
+
+                  Builder(builder: (_) {
+                    final t = teamsOf(d)[i];
+                    final String tName = teamName(t).trim();
+                    final bool isDirect = tName.isEmpty;
+
+                    final bool hasNext = i < teamsOf(d).length - 1;
+                    final bool nextIsDirect = hasNext && teamName(teamsOf(d)[i + 1]).trim().isEmpty;
+
+                    // 사이트 사이 구분선, 또는 사이트 → 직접소속 전환선
+                    final bool showDividerAfterThisSite = !isDirect && hasNext;
+
+                    final List<Widget> col = [];
+
+                    if (isDirect) {
+                      // 직접소속: 헤더 없이 멤버만
+                      col.add(
+                        Padding(
+                          padding: const EdgeInsets.only(left: 26),
+                          child: Column(
+                            children: [
+                              for (final m in membersOf(t)) ...[
+                                SizedBox(height: gapTeamMember.h),
+                                _MemberRow(
+                                  title: memberTitle?.call(m) ?? '',
+                                  subtitle: memberSubTitle?.call(m) ?? '',
+                                  selected: isMemberSelected(m),
+                                  onChanged: (v) => onToggleMember(m, v),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
-                      ],
-                    ],
-                  ),
+                      );
+                      // 직접소속 아래엔 구분선 없음
+                    } else {
+                      // 사업소(팀 타일)
+                      col.add(
+                        _TeamTile(
+                          name: tName,
+                          expanded: isTeamExpanded(d, t),
+                          selected: teamSel(d, t),
+                          onToggle: () => onToggleTeam(d, t),
+                          onChanged: (v) => toggleTeamSel(d, t, v),
+                          children: [
+                            for (final m in membersOf(t)) ...[
+                              SizedBox(height: gapTeamMember.h),
+                              _MemberRow(
+                                title: memberTitle?.call(m) ?? '',
+                                subtitle: memberSubTitle?.call(m) ?? '',
+                                selected: isMemberSelected(m),
+                                onChanged: (v) => onToggleMember(m, v),
+                              ),
+                            ],
+                          ],
+                        ),
+                      );
+
+                      if (showDividerAfterThisSite) {
+                        col.add(
+                          Padding(
+                            padding: const EdgeInsets.only(left: 26, right: 12),
+                            child: Divider(
+                              height: 14,
+                              thickness: 1,
+                              color: AppColors.subtle, // 옅은 선
+                            ),
+                          ),
+                        );
+                      }
+                    }
+
+                    return Column(children: col);
+                  }),
                 ],
               ],
             ),
@@ -117,7 +168,7 @@ class UserTree<D, T, M> extends StatelessWidget {
   }
 }
 
-// ── 내부 UI ───────────────────────────────────────────────────────────────────
+// 내부 UI
 
 class _DeptTile extends StatelessWidget {
   final String name;
@@ -151,8 +202,7 @@ class _DeptTile extends StatelessWidget {
           child: Row(
             children: [
               _SquareIconBtn(expanded: expanded, onTap: onToggle),
-              SizedBox(width: 8.w),
-              // 체크박스(왼쪽, compact)
+              SizedBox(width: 6.w),
               AppCheckbox(
                 value: selected,
                 onChanged: onChanged,
@@ -161,7 +211,7 @@ class _DeptTile extends StatelessWidget {
                 spacing: 6,
                 compact: true,
               ),
-              SizedBox(width: 8.w),
+              SizedBox(width: 6.w),
               Expanded(
                 child: Text(
                   name,
@@ -205,7 +255,7 @@ class _TeamTile extends StatelessWidget {
             color: AppColors.white,
             borderRadius: BorderRadius.circular(8),
           ),
-          padding: const EdgeInsets.fromLTRB(24, 8, 12, 8),
+          padding: const EdgeInsets.fromLTRB(24, 6, 12, 6),
           child: Row(
             children: [
               _SquareIconBtn(expanded: expanded, onTap: onToggle),
@@ -252,11 +302,13 @@ class _MemberRow extends StatelessWidget {
       borderRadius: BorderRadius.circular(8),
       onTap: () => onChanged(!selected),
       child: Container(
-        decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(8)),
-        padding: const EdgeInsets.fromLTRB(48, 8, 12, 8),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.fromLTRB(48, 6, 12, 6),
         child: Row(
           children: [
-            // 체크박스 왼쪽
             AppCheckbox(
               value: selected,
               onChanged: onChanged,
@@ -284,7 +336,6 @@ class _MemberRow extends StatelessWidget {
   }
 }
 
-// 공통 토글 아이콘 버튼
 class _SquareIconBtn extends StatelessWidget {
   final bool expanded;
   final VoidCallback onTap;

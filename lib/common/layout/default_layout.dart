@@ -84,7 +84,7 @@ class DefaultLayout extends ConsumerWidget {
     };
 
     if (map.containsKey(path)) return map[path]!;
-    final candidates = map.keys.where((k) => path.startsWith('$k/')).toList()
+    final candidates = map.keys.where((k) => path.startsWith(k)).toList()
       ..sort((a, b) => b.length.compareTo(a.length));
     return candidates.isNotEmpty ? map[candidates.first]! : '';
   }
@@ -94,14 +94,20 @@ class DefaultLayout extends ConsumerWidget {
     if (path == '/home/my-page/change-info' ||
         path == '/home/salary/auth' ||
         path == '/risk/form' ||
+        path == '/risk/edit' ||
         path.startsWith('/home/my-page/my-risk/form') ||
         path == '/home/complaint/form' ||
-        path.startsWith('/home/my-page/my-complaint/form')) {
+        path == '/home/complaint/edit' ||
+        path.startsWith('/home/my-page/my-complaint/form') ||
+        path == '/user-picker' ||
+        path.endsWith('/user-picker')) {
       return AppBarRightType.none;
     }
+
     if (path == '/chat/detail') {
       return AppBarRightType.settings;
     }
+
     return AppBarRightType.menu;
   }
 

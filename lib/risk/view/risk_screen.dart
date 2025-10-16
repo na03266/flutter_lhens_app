@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lhens_app/common/components/report/report_list_scaffold.dart';
 import 'package:lhens_app/common/components/report/report_list_config.dart';
 import 'package:lhens_app/common/components/report/base_report_item_props.dart';
+import 'package:lhens_app/gen/assets.gen.dart';
 
 import 'package:lhens_app/risk/view/risk_detail_screen.dart';
 import 'package:lhens_app/risk/view/risk_form_screen.dart';
@@ -48,6 +49,10 @@ class RiskScreen extends ConsumerWidget {
           }
         }
       },
+      // 내 위험신고 내역 / 위험신고 empty 아이콘
+      emptyIconPath: mineOnly
+          ? Assets.icons.features.reportDoc.path
+          : Assets.icons.tabs.danger.path,
 
       // FAB 및 라우팅 이름
       showFab: showFab,
@@ -56,6 +61,7 @@ class RiskScreen extends ConsumerWidget {
       myDetailRouteName: '내 위험신고 상세',
 
       // 데이터 로드 (mock 데이터)
+      // load: () async => <RiskItem>[],
       load: () async => generateRiskItems(
         40,
         secretRatio: 0.25,

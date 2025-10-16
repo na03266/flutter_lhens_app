@@ -41,7 +41,7 @@ class SurveyCompleteScreen extends StatelessWidget {
                         color: AppColors.white,
                       ),
                     ),
-                    SizedBox(height: 12.h),
+                    SizedBox(height: 14.h),
 
                     // 안내 문구
                     Text(
