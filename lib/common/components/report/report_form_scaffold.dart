@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:lhens_app/common/components/buttons/app_button.dart';
-import 'package:lhens_app/common/components/editor_container.dart';
+import 'package:lhens_app/common/components/report/editor_container.dart';
 import 'package:lhens_app/common/components/inputs/app_checkbox.dart';
 import 'package:lhens_app/common/components/inputs/app_text_field.dart';
 import 'package:lhens_app/common/components/report/status_segmented.dart';
-import 'package:lhens_app/common/components/sections/attchment_section.dart';
-import 'package:lhens_app/common/components/sections/target_section.dart';
+import 'package:lhens_app/common/components/attachments/attchment_section.dart';
+import 'package:lhens_app/user/component/target_section.dart';
 import 'package:lhens_app/common/components/selector/selector.dart';
-import 'package:lhens_app/common/components/text_editor_adapter.dart';
+import 'package:lhens_app/common/components/report/text_editor_adapter.dart';
 import 'package:lhens_app/common/components/report/report_form_config.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 

@@ -13,7 +13,6 @@ class ComplaintFormScreen extends StatelessWidget {
     final state = GoRouterState.of(context);
     final isEdit = state.name == '민원제안 수정' || state.name == '내 민원제안 수정';
 
-    // 임시 초기값
     final initialType = isEdit ? '민원제안유형명' : null;
     final initialTitle = isEdit
         ? '민원 제목이 표시되는 영역입니다. 민원 제목이 표시되는 영역입니다.'
@@ -27,19 +26,19 @@ class ComplaintFormScreen extends StatelessWidget {
         contentHint: '내용',
         typeItems: const ['민원제안유형명', '민원제안유형명2', '민원제안유형명3'],
         showTargets: false,
-
         isEdit: isEdit,
         submitText: isEdit ? '저장' : '등록',
         canEditStatus: isEdit,
         canEditSecret: true,
         statusItems: const ['접수', '처리중', '완료'],
-
         initialType: initialType,
         initialTitle: initialTitle,
         initialContent: initialContent,
         initialFiles: initialFiles,
-
-        onSubmit: (_) => Navigator.pop(context),
+        onSubmit: (v) async {
+          // TODO: 저장 처리
+          Navigator.pop(context, true);
+        },
       ),
     );
   }

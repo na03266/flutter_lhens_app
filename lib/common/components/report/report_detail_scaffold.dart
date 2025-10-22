@@ -1,34 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:lhens_app/common/components/comments/comments_section.dart';
+import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
 import 'package:lhens_app/common/components/sheets/action_sheet.dart';
-import 'package:lhens_app/common/components/text_sizer.dart';
+import 'package:lhens_app/common/components/report/text_sizer.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
-
-import 'package:lhens_app/risk/component/comments_section.dart';
 import 'package:lhens_app/mock/comment/mock_comment_data.dart';
-
 import 'package:lhens_app/common/components/attachments/attachment_file_row.dart';
 import 'package:lhens_app/common/components/buttons/app_button.dart';
+import 'package:lhens_app/common/components/inputs/inline_action_field.dart';
 
 class ReportDetailConfig {
-  final String typeName; // (헤더) 유형명
-  final String title; // (헤더) 제목
-  final List<Widget> metaRows; // 메타 정보
-  final Widget body; // 본문 위젯
-  final List<String> attachments; // 첨부파일 파일명 리스트
-  final String editRouteName; // 일반 수정 라우트
-  final String? myEditRouteName; // 마이페이지 플로우 수정 라우트 (옵션)
-  final Widget Function(VoidCallback onMore)? headerBuilder; // 헤더 슬롯
-  final double? metaGap; // 메타 행 간격
+  final String typeName;
+  final String title;
+  final List<Widget> metaRows;
+  final Widget body;
+  final List<String> attachments;
+  final String editRouteName;
+  final String? myEditRouteName;
+  final Widget Function(VoidCallback onMore)? headerBuilder;
+  final double? metaGap;
 
-  // 신규 옵션
-  final bool showComments; // 댓글 표시 여부
-  final bool showBackToListButton; // 하단 "목록으로" 버튼 표시 여부
-  final String backButtonLabel; // 버튼 라벨
-  final VoidCallback? onBackToList; // 버튼 탭 핸들러
+  final bool showComments;
+  final bool showBackToListButton;
+  final String backButtonLabel;
+  final VoidCallback? onBackToList;
 
   const ReportDetailConfig({
     required this.typeName,
@@ -50,7 +48,15 @@ class ReportDetailConfig {
 class ReportDetailScaffold extends StatefulWidget {
   final ReportDetailConfig config;
 
-  const ReportDetailScaffold({super.key, required this.config});
+  // 변경: onReplyTap 콜백을 인자로 받는 빌더
+  final Widget Function(void Function(String id, String name) onReplyTap)?
+  commentsBuilder;
+
+  const ReportDetailScaffold({
+    super.key,
+    required this.config,
+    this.commentsBuilder,
+  });
 
   @override
   State<ReportDetailScaffold> createState() => _ReportDetailScaffoldState();
@@ -58,15 +64,19 @@ class ReportDetailScaffold extends StatefulWidget {
 
 class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
   final _comment = TextEditingController();
+  final _inputFocus = FocusNode();
+
+  String? _replyToId;
+  String? _replyToName;
   double _scale = 1.0;
 
   @override
   void dispose() {
     _comment.dispose();
+    _inputFocus.dispose();
     super.dispose();
   }
 
-  // 헤더 더보기 액션
   Future<void> _onMore() async {
     final sel = await showActionSheet(
       context,
@@ -83,12 +93,26 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
       final route = isMyFlow && widget.config.myEditRouteName != null
           ? widget.config.myEditRouteName!
           : widget.config.editRouteName;
-      context.pushNamed(route);
+
+      final ok = await context.pushNamed<bool>(route);
+      if (ok == true && mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('저장되었습니다.')));
+      }
       return;
     }
 
     if (sel == 'delete') {
-      if (mounted) Navigator.pop(context);
+      final ok = await ConfirmDialog.show(
+        context,
+        title: '삭제',
+        message: '이 게시글을 삭제하시겠습니까?',
+        confirmText: '삭제',
+        cancelText: '취소',
+        destructive: true,
+      );
+      if (ok == true && mounted) Navigator.pop(context);
     }
   }
 
@@ -97,6 +121,14 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
     final cfg = widget.config;
     final hpad = 16.w;
     final gap = cfg.metaGap ?? 5.h;
+
+    void handleReplyTap(String id, String name) {
+      setState(() {
+        _replyToId = id;
+        _replyToName = name;
+      });
+      _inputFocus.requestFocus();
+    }
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -109,15 +141,14 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
             child: SingleChildScrollView(
               padding: EdgeInsets.only(bottom: 24.h),
               physics: const ClampingScrollPhysics(),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SizedBox(height: 24.h),
 
-                  // 헤더
                   if (cfg.headerBuilder != null) cfg.headerBuilder!(_onMore),
 
-                  // 글자 크기 조절
                   Padding(
                     padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
                     child: Align(
@@ -130,7 +161,6 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
                   ),
                   SizedBox(height: 12.h),
 
-                  // 메타 정보
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: Container(
@@ -152,7 +182,6 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
 
                   SizedBox(height: 16.h),
 
-                  // 본문 + 첨부
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: hpad),
                     child: Column(
@@ -174,11 +203,9 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
                         ),
                         SizedBox(height: 16.h),
 
-                        // 첨부 파일
                         for (final f in cfg.attachments) ...[
                           AttachmentFileRow(
                             filename: f,
-                            // showDownloadIcon: true,
                             onPreview: () => debugPrint('미리보기: $f'),
                             onDownload: () => debugPrint('다운로드: $f'),
                           ),
@@ -195,16 +222,12 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
                     ),
                   ),
 
-                  if (cfg.showComments) ...[
-                    // 댓글
-                    CommentsSection(
-                      comments: mockComments,
-                      controller: _comment,
-                      onSend: () => setState(() => _comment.clear()),
-                    ),
-
-                    SizedBox(height: 32.h),
-                  ],
+                  if (cfg.showComments)
+                    (widget.commentsBuilder?.call(handleReplyTap) ??
+                        CommentsSection(
+                          comments: mockComments,
+                          onTapReply: handleReplyTap,
+                        )),
 
                   if (cfg.showBackToListButton) ...[
                     SizedBox(height: 16.h),
@@ -224,6 +247,75 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
           ),
         ),
       ),
+
+      bottomNavigationBar: cfg.showComments
+          ? SafeArea(
+              top: false,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  16.w,
+                  12.h,
+                  16.w,
+                  MediaQuery.of(context).viewInsets.bottom > 0 ? 8.h : 16.h,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_replyToId != null)
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 4.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.subtle,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '@$_replyToName에게 답글',
+                              style: AppTextStyles.pr12,
+                            ),
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            visualDensity: VisualDensity.compact,
+                            padding: EdgeInsets.zero,
+                            icon: Icon(
+                              Icons.close_rounded,
+                              size: 18.w,
+                              color: AppColors.textTer,
+                            ),
+                            onPressed: () => setState(() {
+                              _replyToId = null;
+                              _replyToName = null;
+                            }),
+                          ),
+                        ],
+                      ),
+                    InlineActionField(
+                      variant: InlineActionVariant.comment,
+                      controller: _comment,
+                      focusNode: _inputFocus,
+                      hint: _replyToId == null ? '댓글을 입력해주세요.' : '답글을 입력해주세요.',
+                      actionText: '등록',
+                      onAction: () {
+                        final text = _comment.text.trim();
+                        if (text.isEmpty) return;
+                        setState(() {
+                          _comment.clear();
+                          _replyToId = null;
+                          _replyToName = null;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : null,
     );
   }
 
@@ -247,11 +339,11 @@ class _NoBounceGlowBehavior extends ScrollBehavior {
     Widget child,
     ScrollableDetails details,
   ) {
-    return child; // 오버스크롤 글로우 제거
+    return child;
   }
 
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const ClampingScrollPhysics(); // 위/아래 바운스 제거
+    return const ClampingScrollPhysics();
   }
 }

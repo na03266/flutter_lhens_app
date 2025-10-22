@@ -81,7 +81,9 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
   Iterable<Employee> _employeesInDept(String dept) sync* {
     final d = _findDept(dept);
     if (d == null) return;
-    for (final t in d.teams) yield* t.members;
+    for (final t in d.teams) {
+      yield* t.members;
+    }
   }
 
   Iterable<Employee> _employeesInTeam(String dept, String team) sync* {

@@ -55,7 +55,7 @@ class ConfirmDialog extends StatelessWidget {
     return Dialog(
       elevation: 0,
       backgroundColor: Colors.white,
-      insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
+      insetPadding: EdgeInsets.symmetric(horizontal: 40.w),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       child: Padding(
         padding: EdgeInsets.only(

@@ -84,25 +84,48 @@ class UserTree<D, T, M> extends StatelessWidget {
                 for (int i = 0; i < teamsOf(d).length; i++) ...[
                   SizedBox(height: gapDeptTeam.h),
 
-                  Builder(builder: (_) {
-                    final t = teamsOf(d)[i];
-                    final String tName = teamName(t).trim();
-                    final bool isDirect = tName.isEmpty;
+                  Builder(
+                    builder: (_) {
+                      final t = teamsOf(d)[i];
+                      final String tName = teamName(t).trim();
+                      final bool isDirect = tName.isEmpty;
+                      final bool hasNext = i < teamsOf(d).length - 1;
+                      // 사이트 사이 구분선, 또는 사이트 → 직접소속 전환선
+                      final bool showDividerAfterThisSite =
+                          !isDirect && hasNext;
 
-                    final bool hasNext = i < teamsOf(d).length - 1;
-                    final bool nextIsDirect = hasNext && teamName(teamsOf(d)[i + 1]).trim().isEmpty;
+                      final List<Widget> col = [];
 
-                    // 사이트 사이 구분선, 또는 사이트 → 직접소속 전환선
-                    final bool showDividerAfterThisSite = !isDirect && hasNext;
-
-                    final List<Widget> col = [];
-
-                    if (isDirect) {
-                      // 직접소속: 헤더 없이 멤버만
-                      col.add(
-                        Padding(
-                          padding: const EdgeInsets.only(left: 26),
-                          child: Column(
+                      if (isDirect) {
+                        // 직접소속: 헤더 없이 멤버만
+                        col.add(
+                          Padding(
+                            padding: const EdgeInsets.only(left: 26),
+                            child: Column(
+                              children: [
+                                for (final m in membersOf(t)) ...[
+                                  SizedBox(height: gapTeamMember.h),
+                                  _MemberRow(
+                                    title: memberTitle?.call(m) ?? '',
+                                    subtitle: memberSubTitle?.call(m) ?? '',
+                                    selected: isMemberSelected(m),
+                                    onChanged: (v) => onToggleMember(m, v),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                        // 직접소속 아래엔 구분선 없음
+                      } else {
+                        // 사업소(팀 타일)
+                        col.add(
+                          _TeamTile(
+                            name: tName,
+                            expanded: isTeamExpanded(d, t),
+                            selected: teamSel(d, t),
+                            onToggle: () => onToggleTeam(d, t),
+                            onChanged: (v) => toggleTeamSel(d, t, v),
                             children: [
                               for (final m in membersOf(t)) ...[
                                 SizedBox(height: gapTeamMember.h),
@@ -115,48 +138,28 @@ class UserTree<D, T, M> extends StatelessWidget {
                               ],
                             ],
                           ),
-                        ),
-                      );
-                      // 직접소속 아래엔 구분선 없음
-                    } else {
-                      // 사업소(팀 타일)
-                      col.add(
-                        _TeamTile(
-                          name: tName,
-                          expanded: isTeamExpanded(d, t),
-                          selected: teamSel(d, t),
-                          onToggle: () => onToggleTeam(d, t),
-                          onChanged: (v) => toggleTeamSel(d, t, v),
-                          children: [
-                            for (final m in membersOf(t)) ...[
-                              SizedBox(height: gapTeamMember.h),
-                              _MemberRow(
-                                title: memberTitle?.call(m) ?? '',
-                                subtitle: memberSubTitle?.call(m) ?? '',
-                                selected: isMemberSelected(m),
-                                onChanged: (v) => onToggleMember(m, v),
-                              ),
-                            ],
-                          ],
-                        ),
-                      );
-
-                      if (showDividerAfterThisSite) {
-                        col.add(
-                          Padding(
-                            padding: const EdgeInsets.only(left: 26, right: 12),
-                            child: Divider(
-                              height: 14,
-                              thickness: 1,
-                              color: AppColors.subtle, // 옅은 선
-                            ),
-                          ),
                         );
-                      }
-                    }
 
-                    return Column(children: col);
-                  }),
+                        if (showDividerAfterThisSite) {
+                          col.add(
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 26,
+                                right: 12,
+                              ),
+                              child: Divider(
+                                height: 14,
+                                thickness: 1,
+                                color: AppColors.subtle, // 옅은 선
+                              ),
+                            ),
+                          );
+                        }
+                      }
+
+                      return Column(children: col);
+                    },
+                  ),
                 ],
               ],
             ),
@@ -169,7 +172,6 @@ class UserTree<D, T, M> extends StatelessWidget {
 }
 
 // 내부 UI
-
 class _DeptTile extends StatelessWidget {
   final String name;
   final bool expanded;
@@ -197,7 +199,9 @@ class _DeptTile extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: ShapeDecoration(
             color: AppColors.subtle,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
           child: Row(
             children: [
@@ -321,10 +325,20 @@ class _MemberRow extends StatelessWidget {
             Expanded(
               child: Row(
                 children: [
-                  Text(title, style: AppTextStyles.psb16.copyWith(color: AppColors.textSec)),
+                  Text(
+                    title,
+                    style: AppTextStyles.psb16.copyWith(
+                      color: AppColors.textSec,
+                    ),
+                  ),
                   if (subtitle.isNotEmpty) ...[
                     SizedBox(width: 8.w),
-                    Text(subtitle, style: AppTextStyles.pm16.copyWith(color: AppColors.textSec)),
+                    Text(
+                      subtitle,
+                      style: AppTextStyles.pm16.copyWith(
+                        color: AppColors.textSec,
+                      ),
+                    ),
                   ],
                 ],
               ),

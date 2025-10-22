@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:lhens_app/common/components/base_list_item.dart'
+import 'package:lhens_app/common/components/report/base_list_item.dart'
     show ItemStatus;
 import 'package:lhens_app/mock/complaint/mock_complaint_models.dart';
 

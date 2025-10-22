@@ -1,36 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lhens_app/common/components/user_avatar.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
-import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/mock/comment/mock_comment_models.dart';
 import 'reply_tile.dart';
 
 class CommentTile extends StatelessWidget {
   final CommentModel comment;
-  final VoidCallback? onTapDelete;
-  final VoidCallback? onTapReply;
+  final void Function(String id, String name)? onTapReply;
+  final bool Function(CommentModel c)? canDeleteOf;
+  final bool Function(CommentModel c)? deletingOf;
+  final void Function(CommentModel c)? onRequestDelete;
 
   const CommentTile({
     super.key,
     required this.comment,
-    this.onTapDelete,
     this.onTapReply,
+    this.canDeleteOf,
+    this.deletingOf,
+    this.onRequestDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    final avatar = Container(
-      width: 36.w,
-      height: 36.w,
-      decoration: BoxDecoration(
-        color: AppColors.border,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Center(
-        child: Assets.icons.user.svg(width: 20.w, height: 20.w),
-      ),
-    );
+    final canDeleteMe = canDeleteOf?.call(comment) ?? false;
+    final deletingMe = deletingOf?.call(comment) ?? false;
+
+    Widget? deleteBtn;
+    if (canDeleteMe) {
+      deleteBtn = GestureDetector(
+        onTap: deletingMe ? null : () => onRequestDelete?.call(comment),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+          child: deletingMe
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    strokeCap: StrokeCap.round,
+                    valueColor: AlwaysStoppedAnimation(AppColors.subtle),
+                  ),
+                )
+              : Text(
+                  '삭제',
+                  style: AppTextStyles.pr14.copyWith(color: AppColors.textTer),
+                ),
+        ),
+      );
+    }
 
     return Container(
       decoration: const BoxDecoration(
@@ -39,12 +58,13 @@ class CommentTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 상위 댓글 헤더
           Padding(
             padding: EdgeInsets.only(top: 16.h, right: 6.w, bottom: 16.h),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                avatar,
+                const UserAvatar(size: 36, iconSize: 20),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Column(
@@ -60,22 +80,7 @@ class CommentTile extends StatelessWidget {
                               ),
                             ),
                           ),
-                          GestureDetector(
-                            onTap: onTapDelete,
-                            behavior: HitTestBehavior.opaque,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 4.w,
-                                vertical: 2.h,
-                              ),
-                              child: Text(
-                                '삭제',
-                                style: AppTextStyles.pr14.copyWith(
-                                  color: AppColors.textTer,
-                                ),
-                              ),
-                            ),
-                          ),
+                          if (deleteBtn != null) deleteBtn,
                         ],
                       ),
                       SizedBox(height: 6.h),
@@ -97,8 +102,8 @@ class CommentTile extends StatelessWidget {
                           ),
                           SizedBox(width: 8.w),
                           GestureDetector(
-                            onTap: onTapReply,
-                            behavior: HitTestBehavior.opaque,
+                            onTap: () =>
+                                onTapReply?.call(comment.id, comment.user),
                             child: Padding(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 4.w,
@@ -121,6 +126,7 @@ class CommentTile extends StatelessWidget {
             ),
           ),
 
+          // 대댓글 영역
           if (comment.hasReplies)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,7 +134,13 @@ class CommentTile extends StatelessWidget {
                 for (final r in comment.replies)
                   Padding(
                     padding: EdgeInsets.only(left: 32.w),
-                    child: ReplyTile(comment: r),
+                    child: ReplyTile(
+                      comment: r,
+                      canDelete: canDeleteOf?.call(r) ?? false,
+                      deleting: deletingOf?.call(r) ?? false,
+                      onRequestDelete: () => onRequestDelete?.call(r),
+                      onTapReply: () => onTapReply?.call(r.id, r.user),
+                    ),
                   ),
               ],
             ),

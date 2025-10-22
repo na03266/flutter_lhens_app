@@ -17,7 +17,7 @@ class SurveyCompleteScreen extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           // 배경
-          Image.asset(Assets.images.bgComplete4.path, fit: BoxFit.cover),
+          Image.asset(Assets.images.bgComplete.path, fit: BoxFit.cover),
           SafeArea(
             child: Center(
               child: Padding(
@@ -28,10 +28,10 @@ class SurveyCompleteScreen extends StatelessWidget {
                     // 일러스트
                     Image.asset(
                       Assets.illustrations.illustComplete.path,
-                      width: 80.w,
+                      width: 100.w,
                       fit: BoxFit.contain,
                     ),
-                    SizedBox(height: 24.h),
+                    SizedBox(height: 32.h),
 
                     // 제목
                     Text(
@@ -41,11 +41,11 @@ class SurveyCompleteScreen extends StatelessWidget {
                         color: AppColors.white,
                       ),
                     ),
-                    SizedBox(height: 14.h),
+                    SizedBox(height: 16.h),
 
                     // 안내 문구
                     Text(
-                      '설문에 참여해주셔서 감사합니다',
+                      '설문에 참여해주셔서 감사합니다.',
                       textAlign: TextAlign.center,
                       style: AppTextStyles.psb15.copyWith(
                         color: AppColors.white,

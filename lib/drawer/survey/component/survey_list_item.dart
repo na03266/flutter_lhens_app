@@ -31,9 +31,13 @@ class SurveyListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 진행 상태 칩 타입 및 라벨 설정
     final statusType = status == SurveyStatus.ongoing
         ? StatusChipType.processing
         : StatusChipType.done;
+    final statusLabel = status == SurveyStatus.ongoing ? '진행중' : '마감';
+
+    // 이름 공개 여부 칩
     final nameTypeChip = nameType == SurveyNameType.realname
         ? StatusChipType.realname
         : StatusChipType.anonymous;
@@ -49,10 +53,10 @@ class SurveyListItem extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 상단 칩
+            // 상단 칩 영역
             Row(
               children: [
-                StatusChip(type: statusType),
+                StatusChip(type: statusType, text: statusLabel),
                 SizedBox(width: 8.w),
                 StatusChip(type: nameTypeChip),
                 const Spacer(),
@@ -90,7 +94,7 @@ class SurveyListItem extends StatelessWidget {
             ),
             SizedBox(height: 12.h),
 
-            // 대상 / 작성자 + 참여여부
+            // 대상 / 작성자 / 참여여부
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [

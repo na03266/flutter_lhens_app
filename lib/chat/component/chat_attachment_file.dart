@@ -6,13 +6,13 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
-class AttachmentFileRow extends StatelessWidget {
+class ChatAttachmentFile extends StatelessWidget {
   final String filename;
-  final VoidCallback? onPreview; // 미리보기
-  final VoidCallback? onDownload; // 다운로드
-  final bool showDownloadIcon; // 아이콘 표시
+  final VoidCallback? onPreview;
+  final VoidCallback? onDownload;
+  final bool showDownloadIcon;
 
-  const AttachmentFileRow({
+  const ChatAttachmentFile({
     super.key,
     required this.filename,
     this.onPreview,
@@ -21,7 +21,6 @@ class AttachmentFileRow extends StatelessWidget {
   });
 
   Future<void> _handleTap(BuildContext context) async {
-    // 둘 다 있으면 액션시트
     if (onPreview != null && onDownload != null) {
       final sel = await showActionSheet(
         context,
@@ -32,32 +31,41 @@ class AttachmentFileRow extends StatelessWidget {
       );
       if (sel == 'preview') onPreview?.call();
       if (sel == 'download') onDownload?.call();
-      return;
+    } else {
+      (onPreview ?? onDownload)?.call();
     }
-    // 하나만 있으면 해당 동작
-    (onPreview ?? onDownload)?.call();
   }
 
   @override
   Widget build(BuildContext context) {
+    final clickable = (onPreview != null) || (onDownload != null);
+
     final row = Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
-          width: 24.w,
-          height: 24.w,
-          child: Assets.icons.clip.svg(width: 20.w, height: 20.w),
+          width: 22.w,
+          height: 22.w,
+          child: Assets.icons.clip.svg(width: 18.w, height: 18.w),
         ),
         SizedBox(width: 6.w),
-        Expanded(
+        Flexible(
+          fit: FlexFit.loose,
           child: Text(
             filename,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.pm14.copyWith(color: AppColors.text),
+            textAlign: TextAlign.left,
+            textWidthBasis: TextWidthBasis.parent,
+            style: AppTextStyles.pr14.copyWith(
+              height: 1.35,
+              color: AppColors.text,
+            ),
           ),
         ),
         if (showDownloadIcon) ...[
-          SizedBox(width: 8.w),
+          SizedBox(width: 6.w),
           Assets.icons.download.svg(
             width: 18.w,
             height: 18.w,
@@ -70,17 +78,35 @@ class AttachmentFileRow extends StatelessWidget {
       ],
     );
 
-    final hasAnyAction = (onPreview != null) || (onDownload != null);
+    final content = clickable
+        ? GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => _handleTap(context),
+            child: row,
+          )
+        : row;
 
-    return AttachSurface(
-      minHeight: 48,
-      child: hasAnyAction
-          ? GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => _handleTap(context),
-              child: row,
-            )
-          : row,
+    return LayoutBuilder(
+      builder: (context, c) {
+        final cap = 294.w;
+        final max = c.maxWidth.isFinite
+            ? (c.maxWidth < cap ? c.maxWidth : cap)
+            : cap;
+
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: max),
+          child: AttachSurface(
+            minHeight: 44,
+            padding: EdgeInsets.only(
+              left: 8.w,
+              right: 16.w,
+              top: 6.h,
+              bottom: 6.h,
+            ),
+            child: content,
+          ),
+        );
+      },
     );
   }
 }

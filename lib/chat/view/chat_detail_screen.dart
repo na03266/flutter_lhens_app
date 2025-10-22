@@ -1,34 +1,108 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lhens_app/common/theme/app_colors.dart';
-import 'package:lhens_app/common/theme/app_text_styles.dart';
-import 'package:lhens_app/gen/assets.gen.dart';
+import 'package:lhens_app/chat/component/chat_input_bar.dart';
+import 'package:lhens_app/chat/component/chat_message_bubble.dart';
+import 'package:lhens_app/chat/component/chat_message_group.dart';
+import 'package:lhens_app/chat/component/chat_upload_bubbles.dart';
 import 'package:lhens_app/common/components/sheets/action_sheet.dart';
+import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
+import 'package:lhens_app/common/theme/app_colors.dart';
 
-class ChatDetailScreen extends StatefulWidget {
+class ChatDetailScreen extends ConsumerStatefulWidget {
   static String get routeName => '커뮤니케이션 상세';
 
   const ChatDetailScreen({super.key});
 
   @override
-  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
+  ConsumerState<ChatDetailScreen> createState() => _ChatDetailScreenState();
 }
 
-class _ChatDetailScreenState extends State<ChatDetailScreen> {
+class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
+  final _controller = TextEditingController();
+  final _scroll = ScrollController();
+  final List<_GroupData> _groups = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _seedDemo();
+  }
+
+  void _seedDemo() {
+    _groups
+      ..add(
+        _GroupData(
+          side: ChatMessageSide.left,
+          userName: 'LH E&S 기획팀',
+          messages: [
+            _MsgData.text('댓글 내용\n예시입니다.', read: 2),
+            _MsgData.text('ㅋㅋㅋㅋㅋㅋㅋ', read: 2),
+            _MsgData.text(
+              '댓글 예시 테스트중입니다. 문장이 길어질 경우',
+              time: '오후 03:15',
+              read: 2,
+            ),
+          ],
+        ),
+      )
+      ..add(
+        _GroupData(
+          side: ChatMessageSide.right,
+          messages: [
+            _MsgData.text('ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ', read: 1),
+            _MsgData.text('ㅋㅋㅋㅋㅋㅋㅋ', read: 1),
+            _MsgData.text('ㅎ', time: '오후 03:15', read: 1),
+          ],
+        ),
+      )
+      ..add(
+        _GroupData(
+          side: ChatMessageSide.left,
+          userName: 'LH E&S 기획팀',
+          messages: [
+            _MsgData.image(time: '오후 03:18', read: 1),
+            _MsgData.file('파일이름이길어질경우테스트중.pdf', time: '오후 03:20', read: 1),
+          ],
+        ),
+      )
+      ..add(
+        _GroupData(
+          side: ChatMessageSide.right,
+          messages: [
+            _MsgData.uploadImage(
+              localThumbPath: 'assets/images/chat.png',
+              progress: 0.72,
+            ),
+            _MsgData.uploadFile('업로드중_파일.pdf', progress: 0.3),
+            _MsgData.uploadFile('업로드_실패파일이름명테스트.pdf', failed: true),
+            _MsgData.uploadImage(
+              localThumbPath: 'assets/images/bg_complete.png',
+              failed: true,
+            ),
+            _MsgData.uploadText('전송 실패 텍스트 메시지 예시입니다.', failed: true),
+            _MsgData.uploadText('전송 중 텍스트 메시지 예시입니다.', progress: 0.4),
+          ],
+        ),
+      );
+  }
+
+  // 중복 제거 로직 공통화
+  void _removeMsg(_GroupData g, _MsgData msg, int gi) {
+    setState(() {
+      g.messages.remove(msg);
+      if (g.messages.isEmpty) _groups.removeAt(gi);
+    });
+  }
+
   Future<void> _showAttachSheet() async {
     final sel = await showActionSheet(
       context,
-      actions: [
-        ActionItem('photo', '사진 선택'),
-        ActionItem('file', '파일 선택'),
-      ],
+      actions: [ActionItem('photo', '사진 선택'), ActionItem('file', '파일 선택')],
     );
     if (!mounted || sel == null) return;
-    // TODO: hook image/file pickers if needed. For now, just log.
     debugPrint('[CHAT_ATTACH] selected: $sel');
   }
-  final _controller = TextEditingController();
-  final _scroll = ScrollController();
 
   @override
   void dispose() {
@@ -37,368 +111,276 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     super.dispose();
   }
 
+  Future<bool> _confirmDelete() async {
+    final key = await showActionSheet(
+      context,
+      actions: [ActionItem('delete', '메시지 삭제', destructive: true)],
+      cancelText: '취소',
+    );
+    if (!mounted || key != 'delete') return false;
+
+    final ok = await ConfirmDialog.show(
+      context,
+      title: '삭제',
+      message: '이 메시지를\n모두에게서 삭제하시겠습니까?',
+      destructive: true,
+    );
+    if (!mounted) return false;
+    return ok == true;
+  }
+
+  Future<bool> _confirmCancelSend() async {
+    final ok = await ConfirmDialog.show(
+      context,
+      title: '전송 취소',
+      message: '전송을 취소하시겠습니까?',
+      destructive: true,
+    );
+    return ok == true;
+  }
+
+  void _onFilePreview(String name) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('미리보기 선택됨: $name')));
+  }
+
+  Future<void> _onFileDownload(String name) async {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('다운로드 선택됨: $name')));
+  }
+
+  Widget _wrapDeletable({
+    required Widget child,
+    required VoidCallback onDelete,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onLongPress: () async {
+        final go = await _confirmDelete();
+        if (!mounted || !go) return;
+        setState(onDelete);
+      },
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final hpad = 16.w;
 
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              controller: _scroll,
-              physics: const ClampingScrollPhysics(),
-              padding: EdgeInsets.fromLTRB(hpad, 16.h, hpad, 16.h),
-              children: [
-                // 왼쪽(상대) 묶음
-                _LeftMessageGroup(
-                  userName: 'LH E&S 기획팀',
-                  messages: const [
-                    _Msg.text('댓글 내용\n예시입니다.'),
-                    _Msg.text('ㅋㅋㅋㅋㅋㅋㅋ'),
-                    _Msg.text('ㅎ', time: '오후 03:15'),
-                  ],
-                ),
-                SizedBox(height: 16.h),
-                // 오른쪽(나) 묶음
-                _RightMessageGroup(
-                  messages: const [
-                    _Msg.text('ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'),
-                    _Msg.text('ㅋㅋㅋㅋㅋㅋㅋ'),
-                    _Msg.text('ㅎ', time: '오후 03:15'),
-                  ],
-                ),
-                SizedBox(height: 16.h),
-                // 왼쪽 이미지 + 파일 예시
-                _LeftMessageGroup(
-                  userName: 'LH E&S 기획팀',
-                  messages: const [
-                    _Msg.image('https://placehold.co/182x152', time: '오후 03:18'),
-                    _Msg.file('파일예시.pdf', time: '오후 03:20'),
-                  ],
-                ),
-              ],
-            ),
-          ),
+    final items = <Widget>[];
+    for (int gi = 0; gi < _groups.length; gi++) {
+      final g = _groups[gi];
 
-          // 입력 바 (키보드 위 고정)
-          _InputBar(
-            controller: _controller,
-            onSend: () {
-              _controller.clear();
-            },
-            onAttach: _showAttachSheet,
+      final msgWidgets = <Widget>[];
+      for (int mi = 0; mi < g.messages.length; mi++) {
+        final m = g.messages[mi];
+
+        final bubble = switch (m.kind) {
+          _MsgKind.text => ChatMessageBubble(
+            type: ChatMessageType.text,
+            side: g.side,
+            text: m.text,
+            time: m.time,
+            readCount: m.read,
           ),
-        ],
+          _MsgKind.image => ChatMessageBubble(
+            type: ChatMessageType.image,
+            side: g.side,
+            time: m.time,
+            readCount: m.read,
+          ),
+          _MsgKind.file => ChatMessageBubble(
+            type: ChatMessageType.file,
+            side: g.side,
+            fileName: m.text,
+            time: m.time,
+            readCount: m.read,
+            onFilePreview: () => _onFilePreview(m.text!),
+            onFileDownload: () => _onFileDownload(m.text!),
+          ),
+          _MsgKind.uploadImage => (() {
+            final msgRef = m;
+            return UploadImageMessage(
+              localThumbPath: m.text ?? 'assets/images/chat.png',
+              state: m.failed == true
+                  ? UploadState.failed
+                  : UploadState.uploading,
+              progress: m.progress,
+              onCancel: () async {
+                final go = await _confirmCancelSend();
+                if (!mounted || !go) return;
+                _removeMsg(g, msgRef, gi);
+              },
+              onRetry: () {
+                // TODO: 재업로드 로직
+              },
+            );
+          })(),
+          _MsgKind.uploadFile => (() {
+            final msgRef = m;
+            return UploadFileMessage(
+              fileName: m.text ?? '파일',
+              state: m.failed == true
+                  ? UploadState.failed
+                  : UploadState.uploading,
+              progress: m.progress,
+              onCancel: () async {
+                final go = await _confirmCancelSend();
+                if (!mounted || !go) return;
+                _removeMsg(g, msgRef, gi);
+              },
+              onRetry: () {
+                // TODO: 재업로드 로직
+              },
+            );
+          })(),
+          _MsgKind.uploadText => (() {
+            final msgRef = m;
+            return UploadTextMessage(
+              text: m.text ?? '',
+              state: m.failed == true
+                  ? UploadState.failed
+                  : UploadState.uploading,
+              onCancel: () async {
+                final go = await _confirmCancelSend();
+                if (!mounted || !go) return;
+                _removeMsg(g, msgRef, gi);
+              },
+              onRetry: () {
+                // TODO: 텍스트 재전송 로직
+              },
+            );
+          })(),
+        };
+
+        msgWidgets.add(
+          _wrapDeletable(
+            child: bubble,
+            onDelete: () {
+              g.messages.removeAt(mi);
+              if (g.messages.isEmpty) _groups.removeAt(gi);
+            },
+          ),
+        );
+      }
+
+      items.add(
+        ChatMessageGroup(
+          side: g.side,
+          userName: g.userName,
+          messages: msgWidgets,
+        ),
+      );
+      if (gi != _groups.length - 1) items.add(SizedBox(height: 16.h));
+    }
+
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: AppColors.bg,
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: AnimatedPadding(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(context).bottom,
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  controller: _scroll,
+                  reverse: true,
+                  physics: const ClampingScrollPhysics(),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: EdgeInsets.fromLTRB(hpad, 16.h, hpad, 16.h),
+                  children: items.reversed.toList(),
+                ),
+              ),
+              ChatInputBar(
+                controller: _controller,
+                onSend: () => _controller.clear(),
+                onAttach: _showAttachSheet,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-class _InputBar extends StatelessWidget {
-  final TextEditingController controller;
-  final VoidCallback onSend;
-  final VoidCallback onAttach;
+enum _MsgKind { text, image, file, uploadImage, uploadFile, uploadText }
 
-  const _InputBar({
-    required this.controller,
-    required this.onSend,
-    required this.onAttach,
+class _MsgData {
+  final _MsgKind kind;
+  final String? text;
+  final String? time;
+  final int? read;
+  final double? progress;
+  final bool? failed;
+
+  _MsgData._(
+    this.kind, {
+    this.text,
+    this.time,
+    this.read,
+    this.progress,
+    this.failed,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+  factory _MsgData.text(String t, {String? time, int? read}) =>
+      _MsgData._(_MsgKind.text, text: t, time: time, read: read);
 
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: EdgeInsets.only(bottom: bottomInset > 0 ? 0 : 0),
-        child: Container(
-          color: AppColors.white,
-          padding: EdgeInsets.fromLTRB(16.w, 8.h, 8.w, 8.h),
-          child: Row(
-            children: [
-              // 첨부 버튼 스타일 사각형
-              _SquareIconButton(
-                onTap: onAttach,
-                child: Assets.icons.clip.svg(width: 20.w, height: 20.w,
-                    colorFilter: const ColorFilter.mode(AppColors.text, BlendMode.srcIn)),
-              ),
-              SizedBox(width: 8.w),
-              Expanded(
-                child: Container(
-                  height: 48.h,
-                  padding: EdgeInsets.symmetric(horizontal: 12.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    border: Border.all(color: AppColors.border, width: 1),
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  alignment: Alignment.centerLeft,
-                  child: TextField(
-                    controller: controller,
-                    textInputAction: TextInputAction.send,
-                    onSubmitted: (_) => onSend(),
-                    decoration: InputDecoration(
-                      hintText: '메세지를 입력하세요',
-                      hintStyle: AppTextStyles.pm14.copyWith(color: AppColors.placeholder),
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    style: AppTextStyles.pm14.copyWith(color: AppColors.text),
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              // 전송 버튼 (연두톤 연한 배경)
-              _SquareIconButton(
-                onTap: onSend,
-                bg: const Color(0x1990C31E),
-                child: Icon(Icons.send, size: 18.w, color: AppColors.secondary),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+  factory _MsgData.image({String? time, int? read}) =>
+      _MsgData._(_MsgKind.image, time: time, read: read);
 
-class _SquareIconButton extends StatelessWidget {
-  final Widget child;
-  final VoidCallback onTap;
-  final Color? bg;
+  factory _MsgData.file(String name, {String? time, int? read}) =>
+      _MsgData._(_MsgKind.file, text: name, time: time, read: read);
 
-  const _SquareIconButton({required this.child, required this.onTap, this.bg});
+  factory _MsgData.uploadImage({
+    required String localThumbPath,
+    double? progress,
+    bool failed = false,
+  }) => _MsgData._(
+    _MsgKind.uploadImage,
+    text: localThumbPath,
+    progress: progress,
+    failed: failed,
+  );
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Container(
-        width: 32.w,
-        height: 32.w,
-        decoration: BoxDecoration(
-          color: bg ?? AppColors.subtle,
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-        child: Center(child: child),
-      ),
-    );
-  }
-}
+  factory _MsgData.uploadFile(
+    String name, {
+    double? progress,
+    bool failed = false,
+  }) => _MsgData._(
+    _MsgKind.uploadFile,
+    text: name,
+    progress: progress,
+    failed: failed,
+  );
 
-class _LeftMessageGroup extends StatelessWidget {
-  final String userName;
-  final List<_Msg> messages;
-
-  const _LeftMessageGroup({required this.userName, required this.messages});
-
-  @override
-  Widget build(BuildContext context) {
-    final avatar = Container(
-      width: 37.w,
-      height: 37.w,
-      decoration: BoxDecoration(
-        color: AppColors.border,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Center(
-        child: Assets.icons.user.svg(width: 20.w, height: 20.w),
-      ),
-    );
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        avatar,
-        SizedBox(width: 12.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(userName,
-                  style: AppTextStyles.pm14.copyWith(color: AppColors.text)),
-              SizedBox(height: 12.h),
-              for (final m in messages) ...[
-                _LeftBubble(msg: m),
-                SizedBox(height: 12.h),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _RightMessageGroup extends StatelessWidget {
-  final List<_Msg> messages;
-  const _RightMessageGroup({required this.messages});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 294.w,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              for (final m in messages) ...[
-                _RightBubble(msg: m),
-                SizedBox(height: 12.h),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _LeftBubble extends StatelessWidget {
-  final _Msg msg;
-  const _LeftBubble({required this.msg});
-
-  @override
-  Widget build(BuildContext context) {
-    Widget bubble;
-    if (msg.type == _MsgType.text) {
-      bubble = _textBubble(msg.text!, AppColors.white);
-    } else if (msg.type == _MsgType.image) {
-      bubble = _imageBubble(msg.imageUrl!);
-    } else {
-      bubble = _fileBubble(msg.fileName!);
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Flexible(child: bubble),
-        if (msg.time != null) ...[
-          SizedBox(width: 8.w),
-          Text(
-            msg.time!,
-            style: AppTextStyles.pr12.copyWith(color: AppColors.textTer),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-class _RightBubble extends StatelessWidget {
-  final _Msg msg;
-  const _RightBubble({required this.msg});
-
-  @override
-  Widget build(BuildContext context) {
-    Widget bubble;
-    if (msg.type == _MsgType.text) {
-      bubble = _textBubble(msg.text!, AppColors.primarySoft);
-    } else if (msg.type == _MsgType.image) {
-      bubble = _imageBubble(msg.imageUrl!);
-    } else {
-      bubble = _fileBubble(msg.fileName!);
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        if (msg.time != null) ...[
-          Text(
-            msg.time!,
-            style: AppTextStyles.pr12.copyWith(color: AppColors.textTer),
-          ),
-          SizedBox(width: 8.w),
-        ],
-        Flexible(child: bubble),
-      ],
-    );
-  }
-}
-
-// 공통 텍스트 버블
-Widget _textBubble(String text, Color bg) {
-  return Container(
-    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-    decoration: BoxDecoration(
-      color: bg,
-      borderRadius: BorderRadius.circular(8.r),
-      border: Border.all(color: AppColors.border, width: 1),
-    ),
-    child: ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 294.w),
-      child: Text(
-        text,
-        style: AppTextStyles.pr14.copyWith(color: AppColors.text, height: 1.35),
-      ),
-    ),
+  factory _MsgData.uploadText(
+    String text, {
+    double? progress,
+    bool failed = false,
+  }) => _MsgData._(
+    _MsgKind.uploadText,
+    text: text,
+    progress: progress,
+    failed: failed,
   );
 }
 
-Widget _imageBubble(String _ignored) {
-  return ClipRRect(
-    borderRadius: BorderRadius.circular(8.r),
-    child: Image.asset(
-      Assets.images.chat.path,
-      width: 182.w,
-      height: 152.h,
-      fit: BoxFit.cover,
-    ),
-  );
-}
+class _GroupData {
+  final ChatMessageSide side;
+  final String? userName;
+  final List<_MsgData> messages;
 
-Widget _fileBubble(String name) {
-  return Container(
-    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-    decoration: BoxDecoration(
-      color: AppColors.white,
-      borderRadius: BorderRadius.circular(8.r),
-      border: Border.all(color: AppColors.border, width: 1),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: 22.w,
-          height: 22.w,
-          child: Assets.icons.file.svg(width: 18.w, height: 18.w),
-        ),
-        SizedBox(width: 6.w),
-        ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 200.w),
-          child: Text(
-            name,
-            style: AppTextStyles.pr14.copyWith(color: AppColors.text, height: 1.35),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-enum _MsgType { text, image, file }
-
-class _Msg {
-  final _MsgType type;
-  final String? text;
-  final String? imageUrl;
-  final String? fileName;
-  final String? time;
-
-  const _Msg._(this.type, {this.text, this.imageUrl, this.fileName, this.time});
-
-  const _Msg.text(this.text, {this.time}) : type = _MsgType.text, imageUrl = null, fileName = null;
-  const _Msg.image(this.imageUrl, {this.time}) : type = _MsgType.image, text = null, fileName = null;
-  const _Msg.file(this.fileName, {this.time}) : type = _MsgType.file, text = null, imageUrl = null;
+  _GroupData({required this.side, this.userName, required this.messages});
 }

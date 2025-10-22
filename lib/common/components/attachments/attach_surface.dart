@@ -4,21 +4,26 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 
 class AttachSurface extends StatelessWidget {
   final Widget child;
-  final double height;
+  final double minHeight;
   final EdgeInsets padding;
 
   const AttachSurface({
     super.key,
     required this.child,
-    this.height = 40,
-    this.padding = const EdgeInsets.only(left: 8, right: 16),
+    this.minHeight = 40,
+    this.padding = const EdgeInsets.only(left: 8, right: 16, top: 6, bottom: 6),
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height.h,
-      padding: EdgeInsets.only(left: padding.left.w, right: padding.right.w),
+      constraints: BoxConstraints(minHeight: minHeight.h),
+      padding: EdgeInsets.only(
+        left: padding.left.w,
+        right: padding.right.w,
+        top: padding.top.h,
+        bottom: padding.bottom.h,
+      ),
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
           side: const BorderSide(width: 1, color: AppColors.border),

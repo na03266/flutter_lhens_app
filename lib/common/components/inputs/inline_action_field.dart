@@ -10,14 +10,11 @@ class InlineActionField extends StatelessWidget {
   final InlineActionVariant variant;
   final String actionText;
   final VoidCallback onAction;
-
-  // comment 모드(입력)
   final TextEditingController? controller;
   final String? hint;
-
-  // picker 모드(라벨+탭 이동)
   final String? label;
-  final VoidCallback? onTap; // 전체 영역 탭 콜백
+  final VoidCallback? onTap;
+  final FocusNode? focusNode;
 
   const InlineActionField({
     super.key,
@@ -28,6 +25,7 @@ class InlineActionField extends StatelessWidget {
     this.hint,
     this.label,
     this.onTap,
+    this.focusNode,
   });
 
   bool get _isComment => variant == InlineActionVariant.comment;
@@ -63,6 +61,7 @@ class InlineActionField extends StatelessWidget {
   Widget _buildMain() {
     if (_isComment) {
       return TextField(
+        focusNode: focusNode,
         controller: controller,
         textInputAction: TextInputAction.done,
         style: AppTextStyles.pr15.copyWith(color: AppColors.text),

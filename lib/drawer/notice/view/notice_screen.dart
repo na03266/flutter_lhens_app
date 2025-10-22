@@ -18,19 +18,22 @@ class NoticeScreen extends ConsumerWidget {
       tabs: const ['내부 공지사항', '외부 공지사항'],
       filters: const ['전체'],
       emptyMessage: (tab, {required bool mineOnly}) => switch (tab) {
-        1 => mineOnly ? '등록한 공개 제안이 없습니다.' : '등록된 공개 제안이 없습니다.',
-        2 => mineOnly ? '등록한 비공개 제안이 없습니다.' : '등록된 비공개 제안이 없습니다.',
-        _ => mineOnly ? '등록한 제안이 없습니다.' : '등록된 제안이 없습니다.',
+        1 => '등록된 내부 공지사항이 없습니다.',
+        2 => '등록된 외부 공지사항이 없습니다.',
+        _ => '등록된 공지사항이 없습니다.',
       },
       showFab: false,
       detailRouteName: NoticeDetailScreen.routeName,
       myDetailRouteName: null,
       formRouteName: '',
       load: () async => _mockNotices(),
-      tabPredicate: (e, tab) => switch (tab) {
-        1 => e.category == '내부공지사항',
-        2 => e.category == '외부공지사항',
-        _ => true,
+      tabPredicate: (e, tab) {
+        final cat = e.category.trim().toLowerCase().replaceAll(' ', '');
+        return switch (tab) {
+          1 => cat == '내부공지사항',
+          2 => cat == '외부공지사항',
+          _ => true,
+        };
       },
       searchPredicate: (e, f, q) {
         if (q.isEmpty) return true;

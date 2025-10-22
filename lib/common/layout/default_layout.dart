@@ -48,7 +48,7 @@ class DefaultLayout extends ConsumerWidget {
                       : AppBarBottomBorder.thin,
                 ),
           endDrawer: _isChatDetail(path)
-              ? const ChatSettingsDrawer()
+              ? ChatSettingsDrawer(pageContext: context)
               : const CustomDrawer(),
           endDrawerEnableOpenDragGesture: false,
           body: child,
@@ -66,6 +66,10 @@ class DefaultLayout extends ConsumerWidget {
 
   // 타이틀
   String _resolveTitle(String path) {
+    if (path.endsWith('/user-picker')) {
+      path = path.substring(0, path.length - '/user-picker'.length);
+    }
+
     const map = {
       '/home/notice': '공지사항',
       '/home/salary': '급여명세서',
@@ -84,6 +88,7 @@ class DefaultLayout extends ConsumerWidget {
     };
 
     if (map.containsKey(path)) return map[path]!;
+
     final candidates = map.keys.where((k) => path.startsWith(k)).toList()
       ..sort((a, b) => b.length.compareTo(a.length));
     return candidates.isNotEmpty ? map[candidates.first]! : '';

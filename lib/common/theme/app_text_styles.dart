@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  // ---------------- Pretendard ----------------
+  // Pretendard
   static final TextStyle pb18 = TextStyle(
     fontFamily: 'Pretendard',
     fontSize: 18.sp,
@@ -28,6 +28,7 @@ class AppTextStyles {
   static final TextStyle psb14 = psb18.copyWith(fontSize: 14.sp);
   static final TextStyle psb13 = psb18.copyWith(fontSize: 13.sp);
   static final TextStyle psb12 = psb18.copyWith(fontSize: 12.sp);
+  static final TextStyle psb10 = psb18.copyWith(fontSize: 10.sp);
 
   // Medium
   static final TextStyle pm18 = pb18.copyWith(fontWeight: FontWeight.w500);
@@ -50,7 +51,7 @@ class AppTextStyles {
   static final TextStyle pl18 = pb18.copyWith(fontWeight: FontWeight.w300);
   static final TextStyle pl14 = pl18.copyWith(fontSize: 14.sp);
 
-  // ---------------- The Jamsil ----------------
+  // The Jamsil
   // Bold
   static final TextStyle jb18 = TextStyle(
     fontFamily: 'TheJamsil',

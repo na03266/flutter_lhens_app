@@ -18,7 +18,7 @@ class SurveyScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final config = ReportListConfig<SurveyItem>(
-      tabs: const ['전체', '진행', '마감'],
+      tabs: const ['진행', '마감'],
       filters: const ['전체', '작성자', '대상'],
       emptyMessage: (tab, {required bool mineOnly}) {
         if (mineOnly) return '참여한 설문이 없습니다.';

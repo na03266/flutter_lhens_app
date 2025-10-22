@@ -1,42 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lhens_app/common/components/user_avatar.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
-import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/mock/comment/mock_comment_models.dart';
 
 class ReplyTile extends StatelessWidget {
   final CommentModel comment;
-  final VoidCallback? onTapDelete;
   final VoidCallback? onTapReply;
+  final bool canDelete;
+  final bool deleting;
+  final VoidCallback? onRequestDelete;
 
   const ReplyTile({
     super.key,
     required this.comment,
-    this.onTapDelete,
     this.onTapReply,
+    this.canDelete = false,
+    this.deleting = false,
+    this.onRequestDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    final avatar = Container(
-      width: 36.w,
-      height: 36.w,
-      decoration: BoxDecoration(
-        color: AppColors.border,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Center(
-        child: Assets.icons.user.svg(width: 20.w, height: 20.w),
-      ),
-    );
-
     return Padding(
       padding: EdgeInsets.only(top: 4.h, right: 6.w, bottom: 16.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          avatar,
+          const UserAvatar(size: 36, iconSize: 20),
           SizedBox(width: 12.w),
           Expanded(
             child: Column(
@@ -52,22 +44,34 @@ class ReplyTile extends StatelessWidget {
                         ),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: onTapDelete,
-                      behavior: HitTestBehavior.opaque,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 4.w,
-                          vertical: 2.h,
-                        ),
-                        child: Text(
-                          '삭제',
-                          style: AppTextStyles.pr14.copyWith(
-                            color: AppColors.textTer,
+                    if (canDelete)
+                      GestureDetector(
+                        onTap: deleting ? null : onRequestDelete,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 4.w,
+                            vertical: 2.h,
                           ),
+                          child: deleting
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    strokeCap: StrokeCap.round,
+                                    valueColor: AlwaysStoppedAnimation(
+                                      AppColors.subtle,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  '삭제',
+                                  style: AppTextStyles.pr14.copyWith(
+                                    color: AppColors.textTer,
+                                  ),
+                                ),
                         ),
                       ),
-                    ),
                   ],
                 ),
                 SizedBox(height: 6.h),

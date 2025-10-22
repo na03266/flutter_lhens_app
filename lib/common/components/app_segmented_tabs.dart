@@ -43,8 +43,12 @@ class AppSegmentedTabs extends StatelessWidget {
       final isWholeTab = i == 0;
       final badgeVisible = showBadge && (badgeCount ?? 0) > 0 && isWholeTab;
       final badgeActive = isWholeTab && index == 0;
-      final badgeBg = AppColors.secondary.withOpacity(badgeActive ? 1.0 : 0.35);
-      final badgeFg = AppColors.white.withOpacity(badgeActive ? 1.0 : 0.6);
+      final badgeBg = AppColors.secondary.withValues(
+        alpha: badgeActive ? 1.0 : 0.35,
+      );
+      final badgeFg = AppColors.white.withValues(
+        alpha: badgeActive ? 1.0 : 0.6,
+      );
 
       return Expanded(
         child: GestureDetector(
@@ -71,7 +75,7 @@ class AppSegmentedTabs extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: badgeBg,
-                        borderRadius: BorderRadius.circular(8.r),
+                        borderRadius: BorderRadius.circular(50.r),
                       ),
                       child: Text(
                         '${badgeCount!}',

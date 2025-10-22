@@ -77,20 +77,21 @@ class StatusChip extends StatelessWidget {
       case StatusChipType.done:
         return _ChipStyle(
           bg: AppColors.subtle,
-          borderColor: AppColors.border,
-          fg: AppColors.muted,
+          borderColor: AppColors.textTer,
+          fg: AppColors.textSec,
           fallbackLabel: '완료',
         );
       case StatusChipType.participate:
         return _ChipStyle(
-          bg: AppColors.primary,
+          bg: AppColors.textTer,
           borderColor: null,
           fg: AppColors.white,
           fallbackLabel: '참여',
         );
+
       case StatusChipType.notParticipate:
         return _ChipStyle(
-          bg: AppColors.navy,
+          bg: AppColors.secAccent,
           borderColor: null,
           fg: AppColors.white,
           fallbackLabel: '미참여',
@@ -100,7 +101,7 @@ class StatusChip extends StatelessWidget {
         return _ChipStyle(
           bg: AppColors.white,
           borderColor: AppColors.textSec,
-          fg: AppColors.muted,
+          fg: AppColors.text,
           fallbackLabel: t == StatusChipType.realname ? '실명' : '익명',
         );
       case StatusChipType.tag:

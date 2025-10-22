@@ -13,12 +13,11 @@ import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/chat/component/chat_list_item.dart';
 import 'package:lhens_app/chat/view/chat_detail_screen.dart';
 import 'package:lhens_app/user/model/user_picker_args.dart';
-import 'package:lhens_app/user/view/user_picker_screen.dart';
 import 'package:lhens_app/user/model/user_pick_result.dart';
-
 
 class ChatScreen extends ConsumerStatefulWidget {
   static String get routeName => '커뮤니케이션';
+
   const ChatScreen({super.key});
 
   @override
@@ -41,7 +40,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     (name: 'LH E&S 기획팀', participants: 5, unread: 0),
     (name: 'LH E&S 기획팀', participants: 5, unread: 0),
     (name: 'LH E&S 기획팀', participants: 5, unread: 0),
-
   ];
 
   bool _scrolled = false;
@@ -70,7 +68,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 selected: _category,
                 getLabel: (v) => v,
                 onSelected: (v) => setState(() => _category = v),
-                controller: TextEditingController(), // 검색 미사용
+                controller: TextEditingController(),
+                // 검색 미사용
                 onSubmitted: (_) {},
               ),
             ),
@@ -80,46 +79,50 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Expanded(
               child: hasData
                   ? NotificationListener<ScrollNotification>(
-                onNotification: (n) {
-                  if (n is ScrollUpdateNotification) {
-                    final atTop = n.metrics.pixels <= 0;
-                    if (_scrolled == atTop) setState(() => _scrolled = !atTop);
-                  }
-                  return false;
-                },
-                child: ListView.separated(
-                  physics: const ClampingScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  itemCount: items.length + 1, // 헤더 + 아이템
-                  separatorBuilder: (_, i) =>
-                  i == 0 ? const SizedBox.shrink() : SizedBox(height: 10.h),
-                  itemBuilder: (_, i) {
-                    if (i == 0) {
-                      return Padding(
-                        padding: EdgeInsets.fromLTRB(2.w, 0, 2.w, 8.h),
-                        child: CountInline(
-                          label: '전체',
-                          count: items.length, // 실제 개수
-                          showSuffix: false,
-                        ),
-                      );
-                    }
-                    final e = items[i - 1];
-                    return ChatListItem(
-                      title: e.name,
-                      participants: e.participants,
-                      unreadCount: e.unread,
-                      onTap: () => GoRouter.of(context).pushNamed(
-                        ChatDetailScreen.routeName,
+                      onNotification: (n) {
+                        if (n is ScrollUpdateNotification) {
+                          final atTop = n.metrics.pixels <= 0;
+                          if (_scrolled == atTop) {
+                            setState(() => _scrolled = !atTop);
+                          }
+                        }
+                        return false;
+                      },
+                      child: ListView.separated(
+                        physics: const ClampingScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        itemCount: items.length + 1,
+                        // 헤더 + 아이템
+                        separatorBuilder: (_, i) => i == 0
+                            ? const SizedBox.shrink()
+                            : SizedBox(height: 10.h),
+                        itemBuilder: (_, i) {
+                          if (i == 0) {
+                            return Padding(
+                              padding: EdgeInsets.fromLTRB(2.w, 0, 2.w, 8.h),
+                              child: CountInline(
+                                label: '전체',
+                                count: items.length,
+                                showSuffix: false,
+                              ),
+                            );
+                          }
+                          final e = items[i - 1];
+                          return ChatListItem(
+                            title: e.name,
+                            participants: e.participants,
+                            unreadCount: e.unread,
+                            onTap: () => GoRouter.of(
+                              context,
+                            ).pushNamed(ChatDetailScreen.routeName),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-              )
+                    )
                   : EmptyState(
-                iconPath: Assets.icons.tabs.chat.path,
-                message: '참여 중인 채팅방이 없습니다.',
-              ),
+                      iconPath: Assets.icons.tabs.chat.path,
+                      message: '참여 중인 채팅방이 없습니다.',
+                    ),
             ),
           ],
         ),
@@ -129,30 +132,35 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         padding: EdgeInsets.only(bottom: 20.h),
         child: FabAddButton(
           label: '새 채팅',
-            onTap: () async {
-              // 1단계: 채팅방 이름 설정 화면으로 이동
-              final roomName = await GoRouter.of(context)
-                  .pushNamed<String>('채팅방 정보'); // ChatNameScreen.routeName
+          onTap: () async {
+            // 1) 채팅방 이름 설정 화면으로 이동
+            final roomName = await GoRouter.of(
+              context,
+            ).pushNamed<String>('채팅방 정보');
 
-              if (!context.mounted || roomName == null || roomName.trim().isEmpty) return;
-
-              // 2단계: 사용자 선택 화면으로 이동
-              final res = await GoRouter.of(context).pushNamed<UserPickResult>(
-                '커뮤니케이션-사용자선택',
-                extra: UserPickerArgs(UserPickerMode.chatCreate),
-              );
-
-              if (!context.mounted || res == null) return;
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('채팅방 "$roomName"을 생성했습니다.'),
-                  duration: const Duration(seconds: 1),
-                ),
-              );
-
-              GoRouter.of(context).pushNamed(ChatDetailScreen.routeName);
+            if (!context.mounted ||
+                roomName == null ||
+                roomName.trim().isEmpty) {
+              return;
             }
+
+            // 2) 사용자 선택 화면으로 이동
+            final res = await GoRouter.of(context).pushNamed<UserPickResult>(
+              '커뮤니케이션-사용자선택',
+              extra: UserPickerArgs(UserPickerMode.chatCreate),
+            );
+
+            if (!context.mounted || res == null) return;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('채팅방 "$roomName"을 생성했습니다.'),
+                duration: const Duration(seconds: 1),
+              ),
+            );
+
+            GoRouter.of(context).pushNamed(ChatDetailScreen.routeName);
+          },
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lhens_app/common/components/feedback/press_highlight.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_text_styles.dart';
+import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/common/theme/app_text_styles.dart';
 
 class ExitActionButton extends StatelessWidget {
   final String label;

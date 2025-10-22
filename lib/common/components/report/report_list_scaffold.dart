@@ -7,7 +7,7 @@ import 'package:lhens_app/common/components/app_segmented_tabs.dart';
 import 'package:lhens_app/common/components/buttons/fab_add_button.dart';
 import 'package:lhens_app/common/components/count_inline.dart';
 import 'package:lhens_app/common/components/pagination_bar.dart';
-import 'package:lhens_app/common/components/base_list_item.dart';
+import 'package:lhens_app/common/components/report/base_list_item.dart';
 import 'package:lhens_app/common/components/empty_state.dart';
 import 'package:lhens_app/common/components/search/filter_search_bar.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';

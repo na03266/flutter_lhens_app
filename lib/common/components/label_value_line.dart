@@ -54,8 +54,8 @@ class LabelValueLine extends StatelessWidget {
 
   // single: 라벨 고정폭 + 값 확장
   Widget _buildSingle() {
-    final lw = (labelWidth ?? 52).w;
-    final gap = (gapBetween ?? 8).w;
+    final lw = (labelWidth ?? 62).w;
+    final gap = (gapBetween ?? 4).w;
     final vpad = verticalPadding ?? EdgeInsets.zero;
 
     final ls =

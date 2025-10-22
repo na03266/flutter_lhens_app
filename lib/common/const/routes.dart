@@ -154,6 +154,14 @@ List<RouteBase> get routes => [
                     name: '내 위험신고 수정',
                     pageBuilder: (_, __) =>
                         const NoTransitionPage(child: RiskFormScreen()),
+                    routes: [
+                      GoRoute(
+                        path: 'user-picker',
+                        name: '내위험신고수정-사용자선택',
+                        pageBuilder: (_, __) =>
+                            const NoTransitionPage(child: UserPickerScreen()),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -197,18 +205,17 @@ List<RouteBase> get routes => [
           GoRoute(
             path: 'info',
             name: ChatNameScreen.routeName,
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: ChatNameScreen()),
+            pageBuilder: (context, state) {
+              final extra = (state.extra as Map?) ?? const {};
+              final initialName = extra['initialName'] as String?;
+              return NoTransitionPage(
+                child: ChatNameScreen(initialName: initialName),
+              );
+            },
           ),
           GoRoute(
             path: 'user-picker',
             name: '커뮤니케이션-사용자선택',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: UserPickerScreen()),
-          ),
-          GoRoute(
-            path: 'invite',
-            name: '커뮤니케이션-사용자초대',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: UserPickerScreen()),
           ),

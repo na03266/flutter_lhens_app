@@ -12,7 +12,7 @@ class EduEventDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const type = '교육 정보';
+    const type = '교육정보';
     const title = '2025 안전보건 규정 변경 및 실무교육';
 
     return ReportDetailScaffold(
