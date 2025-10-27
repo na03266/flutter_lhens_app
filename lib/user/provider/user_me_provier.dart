@@ -70,28 +70,6 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
     }
   }
 
-  // Future<UserModelBase> login({
-  //   required String mbId,
-  //   required String mbPassword,
-  // }) async {
-  //   try {
-  //     state = UserModelLoading();
-  //     final resp = await authRepository.login(
-  //       mbId: mbId,
-  //       mbPassword: mbPassword,
-  //     );
-  //     await storage.write(key: REFRESH_TOKEN_KEY, value: resp.refreshToken);
-  //     await storage.write(key: ACCESS_TOKEN_KEY, value: resp.accessToken);
-  //
-  //     final userResp = await repository.getMe();
-  //     state = userResp;
-  //     return userResp;
-  //   } catch (e) {
-  //     state = UserModelError(message: '로그인에 실패했습니다.');
-  //     return Future.value(state);
-  //   }
-  // }
-
   logout() async {
     state = null;
 

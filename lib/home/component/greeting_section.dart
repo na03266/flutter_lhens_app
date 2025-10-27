@@ -9,6 +9,7 @@ import 'package:lhens_app/drawer/complaint/view/complaint_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/drawer/survey/view/survey_screen.dart';
+import '../my_page/view/my_page_screen.dart';
 import 'home_nav_card.dart';
 
 class GreetingSection extends StatelessWidget {
@@ -19,7 +20,9 @@ class GreetingSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const GreetingCard(),
+        GestureDetector(onTap: () {
+          context.pushNamed(MyPageScreen.routeName);
+        }, child: const GreetingCard()),
         SizedBox(height: 20.h),
         Row(
           children: [

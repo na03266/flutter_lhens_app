@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lhens_app/common/const/data.dart';
+import 'package:lhens_app/common/secure_storage/secure_storage.dart';
 
 import '../../model/user_model.dart';
 import '../../provider/user_me_provier.dart';
@@ -64,17 +66,26 @@ class AuthProvider extends ChangeNotifier {
   //   return null;
   // }
 
-/// 임의 수정됨
-  FutureOr<String?> redirectLogic(BuildContext context, GoRouterState state) {
+  /// 임의 수정됨
+  Future<String?> redirectLogic(
+    BuildContext context,
+    GoRouterState state,
+  ) async {
     final user = ref.read(userMeProvider);
+    final storage = ref.read(secureStorageProvider);
     final path = state.uri.path;
+
+    final autologin = await storage.read(key: AUTO_LOGIN);
 
     // 루트는 홈으로
     if (path == '/') return '/home';
 
     // 스플래시는 통과점: 로그인 여부에 따라 바로 보냄
     if (path == '/splash') {
-      if (user is UserModel) return '/home';
+      if (user is UserModel) {
+        return autologin != null ? '/home' : '/login';
+      }
+
       if (user == null || user is UserModelError) return '/login';
       return null;
     }
@@ -88,7 +99,7 @@ class AuthProvider extends ChangeNotifier {
     }
 
     // 로그인 상태: 로그인/재설정 페이지로 가면 홈으로 돌림
-    if (user is UserModel) {
+    if (user is UserModel && autologin != null) {
       if (path == '/login' || path == '/reset-password') return '/home';
       return null;
     }

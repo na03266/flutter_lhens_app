@@ -7,6 +7,8 @@ import 'package:lhens_app/common/components/buttons/app_button.dart';
 import 'package:lhens_app/common/components/inputs/app_text_field.dart';
 import 'package:lhens_app/common/components/link_text.dart';
 import 'package:lhens_app/common/components/inputs/app_checkbox.dart';
+import 'package:lhens_app/common/const/data.dart';
+import 'package:lhens_app/common/secure_storage/secure_storage.dart';
 import '../../gen/assets.gen.dart';
 import '../provider/user_me_provier.dart';
 import 'reset_password_screen.dart';
@@ -32,6 +34,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     id.dispose();
     pw.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => loadState());
+  }
+
+  loadState() async {
+    final storage = ref.read(secureStorageProvider);
+    final autoLoginState = await storage.read(key: AUTO_LOGIN);
+    final savedId = await storage.read(key: SAVE_MB_NO);
+    setState(() {
+      autoLoginState == null ? autoLogin = false : autoLogin = true;
+      if (savedId == null) {
+        rememberId = false;
+      } else {
+        rememberId = true;
+        id.text = savedId;
+      }
+    });
   }
 
   @override
@@ -147,6 +170,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     final username = id.text.trim();
     final password = pw.text;
+
+    final storage = ref.read(secureStorageProvider);
+
+    await storage.write(key: AUTO_LOGIN, value: autoLogin.toString());
+    await storage.write(key: SAVE_MB_NO, value: id.text.trim());
 
     ref
         .read(userMeProvider.notifier)
