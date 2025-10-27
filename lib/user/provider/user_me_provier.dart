@@ -1,3 +1,4 @@
+import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -9,16 +10,16 @@ import '../model/user_model.dart';
 import '../repository/user_me_repository.dart';
 
 final userMeProvider =
-StateNotifierProvider<UserMeStateNotifier, UserModelBase?>((ref) {
-  final authRepository = ref.watch(authRepositoryProvider);
-  final repository = ref.watch(userMeRepositoryProvider);
-  final storage = ref.watch(secureStorageProvider);
-  return UserMeStateNotifier(
-    authRepository: authRepository,
-    repository: repository,
-    storage: storage,
-  );
-});
+    StateNotifierProvider<UserMeStateNotifier, UserModelBase?>((ref) {
+      final authRepository = ref.watch(authRepositoryProvider);
+      final repository = ref.watch(userMeRepositoryProvider);
+      final storage = ref.watch(secureStorageProvider);
+      return UserMeStateNotifier(
+        authRepository: authRepository,
+        repository: repository,
+        storage: storage,
+      );
+    });
 
 class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
   final AuthRepository authRepository;
@@ -43,7 +44,6 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
     }
 
     final resp = await repository.getMe();
-
     state = resp;
   }
 
@@ -53,8 +53,15 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
   }) async {
     try {
       state = UserModelLoading();
+      final resp = await authRepository.login(
+        mbId: mbId,
+        mbPassword: mbPassword,
+      );
+      await storage.write(key: REFRESH_TOKEN_KEY, value: resp.refreshToken);
+      await storage.write(key: ACCESS_TOKEN_KEY, value: resp.accessToken);
 
-      final userResp =UserModel(mbId: 'admin', mbName: '9999');
+      final userResp = await repository.getMe();
+
       state = userResp;
       return userResp;
     } catch (e) {
@@ -62,6 +69,7 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
       return Future.value(state);
     }
   }
+
   // Future<UserModelBase> login({
   //   required String mbId,
   //   required String mbPassword,
@@ -87,11 +95,9 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
   logout() async {
     state = null;
 
-    await Future.wait(
-      [
-        storage.delete(key: REFRESH_TOKEN_KEY),
-        storage.delete(key: ACCESS_TOKEN_KEY),
-      ],
-    );
+    await Future.wait([
+      storage.delete(key: REFRESH_TOKEN_KEY),
+      storage.delete(key: ACCESS_TOKEN_KEY),
+    ]);
   }
 }

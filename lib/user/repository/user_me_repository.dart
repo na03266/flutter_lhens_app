@@ -1,34 +1,26 @@
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' hide Headers;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lhens_app/common/const/data.dart';
+import 'package:retrofit/retrofit.dart';
 
 import '../../common/dio/dio.dart';
 import '../model/user_model.dart';
 
+part 'user_me_repository.g.dart';
+
 final userMeRepositoryProvider = Provider<UserMeRepository>((ref) {
   final dio = ref.watch(dioProvider);
-  return UserMeRepository(baseUrl: '$ip/userMe', dio: dio);
+  return UserMeRepository(dio, baseUrl: '$ip/user/me');
 });
 
-class UserMeRepository {
-  final String baseUrl;
-  final Dio dio;
+@RestApi()
+abstract class UserMeRepository {
+  factory UserMeRepository(Dio dio, {String baseUrl}) = _UserMeRepository;
 
-  UserMeRepository({required this.baseUrl, required this.dio});
-
-  Future<UserModel> getMe() async {
-    return UserModel(mbId: '', mbName: '');
-  }
-
-  // Future<TokenResponse> token() async {
-  //   final resp = await dio.post(
-  //     '$baseUrl/token',
-  //     options: Options(
-  //       headers: {
-  //         'refreshToken': 'true',
-  //       },
-  //     ),
-  //   );
-  //   return TokenResponse.fromJson(resp.data);
-  // }
+  @GET('/')
+  @Headers({
+    'accessToken': 'true',
+  })
+  Future<UserModel> getMe();
 }
+

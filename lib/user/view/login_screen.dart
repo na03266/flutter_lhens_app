@@ -142,6 +142,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleLogin(BuildContext context, WidgetRef ref) async {
+    id.text = 'admin';
+    pw.text = '9999';
+
     final username = id.text.trim();
     final password = pw.text;
 
