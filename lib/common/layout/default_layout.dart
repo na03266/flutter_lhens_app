@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lhens_app/alarm/view/alarm_screen.dart';
 
 import 'package:lhens_app/common/components/app_bottom_nav.dart';
 import 'package:lhens_app/common/components/custom_app_bar.dart';
@@ -12,7 +13,6 @@ import '../../home/view/home_screen.dart';
 import '../../risk/view/risk_screen.dart';
 import '../../chat/view/chat_screen.dart';
 import '../../manual/view/manual_screen.dart';
-import '../../home/my_page/view/my_page_screen.dart';
 import '../../chat/component/chat_settings_drawer.dart';
 
 class DefaultLayout extends ConsumerWidget {
@@ -146,7 +146,7 @@ class DefaultLayout extends ConsumerWidget {
         context.goNamed(ManualScreen.routeName);
         break;
       case 4:
-        context.goNamed(MyPageScreen.routeName);
+        context.goNamed(AlarmScreen.routeName);
         break;
     }
   }

@@ -8,7 +8,11 @@ import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
 class AppBottomNav extends StatelessWidget {
-  final VoidCallback onTapLeft1, onTapLeft2, onTapRight1, onTapRight2, onTapCenter;
+  final VoidCallback onTapLeft1,
+      onTapLeft2,
+      onTapRight1,
+      onTapRight2,
+      onTapCenter;
   final double fabDiameter, topGap, contentHeight, minBottomGap;
 
   const AppBottomNav({
@@ -56,8 +60,8 @@ class AppBottomNav extends StatelessWidget {
                   _item('위험신고', Assets.icons.tabs.danger, onTapLeft1),
                   _item('커뮤니케이션', Assets.icons.tabs.chat, onTapLeft2),
                   SizedBox(width: fabDiameter.w), // FAB 자리만 비워둠
+                  _item('알림', Assets.icons.bell, onTapRight2),
                   _item('업무매뉴얼', Assets.icons.tabs.manual, onTapRight1),
-                  _item('마이페이지', Assets.icons.tabs.my, onTapRight2),
                 ],
               ),
             ),
@@ -83,7 +87,10 @@ class AppBottomNav extends StatelessWidget {
                     child: Assets.icons.tabs.home.svg(
                       width: 32.w,
                       height: 32.w,
-                      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                 ),
