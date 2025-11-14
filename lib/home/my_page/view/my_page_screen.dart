@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,14 +10,19 @@ import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/home/my_page/component/my_nav_card.dart';
 import 'package:lhens_app/home/my_page/change_info/view/change_info_screen.dart';
+import 'package:lhens_app/user/model/user_model.dart';
 
-class MyPageScreen extends StatelessWidget {
+import '../../../user/provider/user_me_provier.dart';
+
+class MyPageScreen extends ConsumerWidget {
   static String get routeName => '마이페이지';
 
   const MyPageScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mb = ref.watch(userMeProvider) as UserModel;
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SingleChildScrollView(
@@ -35,19 +41,18 @@ class MyPageScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('홍길동', style: AppTextStyles.psb20),
+                  Text(mb.mbName, style: AppTextStyles.psb20),
                   SizedBox(height: 24.h),
-                  ..._buildInfoList(const [
-                    ['소속', '사업운영본부 경인지사'],
-                    ['직급', '차장'],
-                    ['사번', '1001103'],
-                    ['입사일', '2018.01.15'],
+                  ..._buildInfoList( [
+                    ['소속', mb.mbDepart],
+                    ['직위', mb.mb2],
+                    ['사번', mb.mbId],
+                    ['입사일', mb.mb3],
                   ]),
                   _divider(),
-                  ..._buildInfoList(const [
-                    ['사무전화', '055-000-0000'],
-                    ['휴대전화', '010-0000-0000'],
-                    ['이메일', 'lh@test.com'],
+                  ..._buildInfoList([
+                    ['휴대전화', mb.mbHp],
+                    ['이메일', mb.mbEmail],
                   ]),
                   _divider(),
                   _buildNavRow([

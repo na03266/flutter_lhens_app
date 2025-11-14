@@ -16,10 +16,24 @@ class UserModelError extends UserModelBase {
 class UserModel extends UserModelBase {
   final String mbId;
   final String mbName;
+  final String mbNick;
+  final String jobDuty;
+  final String mb2; // 직위
+  final String mb3; // 입사일
+  final String mbHp;
+  final String mbEmail;
+  final String mbDepart; // 소속
 
   UserModel({
     required this.mbId,
     required this.mbName,
+    required this.mbNick,
+    this.jobDuty = '',
+    this.mb2 = '',
+    this.mb3 = '',
+    this.mbHp = '',
+    this.mbEmail = '',
+    this.mbDepart = '',
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

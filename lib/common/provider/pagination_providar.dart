@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../model/cursor_pagination_model.dart';
 import '../model/model_with_id.dart';
-import '../model/pagination_params.dart';
+import '../model/cursor_pagination_params.dart';
 import '../repository/base_pagination_repository.dart';
 
 class _PaginationInfo {
@@ -17,16 +17,15 @@ class _PaginationInfo {
   });
 }
 
-class PaginationProvider<T extends IModelWithId,
-U extends IBasePaginationRepository<T>>
+class PaginationProvider<
+  T extends IModelWithIdString,
+  U extends IBaseCursorPaginationRepository<T>
+>
     extends StateNotifier<CursorPaginationBase> {
   final U repository;
 
-  PaginationProvider({
-    required this.repository,
-  }) : super(
-    CursorPaginationLoading(),
-  ) {
+  PaginationProvider({required this.repository})
+    : super(CursorPaginationLoading()) {
     paginate();
   }
 
@@ -80,11 +79,11 @@ U extends IBasePaginationRepository<T>>
       }
 
       // PaginationParams 생성
-      PaginationParams paginationParams = PaginationParams(
+      CursorPaginationParams paginationParams = CursorPaginationParams(
         count: fetchCount,
       );
 
-// fetchMore
+      // fetchMore
       if (fetchMore) {
         final pState = state as CursorPagination<T>;
 
@@ -106,10 +105,7 @@ U extends IBasePaginationRepository<T>>
         final pState = state as CursorPaginationFetchingMore<T>;
 
         // 기존 데이터에 새로운 데이터 추가
-        state = resp.copyWith(data: [
-          ...pState.data,
-          ...resp.data,
-        ]);
+        state = resp.copyWith(data: [...pState.data, ...resp.data]);
       } else {
         state = resp;
       }

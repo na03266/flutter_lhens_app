@@ -8,6 +8,8 @@ import 'package:lhens_app/drawer/component/drawer_body_section.dart';
 import 'package:lhens_app/drawer/component/drawer_header_section.dart';
 
 import '../../user/auth/provider/auth_provider.dart';
+import '../../user/model/user_model.dart';
+import '../../user/provider/user_me_provier.dart';
 
 class CustomDrawer extends ConsumerWidget {
   final bool hasNewAlarm;
@@ -16,6 +18,8 @@ class CustomDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final mb = ref.watch(userMeProvider);
+    final state = mb is UserModel;
     return Drawer(
       backgroundColor: AppColors.white,
       shape: const ContinuousRectangleBorder(),
@@ -23,11 +27,11 @@ class CustomDrawer extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           DrawerHeaderSection(
-            userName: '홍길동',
-            dept: '사업운영본부 경영기획팀',
-            position: '차장',
-            empNo: '1001103',
-            joinDate: '2018.01.15',
+            userName: state ? mb.mbName : '',
+            dept: state ? mb.mbDepart : '',
+            position: state ? mb.mb2 : '',
+            empNo: state ? mb.mbId : '',
+            joinDate: state ? mb.mb3 : '',
             hasNewAlarm: hasNewAlarm,
             onTapClose: () => Navigator.of(context).maybePop(),
             onTapBell: () async {

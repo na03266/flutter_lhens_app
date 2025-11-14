@@ -1,23 +1,25 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'notice_model.g.dart';
 
+@JsonSerializable()
 class NoticeModel {
-  final int id;
-  final String title;
-  final String content;
-  final String author;
-  final String createdAt;
-  final bool isNotice;
-  final String category;
+  final int wrId;
+  final String wrSubject;
+  final String wrName;
+  final String wrDatetime;
+  final String caName;
+  final String wr1;
 
   NoticeModel({
-    required this.id,
-    required this.title,
-    required this.content,
-    required this.author,
-    required this.createdAt,
-    required this.isNotice,
-    required this.category,
+    required this.wrId,
+    required this.wrSubject,
+    required this.wrName,
+    required this.wrDatetime,
+    required this.caName,
+    required this.wr1,
   });
 
-
+  factory NoticeModel.fromJson(Map<String, dynamic> json) =>
+      _$NoticeModelFromJson(json);
 }

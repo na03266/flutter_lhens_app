@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/label_value_line.dart';
@@ -9,20 +10,25 @@ import 'package:lhens_app/drawer/complaint/view/complaint_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/drawer/survey/view/survey_screen.dart';
+import '../../user/model/user_model.dart';
+import '../../user/provider/user_me_provier.dart';
 import '../my_page/view/my_page_screen.dart';
 import 'home_nav_card.dart';
 
-class GreetingSection extends StatelessWidget {
+class GreetingSection extends ConsumerWidget {
   const GreetingSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GestureDetector(onTap: () {
-          context.pushNamed(MyPageScreen.routeName);
-        }, child: const GreetingCard()),
+        GestureDetector(
+          onTap: () {
+            context.pushNamed(MyPageScreen.routeName);
+          },
+          child: GreetingCard(ref: ref),
+        ),
         SizedBox(height: 20.h),
         Row(
           children: [
@@ -63,14 +69,18 @@ class GreetingSection extends StatelessWidget {
 }
 
 class GreetingCard extends StatelessWidget {
-  const GreetingCard({super.key});
+  final WidgetRef ref;
+
+  const GreetingCard({super.key, required this.ref});
 
   @override
   Widget build(BuildContext context) {
     final imgSize = 104.w;
     final gap = 12.h;
     final reservedRight = imgSize * .6 + 12.w;
+    final mb = ref.watch(userMeProvider);
 
+    final condition = mb is UserModel;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -87,7 +97,7 @@ class GreetingCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '홍길동님',
+                  '${condition ? mb.mbName : ''}님',
                   style: AppTextStyles.jm18.copyWith(color: AppColors.white),
                 ),
                 SizedBox(height: 6.h),
@@ -98,16 +108,16 @@ class GreetingCard extends StatelessWidget {
                 SizedBox(height: gap),
                 LabelValueLine.double(
                   label1: '소속',
-                  value1: '사업운영본부 경영기획팀',
-                  label2: '직급',
-                  value2: '차장',
+                  value1: condition ? mb.mbDepart : '',
+                  label2: '직위',
+                  value2: condition ? mb.mb2 : '',
                 ),
                 SizedBox(height: 4.h),
                 LabelValueLine.double(
                   label1: '사번',
-                  value1: '100103',
+                  value1: condition ? mb.mbId : '',
                   label2: '입사일',
-                  value2: '2018.01.15',
+                  value2: condition ? mb.mb3 : '',
                 ),
               ],
             ),

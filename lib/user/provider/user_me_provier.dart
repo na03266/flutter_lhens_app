@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../common/const/data.dart';
 import '../../common/secure_storage/secure_storage.dart';
+import '../auth/provider/auth_provider.dart';
 import '../auth/repository/auth_repository.dart';
 import '../model/user_model.dart';
 import '../repository/user_me_repository.dart';
@@ -15,6 +16,7 @@ final userMeProvider =
       final repository = ref.watch(userMeRepositoryProvider);
       final storage = ref.watch(secureStorageProvider);
       return UserMeStateNotifier(
+        ref:ref,
         authRepository: authRepository,
         repository: repository,
         storage: storage,
@@ -22,11 +24,13 @@ final userMeProvider =
     });
 
 class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
+  final Ref ref;
   final AuthRepository authRepository;
   final UserMeRepository repository;
   final FlutterSecureStorage storage;
 
   UserMeStateNotifier({
+    required this.ref,
     required this.authRepository,
     required this.repository,
     required this.storage,
@@ -37,6 +41,8 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
   getMe() async {
     final refreshToken = await storage.read(key: REFRESH_TOKEN_KEY);
     final accessToken = await storage.read(key: ACCESS_TOKEN_KEY);
+
+    ref.read(authTokenProvider.notifier).state = accessToken;
 
     if (refreshToken == null || accessToken == null) {
       state = null;
@@ -53,12 +59,18 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
   }) async {
     try {
       state = UserModelLoading();
+
       final resp = await authRepository.login(
         mbId: mbId,
         mbPassword: mbPassword,
       );
+
+      // 1) 토큰 저장
       await storage.write(key: REFRESH_TOKEN_KEY, value: resp.refreshToken);
       await storage.write(key: ACCESS_TOKEN_KEY, value: resp.accessToken);
+
+      // 2) 전역 Auth 토큰 프로바이더에 반영(소켓/요청에 쓰임)
+
 
       final userResp = await repository.getMe();
 

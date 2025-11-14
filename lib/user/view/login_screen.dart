@@ -9,6 +9,8 @@ import 'package:lhens_app/common/components/link_text.dart';
 import 'package:lhens_app/common/components/inputs/app_checkbox.dart';
 import 'package:lhens_app/common/const/data.dart';
 import 'package:lhens_app/common/secure_storage/secure_storage.dart';
+import 'package:lhens_app/user/model/user_model.dart';
+import '../../common/components/dialogs/confirm_dialog.dart';
 import '../../gen/assets.gen.dart';
 import '../provider/user_me_provier.dart';
 import 'reset_password_screen.dart';
@@ -165,7 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleLogin(BuildContext context, WidgetRef ref) async {
-    id.text = 'admin';
+    id.text = '0000001';
     pw.text = '9999';
 
     final username = id.text.trim();
@@ -176,8 +178,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     await storage.write(key: AUTO_LOGIN, value: autoLogin.toString());
     await storage.write(key: SAVE_MB_NO, value: id.text.trim());
 
-    ref
+    await ref
         .read(userMeProvider.notifier)
         .login(mbId: username, mbPassword: password);
+
+    final state = ref.read(userMeProvider);
+
+    if (state is UserModelError) {
+      await ConfirmDialog.show(
+        context,
+        title: '로그인 실패',
+        message: state.message,
+        destructive: true,
+      );
+    }
   }
 }

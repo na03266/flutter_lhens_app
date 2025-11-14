@@ -115,7 +115,7 @@ class DrawerHeaderSection extends StatelessWidget {
                   LabelValueLine.double(
                     label1: '소속',
                     value1: dept,
-                    label2: '직급',
+                    label2: '직위',
                     value2: position,
                   ),
                   SizedBox(height: 4.h),

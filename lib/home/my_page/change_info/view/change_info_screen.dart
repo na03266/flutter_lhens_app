@@ -9,6 +9,9 @@ import 'package:lhens_app/common/components/link_text.dart';
 import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/utils/tel_formatter.dart';
+import 'package:lhens_app/user/provider/user_me_provier.dart';
+
+import '../../../../user/model/user_model.dart';
 
 class ChangeInfoScreen extends ConsumerStatefulWidget {
   static String get routeName => '정보변경';
@@ -21,9 +24,8 @@ class ChangeInfoScreen extends ConsumerStatefulWidget {
 
 class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
   // 초기값(서버에서 내려온 값이라 가정)
-  final _initOffice = '055-000-0000';
-  final _initMobile = '010-0000-0000';
-  final _initEmail = 'lh@test.com';
+  String _initMobile = '010-0000-0000';
+  String _initEmail = 'lh@test.com';
 
   final newPassword = TextEditingController();
   final confirmPassword = TextEditingController();
@@ -39,9 +41,13 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
   @override
   void initState() {
     super.initState();
-    officePhone.text = _initOffice;
     mobilePhone.text = _initMobile;
     email.text = _initEmail;
+    final mb = ref.read(userMeProvider);
+    if (mb is UserModel) {
+      mobilePhone.text = mb.mbHp;
+      email.text = mb.mbEmail;
+    }
   }
 
   @override
@@ -58,11 +64,10 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
 
   // 어떤 값이라도 바뀌었는지
   bool get _anyProfileChanged =>
-      officePhone.text != _initOffice ||
-      mobilePhone.text != _initMobile ||
-      email.text != _initEmail ||
-      newPassword.text.isNotEmpty ||
-      confirmPassword.text.isNotEmpty;
+          mobilePhone.text != _initMobile ||
+          email.text != _initEmail ||
+          newPassword.text.isNotEmpty ||
+          confirmPassword.text.isNotEmpty;
 
   // 비번 입력 시에는 두 칸 모두 채움+일치 필요
   bool get _passwordValid {
@@ -109,115 +114,104 @@ class _ChangeInfoScreenState extends ConsumerState<ChangeInfoScreen> {
     if (result == true) {
       // 탈퇴 처리 호출 위치
       _snack('탈퇴 요청이 접수되었습니다.');
+
+      ref.read(userMeProvider.notifier).logout();
     }
   }
 
-  //   if (result == true) {
-  //   print('회원탈퇴 확인');
-  //   } else {
-  //   print('회원탈퇴 취소');
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
+    final mb = ref.read(userMeProvider);
     return Scaffold(
       backgroundColor: AppColors.white,
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: LayoutBuilder(
-          builder: (context, c) => SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 20.w).add(
-              EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: c.maxHeight,
-                maxWidth: 420.w,
-              ),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // 비밀번호 변경은 옵션
-                      AppTextField(
-                        label: '새 비밀번호',
-                        controller: newPassword,
-                        focusNode: _pwFocus,
-                        isPassword: true,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (_) {
-                          _syncPwErrorInline();
-                          setState(() {}); // 버튼 갱신
-                        },
-                      ),
-                      SizedBox(height: 16.h),
-                      AppTextField(
-                        label: '새 비밀번호 확인',
-                        controller: confirmPassword,
-                        focusNode: _pw2Focus,
-                        isPassword: true,
-                        textInputAction: TextInputAction.done,
-                        error: _pwError != null,
-                        errorText: _pwError,
-                        onSubmitted: (_) => _submit(),
-                        onChanged: (_) {
-                          _syncPwErrorInline();
-                          setState(() {}); // 버튼 갱신
-                        },
-                      ),
-                      SizedBox(height: 24.h),
+          builder: (context, c) =>
+              SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 20.w).add(
+                  EdgeInsets.only(bottom: MediaQuery
+                      .viewInsetsOf(context)
+                      .bottom),
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: c.maxHeight,
+                    maxWidth: 420.w,
+                  ),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // 비밀번호 변경은 옵션
+                          AppTextField(
+                            label: '새 비밀번호',
+                            controller: newPassword,
+                            focusNode: _pwFocus,
+                            isPassword: true,
+                            textInputAction: TextInputAction.next,
+                            onChanged: (_) {
+                              _syncPwErrorInline();
+                              setState(() {}); // 버튼 갱신
+                            },
+                          ),
+                          SizedBox(height: 16.h),
+                          AppTextField(
+                            label: '새 비밀번호 확인',
+                            controller: confirmPassword,
+                            focusNode: _pw2Focus,
+                            isPassword: true,
+                            textInputAction: TextInputAction.done,
+                            error: _pwError != null,
+                            errorText: _pwError,
+                            onSubmitted: (_) => _submit(),
+                            onChanged: (_) {
+                              _syncPwErrorInline();
+                              setState(() {}); // 버튼 갱신
+                            },
+                          ),
+                          SizedBox(height: 24.h),
 
-                      AppTextField(
-                        label: '사무전화',
-                        controller: officePhone,
-                        keyboard: TextInputType.phone,
-                        formatters: [TelFormatter()],
-                        showClear: true,
-                        onChanged: (_) => setState(() {}),
-                      ),
-                      SizedBox(height: 16.h),
+                          AppTextField(
+                            label: '휴대전화',
+                            controller: mobilePhone,
+                            keyboard: TextInputType.phone,
+                            formatters: [TelFormatter()],
+                            showClear: true,
+                            onChanged: (_) => setState(() {}),
+                          ),
+                          SizedBox(height: 16.h),
 
-                      AppTextField(
-                        label: '휴대전화',
-                        controller: mobilePhone,
-                        keyboard: TextInputType.phone,
-                        formatters: [TelFormatter()],
-                        showClear: true,
-                        onChanged: (_) => setState(() {}),
-                      ),
-                      SizedBox(height: 16.h),
+                          AppTextField(
+                            label: '이메일',
+                            controller: email,
+                            keyboard: TextInputType.emailAddress,
+                            showClear: true,
+                            onChanged: (_) => setState(() {}),
+                          ),
+                          SizedBox(height: 24.h),
 
-                      AppTextField(
-                        label: '이메일',
-                        controller: email,
-                        keyboard: TextInputType.emailAddress,
-                        showClear: true,
-                        onChanged: (_) => setState(() {}),
-                      ),
-                      SizedBox(height: 24.h),
+                          AppButton(
+                            text: '저장',
+                            onTap: _canSubmit ? _submit : null,
+                            type: AppButtonType.secondary,
+                          ),
+                          SizedBox(height: 12.h),
 
-                      AppButton(
-                        text: '저장',
-                        onTap: _canSubmit ? _submit : null,
-                        type: AppButtonType.secondary,
+                          LinkText(
+                            text: '회원탈퇴',
+                            textAlign: TextAlign.right,
+                            onTap: _confirmWithdraw,
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 12.h),
-
-                      LinkText(
-                        text: '회원탈퇴',
-                        textAlign: TextAlign.right,
-                        onTap: _confirmWithdraw,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
         ),
       ),
     );

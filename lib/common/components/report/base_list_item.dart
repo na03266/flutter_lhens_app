@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/common/components/status_chip.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:lhens_app/drawer/notice/model/notice_model.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
 // 상태 구분 (필요한 경우만 사용)
@@ -29,6 +30,18 @@ class BaseListItem extends StatelessWidget {
     this.secret = false,
     this.onTap,
   });
+
+  factory BaseListItem.fromNoticeModel({
+    required NoticeModel model,
+    bool isDetail = false,
+  }) {
+    return BaseListItem(
+      typeName: model.caName,
+      title: model.wrSubject,
+      author: model.wrName,
+      dateText: model.wrDatetime,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

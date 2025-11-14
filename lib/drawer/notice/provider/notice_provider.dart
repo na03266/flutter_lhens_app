@@ -1,70 +1,51 @@
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-//
-// import '../model/notice_model.dart';
-// import '../repository/board_repository.dart';
-//
-// final noticeProvider = StateNotifierProvider<NoticeStateNotifier, NoticeState>((ref) {
-//   final repository = ref.watch(boardRepositoryProvider);
-//   return NoticeStateNotifier(
-//     repository: repository
-//   );
-// });
-//
-// class NoticeStateNotifier extends StateNotifier<NoticeState> {
-//   final BoardRepository repository;
-//
-//   NoticeStateNotifier({
-//     required this.repository
-//   }) : super(NoticeState()){
-//     fetchNoticeList();
-//   }
-//
-//   // list
-//   Future<void> fetchNoticeList() async {
-//     print("fetchNoticeList11");
-//     try {
-//       state = state.copyWith(isLoading: true, error: null);
-//
-//       final List<NoticeModel> notices = await repository.getNoticeList();
-//
-//       // print('state: ${state}');
-//       // print('notices: ${notices}');
-//       state = state.copyWith(
-//         notices: notices,
-//         isLoading: false,
-//         error: null,
-//       );
-//     } catch (e) {
-//       state = state.copyWith(
-//         isLoading: false,
-//         error: 'Failed to load notices: $e',
-//       );
-//     }
-//   }
-//
-//
-// }
-//
-// class NoticeState {
-//   final List<NoticeModel> notices;
-//   final bool isLoading;
-//   final String? error;
-//
-//   NoticeState({
-//     this.notices = const [],
-//     this.isLoading = false,
-//     this.error,
-//   });
-//
-//   NoticeState copyWith({
-//     List<NoticeModel>? notices,
-//     bool? isLoading,
-//     String? error,
-//   }) {
-//     return NoticeState(
-//       notices: notices ?? this.notices,
-//       isLoading: isLoading ?? this.isLoading,
-//       error: error ?? this.error,
-//     );
-//   }
-// }
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lhens_app/common/model/page_pagination_model.dart';
+import 'package:lhens_app/common/provider/page_pagination_providar.dart';
+import 'package:lhens_app/drawer/notice/model/notice_model.dart';
+import 'package:lhens_app/drawer/notice/repository/notice_repository.dart';
+
+final noticeDetailProvider = Provider.family<NoticeModel?, String>((ref, id) {
+  final state = ref.watch(noticeProvider);
+
+  if (state is! PagePagination) {
+    return null;
+  }
+
+  return state.data.firstWhere((element) => element.id == id);
+});
+
+final noticeProvider =
+    StateNotifierProvider<NoticeStateNotifier, PagePaginationBase>((ref) {
+      final repository = ref.watch(noticeRepositoryProvider);
+      final notifier = NoticeStateNotifier(repository: repository);
+
+      return notifier;
+    });
+
+class NoticeStateNotifier
+    extends PagePaginationProvider<NoticeModel, NoticeRepository> {
+
+  NoticeStateNotifier({required super.repository});
+
+  getDetail({required String wrId}) async {
+    if (state is! PagePagination) {
+      await paginate();
+    }
+    if (state is! PagePagination) {
+      return;
+    }
+
+    final pState = state as PagePagination;
+
+    final resp = await repository.getNoticeDetail(wrId: wrId);
+    if (pState.data.where((e) => e.wrId == wrId).isEmpty) {
+      state = pState.copyWith(data: <NoticeModel>[...pState.data, resp]);
+    } else {
+      state = pState.copyWith(
+        data: pState.data
+            .map<NoticeModel>((e) => e.wrId == wrId ? resp : e)
+            .toList(),
+      );
+    }
+  }
+}

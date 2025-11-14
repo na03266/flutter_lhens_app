@@ -24,7 +24,7 @@ class MyApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
 
     return ScreenUtilInit(
-      designSize: const Size(390, 844), // 시안 기준
+      designSize: const Size(390, 844),
       minTextAdapt: true,
       builder: (_, __) {
         return MaterialApp.router(

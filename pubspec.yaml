@@ -24,8 +24,8 @@ dependencies:
   shared_preferences: ^2.3.3 # 캐시 저장용
   flutter_screenutil: ^5.7.0 # font정교하게 dpi, 폰트 스케일 등 고려하여
   flutter_secure_storage: ^9.2.4
-
-
+  socket_io_client: ^3.1.2
+  debounce_throttle: ^2.0.0
 
 dev_dependencies:
   flutter_test:
