@@ -103,10 +103,12 @@ List<RouteBase> get routes => [
                 const NoTransitionPage(child: NoticeScreen()),
             routes: [
               GoRoute(
-                path: 'detail',
+                path: ':rid',
                 name: NoticeDetailScreen.routeName,
                 pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: NoticeDetailScreen()),
+                     NoTransitionPage(child: NoticeDetailScreen(
+                      wrId: state.pathParameters['rid']!,
+                    )),
               ),
             ],
           ),

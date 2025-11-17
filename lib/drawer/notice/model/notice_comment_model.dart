@@ -1,19 +1,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:lhens_app/drawer/notice/model/notice_model.dart';
 
-import 'notice_comment_model.dart';
-import 'notice_file_model.dart';
-
-part 'notice_detail_model.g.dart';
+part 'notice_comment_model.g.dart';
 
 @JsonSerializable()
-class NoticeDetailModel extends NoticeModel {
+class NoticeCommentModel extends NoticeModel {
   final String wrContent;
   final int wrHit;
-  final List<NoticeCommentModel> comments;
-  final List<NoticeFileModel> files;
 
-  NoticeDetailModel({
+  NoticeCommentModel({
     required super.wrId,
     required super.wrSubject,
     required super.wrName,
@@ -22,11 +17,9 @@ class NoticeDetailModel extends NoticeModel {
     required super.wr1,
     required this.wrContent,
     required this.wrHit,
-    required this.comments,
-    required this.files,
   });
 
-  factory NoticeDetailModel.fromJson(Map<String, dynamic> json) =>
-      _$NoticeDetailModelFromJson(json);
+  factory NoticeCommentModel.fromJson(Map<String, dynamic> json) =>
+      _$NoticeCommentModelFromJson(json);
 }
 

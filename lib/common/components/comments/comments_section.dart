@@ -20,7 +20,7 @@ class CommentsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hpad = 18.w;
-    final totalCount = mockTotalCommentCount;
+    final totalCount = comments.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -17,13 +17,11 @@ class BoardInfo extends BoardInfoBase {
   final String boTable;
   final String boSubject;
   final String boCategoryList;
-  final String total;
 
   BoardInfo({
     required this.boTable,
     required this.boSubject,
     required this.boCategoryList,
-    required this.total,
   });
 
   factory BoardInfo.fromJson(Map<String, dynamic> json) =>

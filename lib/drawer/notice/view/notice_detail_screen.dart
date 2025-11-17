@@ -1,69 +1,90 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:lhens_app/common/components/label_value_line.dart';
 import 'package:lhens_app/common/components/report/report_detail_header.dart';
 import 'package:lhens_app/common/components/report/report_detail_scaffold.dart';
-import 'package:lhens_app/gen/assets.gen.dart';
+import 'package:lhens_app/common/components/report/report_detail_scaffold_v2.dart';
+import 'package:lhens_app/drawer/notice/provider/notice_provider.dart';
 
-class NoticeDetailScreen extends ConsumerWidget {
+import '../model/notice_detail_model.dart';
+
+class NoticeDetailScreen extends ConsumerStatefulWidget {
   static String get routeName => '공지사항 상세';
+  final String wrId;
 
-  const NoticeDetailScreen({super.key});
+  const NoticeDetailScreen({super.key, required this.wrId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    const type = '외부공지사항';
-    const title = "[보도자료] LH E&S, 폭염 속 '온열질환 예방'에 총력";
+  ConsumerState<NoticeDetailScreen> createState() => _NoticeDetailScreenState();
+}
 
-    return ReportDetailScaffold(
-      config: ReportDetailConfig(
-        typeName: type,
-        title: title,
-        headerBuilder: (_) => const ReportDetailHeader(
-          typeName: type,
-          title: title,
-          onMoreTap: null,
-        ),
-        metaRows: const [
-          LabelValueLine.single(label1: '작성자', value1: '조예빈(1001599)'),
-          LabelValueLine.single(label1: '등록일', value1: '2025. 08. 28'),
-          LabelValueLine.single(label1: '조회수', value1: '317'),
-        ],
-        body: const _NoticeBody(),
-        attachments: const ['첨부파일명.pdf'],
-        editRouteName: '공지사항 수정',
-        showComments: false,
-        showBackToListButton: true,
-        onBackToList: () => Navigator.of(context).pop(),
-      ),
-    );
+class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(noticeProvider.notifier).getDetail(wrId: widget.wrId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(noticeDetailProvider(widget.wrId));
+
+    if (state == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+    final isDetail = state is NoticeDetailModel;
+    print(isDetail);
+    // return ReportDetailScaffold(
+    //   config: ReportDetailConfig(
+    //     typeName: isDetail ? state.caName : '공지사항',
+    //     title: isDetail ? state.wrSubject : 'asdf',
+    //     headerBuilder: (onMore) => ReportDetailHeader(
+    //       typeName: isDetail ? state.caName : '공지사항',
+    //       title: isDetail ? state.wrSubject : '',
+    //       onMoreTap: onMore,
+    //     ),
+    //     metaRows: [
+    //       LabelValueLine.single(
+    //         label1: '작성자',
+    //         value1: isDetail ? state.wrName : '',
+    //       ),
+    //       LabelValueLine.single(
+    //         label1: '등록일',
+    //         value1: isDetail ? state.wrDatetime : '',
+    //       ),
+    //       LabelValueLine.single(
+    //         label1: '조회수',
+    //         value1: isDetail ? state.wrHit.toString() : '0',
+    //       ),
+    //     ],
+    //     body: _NoticeBody(html: isDetail ? state.wrContent : ""),
+    //     attachments: isDetail
+    //         ? state.files.map((e) => e.fileName).toList()
+    //         : [],
+    //     editRouteName: '공지사항 수정',
+    //     showComments: true,
+    //     showBackToListButton: true,
+    //     onBackToList: () => Navigator.of(context).pop(),
+    //   ),
+    // );
+    return ReportDetailScaffoldV2.fromModel(isDetail ? state : null);
   }
 }
 
 class _NoticeBody extends StatelessWidget {
-  const _NoticeBody();
+  final String html;
+
+  const _NoticeBody({super.key, required this.html});
 
   @override
   Widget build(BuildContext context) {
+    // HTML이 비어 있을 때 보여줄 기본 텍스트 (선택)
+    const fallbackText = "내용이 없습니다. 관리자에게 문의해 주세요.";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Image.asset(
-          Assets.images.notice.path,
-          fit: BoxFit.contain,
-          width: double.infinity,
-        ),
-        SizedBox(height: 12.h),
-        const Text(
-          "한국토지주택공사(LH)의 자회사인 (주)LH E&S(대표이사 김규명)는 2025년 8월 한 달간 전국 23개 사업소에서 옥외근로자를 대상으로 ‘온열질환자 긴급구조 훈련’을 실시했다.\n\n"
-          "이번 훈련은 연일 지속되는 폭염으로 온열질환 발생 위험이 높아짐에 따라 실시한 것으로 온열질환자 발생을 가정하여 긴급구조 및 응급처치 훈련에 이어, 온열질환 예방을 위한 건강관리 방법을 교육하는 순으로 진행되었다.\n\n"
-          "훈련 참가자들은 온열질환자 발생상황을 생동감 있게 재현하며, 체계적이고 신속한 대응 절차를 숙달함으로써 현장 대응 역량을 높였다.\n\n"
-          "(주)LH E&S는 최근 산업안전보건위원회를 통해 옥외근로자에게 냉각조끼 지급을 의결하고, 각종 온열질환 예방용품을 배포하는 등 폭염에 의한 근로자 건강 보호를 위한 조치를 강화했다.\n\n"
-          "김규명 대표이사는 “이번 훈련을 통해 근로자의 안전과 건강이 회사 경영의 최우선 가치임을 다시금 강조드리며, 이를 바탕으로 공공안전에도 이바지할 수 있다”라며 안전보건경영에 대한 강한 의지를 밝혔다.",
-        ),
-      ],
+      children: [Html(data: (html.isEmpty) ? fallbackText : html)],
     );
   }
 }

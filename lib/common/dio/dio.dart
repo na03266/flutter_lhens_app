@@ -36,7 +36,7 @@ class CustomInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     print('[REQ] [${options.method}] ${options.uri}');
-    print('[REQ] Headers: ${options.headers}');
+    // print('[REQ] Headers: ${options.headers}');
 
     if (options.headers['accessToken'] == 'true') {
       // 헤더 삭제
@@ -68,7 +68,7 @@ class CustomInterceptor extends Interceptor {
       '[RES] [${response.requestOptions.method}] ${response.requestOptions.uri}',
     );
     print('[RES] Status: ${response.statusCode}');
-    print('[RES] Data: ${response.data}');
+    // print('[RES] Data: ${response.data}');
 
     return super.onResponse(response, handler);
   }

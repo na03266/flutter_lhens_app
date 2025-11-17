@@ -30,7 +30,8 @@ abstract class NoticeRepository
     PagePaginationParams? paginationParams = const PagePaginationParams(),
   });
 
-  @GET('/{id}')
+  @GET('/{wrId}')
+  @Headers({'accessToken': 'true'})
   Future<NoticeDetailModel> getNoticeDetail({
     @Path('wrId') required String wrId,
   });

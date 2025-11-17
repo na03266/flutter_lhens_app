@@ -1,68 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lhens_app/common/components/attachments/attachment_file_row.dart';
 import 'package:lhens_app/common/components/comments/comments_section.dart';
 import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
-import 'package:lhens_app/common/components/sheets/action_sheet.dart';
+import 'package:lhens_app/common/components/inputs/inline_action_field.dart';
+import 'package:lhens_app/common/components/report/report_detail_header.dart';
 import 'package:lhens_app/common/components/report/text_sizer.dart';
+import 'package:lhens_app/common/components/sheets/action_sheet.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:lhens_app/drawer/notice/model/notice_detail_model.dart';
+import 'package:lhens_app/drawer/notice/model/notice_file_model.dart';
 import 'package:lhens_app/mock/comment/mock_comment_data.dart';
-import 'package:lhens_app/common/components/attachments/attachment_file_row.dart';
-import 'package:lhens_app/common/components/buttons/app_button.dart';
-import 'package:lhens_app/common/components/inputs/inline_action_field.dart';
+import 'package:lhens_app/mock/comment/mock_comment_models.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ReportDetailConfig {
-  final String typeName;
-  final String title;
-  final List<Widget> metaRows;
-  final Widget body;
-  final List<String> attachments;
-  final String editRouteName;
-  final String? myEditRouteName;
-  final Widget Function(VoidCallback onMore)? headerBuilder;
-  final double? metaGap;
+import '../../../drawer/notice/model/notice_comment_model.dart';
+import '../label_value_line.dart';
 
-  final bool showComments;
-  final bool showBackToListButton;
-  final String backButtonLabel;
-  final VoidCallback? onBackToList;
+class ReportDetailScaffoldV2 extends StatefulWidget {
+  final bool Function()? onUpdate;
+  final bool Function()? onDelete;
+  final Function()? postComment;
+  final Function()? postReply;
+  final String wrSubject;
+  final String caName;
+  final String wrContent;
+  final String wrName;
+  final String wrDatetime;
+  final String wrHit;
+  final List<NoticeCommentModel> comments;
+  final List<NoticeFileModel> files;
 
-  const ReportDetailConfig({
-    required this.typeName,
-    required this.title,
-    required this.metaRows,
-    required this.body,
-    this.attachments = const [],
-    required this.editRouteName,
-    this.myEditRouteName,
-    this.headerBuilder,
-    this.metaGap,
-    this.showComments = true,
-    this.showBackToListButton = false,
-    this.backButtonLabel = '목록으로',
-    this.onBackToList,
-  });
-}
-
-class ReportDetailScaffold extends StatefulWidget {
-  final ReportDetailConfig config;
-
-  // 변경: onReplyTap 콜백을 인자로 받는 빌더
-  final Widget Function(void Function(String id, String name) onReplyTap)?
-  commentsBuilder;
-
-  const ReportDetailScaffold({
+  const ReportDetailScaffoldV2({
     super.key,
-    required this.config,
-    this.commentsBuilder,
+    this.onUpdate,
+    this.onDelete,
+    this.postComment,
+    this.postReply,
+    this.caName = '',
+    this.wrSubject = '',
+    this.wrContent = '',
+    this.wrName = '',
+    this.wrDatetime = '',
+    this.wrHit = '',
+    this.comments = const [],
+    this.files = const [],
   });
 
   @override
-  State<ReportDetailScaffold> createState() => _ReportDetailScaffoldState();
+  State<ReportDetailScaffoldV2> createState() => _ReportDetailScaffoldV2State();
+
+  factory ReportDetailScaffoldV2.fromModel(
+    NoticeDetailModel? model, {
+    bool Function()? onUpdate,
+    bool Function()? onDelete,
+    Function()? postComment,
+    Function()? postReply,
+  }) {
+    return ReportDetailScaffoldV2(
+      onUpdate: onUpdate,
+      onDelete: onDelete,
+      postComment: postComment,
+      postReply: postReply,
+      caName: model?.caName ?? '',
+      wrSubject: model?.wrSubject ?? '',
+      wrContent: model?.wrContent ?? '',
+      wrName: model?.wrName ?? '',
+      wrDatetime: model?.wrDatetime ?? '',
+      wrHit: model?.wrHit.toString() ?? '',
+      comments: model?.comments ?? [],
+      files: model?.files ?? [],
+    );
+  }
 }
 
-class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
+class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
   final _comment = TextEditingController();
   final _inputFocus = FocusNode();
 
@@ -88,13 +103,7 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
     if (!mounted || sel == null) return;
 
     if (sel == 'edit') {
-      final path = GoRouterState.of(context).uri.path;
-      final isMyFlow = path.contains('/my-page/');
-      final route = isMyFlow && widget.config.myEditRouteName != null
-          ? widget.config.myEditRouteName!
-          : widget.config.editRouteName;
-
-      final ok = await context.pushNamed<bool>(route);
+      final ok = widget.onUpdate ?? false;
       if (ok == true && mounted) {
         ScaffoldMessenger.of(
           context,
@@ -112,23 +121,22 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
         cancelText: '취소',
         destructive: true,
       );
+      widget.onDelete?.call();
       if (ok == true && mounted) Navigator.pop(context);
     }
   }
 
+  void handleReplyTap(String id, String name) {
+    setState(() {
+      _replyToId = id;
+      _replyToName = name;
+    });
+    _inputFocus.requestFocus();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final cfg = widget.config;
-    final hpad = 16.w;
-    final gap = cfg.metaGap ?? 5.h;
-
-    void handleReplyTap(String id, String name) {
-      setState(() {
-        _replyToId = id;
-        _replyToName = name;
-      });
-      _inputFocus.requestFocus();
-    }
+    final hPad = 16.w;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -147,7 +155,11 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
                 children: [
                   SizedBox(height: 24.h),
 
-                  if (cfg.headerBuilder != null) cfg.headerBuilder!(_onMore),
+                  ReportDetailHeader(
+                    typeName: widget.caName,
+                    title: widget.wrSubject,
+                    onMoreTap: _onMore,
+                  ),
 
                   Padding(
                     padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
@@ -175,7 +187,20 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _withGaps(cfg.metaRows, gap),
+                        children: [
+                          LabelValueLine.single(
+                            label1: '작성자',
+                            value1: widget.wrName,
+                          ),
+                          LabelValueLine.single(
+                            label1: '등록일',
+                            value1: widget.wrDatetime,
+                          ),
+                          LabelValueLine.single(
+                            label1: '조회수',
+                            value1: widget.wrHit,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -183,7 +208,7 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
                   SizedBox(height: 16.h),
 
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hpad),
+                    padding: EdgeInsets.symmetric(horizontal: hPad),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -193,21 +218,45 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
                             horizontal: 6.w,
                             vertical: 4.h,
                           ),
-                          child: DefaultTextStyle.merge(
-                            style: AppTextStyles.pr16.copyWith(
-                              fontSize: (16.0 * _scale).sp,
-                              height: 1.5,
+                          child: MediaQuery(
+                            data: MediaQuery.of(context).copyWith(
+                              // 전체 텍스트 스케일 조정 (1.0 = 기본, 1.2 = 20% 확대)
+                              textScaler: TextScaler.linear(_scale),
                             ),
-                            child: cfg.body,
+                            child: Html(
+                              data: widget.wrContent,
+                              style: {
+                                "img": Style(
+                                  margin: Margins.only(bottom: 12),
+                                  // maxWidth만 잡아주고 싶으면
+                                  // width: Width.auto(),
+                                ),
+                              },
+                              // 기사 링크(관련 기사)는 그대로 브라우저로
+                              onLinkTap: (url, _, __) {
+                                if (url == null) return;
+                                final uri = Uri.parse(url);
+                                launchUrl(
+                                  uri,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              },
+                            ),
                           ),
                         ),
                         SizedBox(height: 16.h),
 
-                        for (final f in cfg.attachments) ...[
+                        for (final f in widget.files) ...[
                           AttachmentFileRow(
-                            filename: f,
+                            filename: f.fileName,
                             onPreview: () => debugPrint('미리보기: $f'),
-                            onDownload: () => debugPrint('다운로드: $f'),
+                            onDownload: () {
+                              final uri = Uri.parse(f.url);
+                              launchUrl(
+                                uri,
+                                mode: LaunchMode.externalApplication,
+                              );
+                            },
                           ),
                           SizedBox(height: 8.h),
                         ],
@@ -222,26 +271,33 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
                     ),
                   ),
 
-                  if (cfg.showComments)
-                    (widget.commentsBuilder?.call(handleReplyTap) ??
-                        CommentsSection(
-                          comments: mockComments,
-                          onTapReply: handleReplyTap,
-                        )),
-
-                  if (true) ...[
-                    SizedBox(height: 16.h),
-                    Container(color: Colors.red,height: 16.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: AppButton(
-                        text: cfg.backButtonLabel,
-                        onTap: cfg.onBackToList,
-                        type: AppButtonType.secondary,
-                      ),
+                  if (widget.comments.isNotEmpty)
+                    CommentsSection(
+                      comments: widget.comments
+                          .map(
+                            (e) => CommentModel(
+                              id: e.wrId.toString(),
+                              user: e.wrName,
+                              time: e.wrDatetime,
+                              text: e.wrContent,
+                            ),
+                          )
+                          .toList(),
+                      onTapReply: handleReplyTap,
                     ),
-                    SizedBox(height: 24.h),
-                  ],
+
+                  // if (cfg.showBackToListButton) ...[
+                  //   SizedBox(height: 16.h),
+                  //   Padding(
+                  //     padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  //     child: AppButton(
+                  //       text: cfg.backButtonLabel,
+                  //       onTap: cfg.onBackToList,
+                  //       type: AppButtonType.secondary,
+                  //     ),
+                  //   ),
+                  //   SizedBox(height: 24.h),
+                  // ],
                 ],
               ),
             ),
@@ -249,7 +305,7 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
         ),
       ),
 
-      bottomNavigationBar: cfg.showComments
+      bottomNavigationBar: true
           ? SafeArea(
               top: false,
               child: Padding(
@@ -318,16 +374,6 @@ class _ReportDetailScaffoldState extends State<ReportDetailScaffold> {
             )
           : null,
     );
-  }
-
-  List<Widget> _withGaps(List<Widget> rows, double gap) {
-    if (rows.isEmpty) return rows;
-    return [
-      for (int i = 0; i < rows.length; i++) ...[
-        rows[i],
-        if (i != rows.length - 1) SizedBox(height: gap),
-      ],
-    ];
   }
 }
 

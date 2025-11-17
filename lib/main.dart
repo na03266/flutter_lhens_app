@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 세로 고정
+  // HttpOverrides.global = InsecureHttpOverrides();
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -36,5 +40,20 @@ class MyApp extends ConsumerWidget {
         );
       },
     );
+  }
+}
+
+class InsecureHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) {
+        // 특정 도메인만 허용
+        if (host == 'lhes.co.kr') {
+          return true; // ⚠️ 이 도메인의 인증서 검증을 모두 통과시킴
+        }
+        return false;
+      };
   }
 }

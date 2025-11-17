@@ -15,7 +15,7 @@ class TextSizer extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.min = 0.8,
-    this.max = 1.4,
+    this.max = 2,
     this.step = 0.1,
   });
 

@@ -26,7 +26,6 @@ class AttachmentFileRow extends StatelessWidget {
       final sel = await showActionSheet(
         context,
         actions: [
-          ActionItem('preview', '미리보기'),
           ActionItem('download', '다운로드'),
         ],
       );
