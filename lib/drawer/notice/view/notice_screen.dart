@@ -6,9 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/report/base_list_item.dart';
 import 'package:lhens_app/common/components/report/report_list_scaffold_v2.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
-import 'package:lhens_app/drawer/notice/model/notice_model.dart';
+import 'package:lhens_app/drawer/model/board_info_model.dart';
+import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/drawer/notice/provider/notice_provider.dart';
 
+import '../../provider/board_provider.dart';
 import 'notice_detail_screen.dart';
 
 class NoticeScreen extends ConsumerStatefulWidget {
@@ -27,11 +29,22 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final board = ref.watch(boardProvider);
+    if (board is! BoardInfo) {
+      return Scaffold(
+        backgroundColor: AppColors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final item = board.items.firstWhere(
+      (element) => element.boTable == 'comm08',
+    );
     return Scaffold(
       backgroundColor: AppColors.white,
-      body: ReportListScaffoldV2<NoticeModel>(
-        tabs: const ['내부 공지사항', '외부 공지사항'],
-        filters: const ['전체', '보도자료', '게살버거'],
+      body: ReportListScaffoldV2<PostModel>(
+        tabs: item.boCategoryList.split('|'),
+        filters: item.bo1.split('|'),
         selectTabName: (String selectedTab) {
           setState(() {
             caName = selectedTab.replaceAll(" ", "");

@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lhens_app/common/model/page_pagination_model.dart';
 import 'package:lhens_app/common/provider/page_pagination_providar.dart';
-import 'package:lhens_app/drawer/notice/model/notice_model.dart';
+import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/drawer/notice/repository/notice_repository.dart';
 
-final noticeDetailProvider = Provider.family<NoticeModel?, String>((ref, id) {
+final noticeDetailProvider = Provider.family<PostModel?, String>((ref, id) {
   final state = ref.watch(noticeProvider);
   if (state is! PagePagination) {
     return null;
@@ -22,7 +22,7 @@ final noticeProvider =
     });
 
 class NoticeStateNotifier
-    extends PagePaginationProvider<NoticeModel, NoticeRepository> {
+    extends PagePaginationProvider<PostModel, NoticeRepository> {
   NoticeStateNotifier({required super.repository});
 
   getDetail({required String wrId}) async {
@@ -39,11 +39,11 @@ class NoticeStateNotifier
 
     final parsedWrId = int.parse(wrId);
     if (pState.data.where((e) => e.wrId == parsedWrId).isEmpty) {
-      state = pState.copyWith(data: <NoticeModel>[...pState.data, resp]);
+      state = pState.copyWith(data: <PostModel>[...pState.data, resp]);
     } else {
       state = pState.copyWith(
         data: pState.data
-            .map<NoticeModel>((e) => e.wrId == parsedWrId ? resp : e)
+            .map<PostModel>((e) => e.wrId == parsedWrId ? resp : e)
             .toList(),
       );
     }

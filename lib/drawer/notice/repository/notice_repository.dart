@@ -5,10 +5,10 @@ import 'package:lhens_app/common/dio/dio.dart';
 import 'package:lhens_app/common/model/page_pagination_model.dart';
 import 'package:lhens_app/common/model/page_pagination_params.dart';
 import 'package:lhens_app/common/repository/base_pagination_repository.dart';
-import 'package:lhens_app/drawer/notice/model/notice_model.dart';
+import 'package:lhens_app/drawer/model/post_detail_model.dart';
+import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:retrofit/retrofit.dart';
 
-import '../model/notice_detail_model.dart';
 
 part 'notice_repository.g.dart';
 
@@ -19,20 +19,20 @@ final noticeRepositoryProvider = Provider<NoticeRepository>((ref) {
 
 @RestApi()
 abstract class NoticeRepository
-    implements IBasePagePaginationRepository<NoticeModel> {
+    implements IBasePagePaginationRepository<PostModel> {
   factory NoticeRepository(Dio dio, {String baseUrl}) = _NoticeRepository;
 
   @override
   @GET('')
   @Headers({'accessToken': 'true'})
-  Future<PagePagination<NoticeModel>> paginate({
+  Future<PagePagination<PostModel>> paginate({
     @Queries()
     PagePaginationParams? paginationParams = const PagePaginationParams(),
   });
 
   @GET('/{wrId}')
   @Headers({'accessToken': 'true'})
-  Future<NoticeDetailModel> getNoticeDetail({
+  Future<PostDetailModel> getNoticeDetail({
     @Path('wrId') required String wrId,
   });
 }

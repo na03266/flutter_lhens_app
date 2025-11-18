@@ -14,16 +14,29 @@ class BoardInfoError extends BoardInfoBase {
 
 @JsonSerializable()
 class BoardInfo extends BoardInfoBase {
-  final String boTable;
-  final String boSubject;
-  final String boCategoryList;
-
+  final List<BoardInfoItem> items;
   BoardInfo({
-    required this.boTable,
-    required this.boSubject,
-    required this.boCategoryList,
+    required this.items,
   });
 
   factory BoardInfo.fromJson(Map<String, dynamic> json) =>
       _$BoardInfoFromJson(json);
+}
+
+@JsonSerializable()
+class BoardInfoItem extends BoardInfoBase {
+  final String boTable;
+  final String boSubject;
+  final String boCategoryList;
+  final String bo1;
+
+  BoardInfoItem({
+    required this.boTable,
+    required this.boSubject,
+    required this.boCategoryList,
+    required this.bo1,
+  });
+
+  factory BoardInfoItem.fromJson(Map<String, dynamic> json) =>
+      _$BoardInfoItemFromJson(json);
 }

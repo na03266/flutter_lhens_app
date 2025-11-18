@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/common/components/status_chip.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
-import 'package:lhens_app/drawer/notice/model/notice_model.dart';
+import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
 // 상태 구분 (필요한 경우만 사용)
@@ -32,7 +32,7 @@ class BaseListItem extends StatelessWidget {
   });
 
   factory BaseListItem.fromNoticeModel({
-    required NoticeModel model,
+    required PostModel model,
     bool isDetail = false,
   }) {
     return BaseListItem(

@@ -1,9 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'notice_model.g.dart';
+part 'post_model.g.dart';
 
 @JsonSerializable()
-class NoticeModel {
+class PostModel {
   final int wrId;
   final String wrSubject;
   final String wrName;
@@ -11,7 +11,7 @@ class NoticeModel {
   final String caName;
   final String wr1;
 
-  NoticeModel({
+  PostModel({
     required this.wrId,
     required this.wrSubject,
     required this.wrName,
@@ -20,6 +20,6 @@ class NoticeModel {
     required this.wr1,
   });
 
-  factory NoticeModel.fromJson(Map<String, dynamic> json) =>
-      _$NoticeModelFromJson(json);
+  factory PostModel.fromJson(Map<String, dynamic> json) =>
+      _$PostModelFromJson(json);
 }

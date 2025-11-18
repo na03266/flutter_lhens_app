@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/attachments/attachment_file_row.dart';
 import 'package:lhens_app/common/components/comments/comments_section.dart';
+import 'package:lhens_app/common/components/comments/comments_section_v2.dart';
 import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
 import 'package:lhens_app/common/components/inputs/inline_action_field.dart';
 import 'package:lhens_app/common/components/report/report_detail_header.dart';
@@ -11,13 +12,13 @@ import 'package:lhens_app/common/components/report/text_sizer.dart';
 import 'package:lhens_app/common/components/sheets/action_sheet.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
-import 'package:lhens_app/drawer/notice/model/notice_detail_model.dart';
-import 'package:lhens_app/drawer/notice/model/notice_file_model.dart';
-import 'package:lhens_app/mock/comment/mock_comment_data.dart';
+import 'package:lhens_app/drawer/model/file_model.dart';
+import 'package:lhens_app/drawer/model/post_comment_model.dart';
+import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:lhens_app/mock/comment/mock_comment_models.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../drawer/notice/model/notice_comment_model.dart';
+import '../buttons/app_button.dart';
 import '../label_value_line.dart';
 
 class ReportDetailScaffoldV2 extends StatefulWidget {
@@ -31,8 +32,9 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
   final String wrName;
   final String wrDatetime;
   final String wrHit;
-  final List<NoticeCommentModel> comments;
-  final List<NoticeFileModel> files;
+  final List<PostCommentModel> comments;
+  final List<FileModel> files;
+  final bool showBackToList;
 
   const ReportDetailScaffoldV2({
     super.key,
@@ -48,13 +50,14 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     this.wrHit = '',
     this.comments = const [],
     this.files = const [],
+    this.showBackToList = false,
   });
 
   @override
   State<ReportDetailScaffoldV2> createState() => _ReportDetailScaffoldV2State();
 
   factory ReportDetailScaffoldV2.fromModel(
-    NoticeDetailModel? model, {
+    PostDetailModel? model, {
     bool Function()? onUpdate,
     bool Function()? onDelete,
     Function()? postComment,
@@ -225,14 +228,6 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                             ),
                             child: Html(
                               data: widget.wrContent,
-                              style: {
-                                "img": Style(
-                                  margin: Margins.only(bottom: 12),
-                                  // maxWidth만 잡아주고 싶으면
-                                  // width: Width.auto(),
-                                ),
-                              },
-                              // 기사 링크(관련 기사)는 그대로 브라우저로
                               onLinkTap: (url, _, __) {
                                 if (url == null) return;
                                 final uri = Uri.parse(url);
@@ -272,32 +267,23 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                   ),
 
                   if (widget.comments.isNotEmpty)
-                    CommentsSection(
-                      comments: widget.comments
-                          .map(
-                            (e) => CommentModel(
-                              id: e.wrId.toString(),
-                              user: e.wrName,
-                              time: e.wrDatetime,
-                              text: e.wrContent,
-                            ),
-                          )
-                          .toList(),
+                    CommentsSectionV2(
+                      comments: widget.comments,
                       onTapReply: handleReplyTap,
                     ),
 
-                  // if (cfg.showBackToListButton) ...[
-                  //   SizedBox(height: 16.h),
-                  //   Padding(
-                  //     padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  //     child: AppButton(
-                  //       text: cfg.backButtonLabel,
-                  //       onTap: cfg.onBackToList,
-                  //       type: AppButtonType.secondary,
-                  //     ),
-                  //   ),
-                  //   SizedBox(height: 24.h),
-                  // ],
+                  if (!widget.showBackToList) ...[
+                    SizedBox(height: 16.h),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      child: AppButton(
+                        text: '목록으로',
+                        onTap: context.pop,
+                        type: AppButtonType.secondary,
+                      ),
+                    ),
+                    SizedBox(height: 24.h),
+                  ],
                 ],
               ),
             ),
@@ -305,7 +291,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
         ),
       ),
 
-      bottomNavigationBar: true
+      bottomNavigationBar: widget.postComment != null
           ? SafeArea(
               top: false,
               child: Padding(
