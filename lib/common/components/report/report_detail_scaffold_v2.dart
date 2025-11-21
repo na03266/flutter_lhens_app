@@ -3,7 +3,6 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/attachments/attachment_file_row.dart';
-import 'package:lhens_app/common/components/comments/comments_section.dart';
 import 'package:lhens_app/common/components/comments/comments_section_v2.dart';
 import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
 import 'package:lhens_app/common/components/inputs/inline_action_field.dart';
@@ -12,10 +11,10 @@ import 'package:lhens_app/common/components/report/text_sizer.dart';
 import 'package:lhens_app/common/components/sheets/action_sheet.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:lhens_app/common/utils/data_utils.dart';
 import 'package:lhens_app/drawer/model/file_model.dart';
 import 'package:lhens_app/drawer/model/post_comment_model.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
-import 'package:lhens_app/mock/comment/mock_comment_models.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../buttons/app_button.dart';
@@ -64,6 +63,7 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     Function()? postReply,
   }) {
     return ReportDetailScaffoldV2(
+      //
       onUpdate: onUpdate,
       onDelete: onDelete,
       postComment: postComment,
@@ -197,7 +197,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                           ),
                           LabelValueLine.single(
                             label1: '등록일',
-                            value1: widget.wrDatetime,
+                            value1: DataUtils.datetimeParse(widget.wrDatetime),
                           ),
                           LabelValueLine.single(
                             label1: '조회수',

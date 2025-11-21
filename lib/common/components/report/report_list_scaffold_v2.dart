@@ -121,7 +121,6 @@ class _ReportListScaffoldState<T>
               index: _tabIndex,
               rightTabs: widget.tabs,
               onChanged: (tabIndex) => setState(() {
-                print(tabIndex);
                 _tabIndex = tabIndex;
                 if (tabIndex == 0) {
                   widget.selectTabName('');

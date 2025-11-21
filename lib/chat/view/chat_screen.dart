@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lhens_app/chat/provider/chat_room_provider.dart';
+import 'package:lhens_app/chat/repository/chat_socket.dart';
 
 import 'package:lhens_app/common/components/empty_state.dart';
 import 'package:lhens_app/common/components/buttons/fab_add_button.dart';
 import 'package:lhens_app/common/components/search/filter_search_bar.dart';
 import 'package:lhens_app/common/components/count_inline.dart';
+import 'package:lhens_app/common/model/cursor_pagination_model.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_shadows.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
@@ -45,11 +48,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   bool _scrolled = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.read(chatGatewayClientProvider);
+      ref.read(chatRoomProvider.notifier).paginate(fetchOrder: ['roomId_DESC']);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     // final asyncItems = ref.watch(chatItemsProvider); // 추후 전환
-    final items = _items; // 지금은 mock 사용
-    final hasData = items.isNotEmpty;
-
+    final state = ref.watch(chatRoomProvider);
+    print(state is CursorPagination ? state.data :'');
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: Padding(
@@ -77,7 +88,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
             // 스크롤 영역
             Expanded(
-              child: hasData
+              child: state is CursorPagination && state.data.isNotEmpty
                   ? NotificationListener<ScrollNotification>(
                       onNotification: (n) {
                         if (n is ScrollUpdateNotification) {
@@ -91,7 +102,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       child: ListView.separated(
                         physics: const ClampingScrollPhysics(),
                         padding: EdgeInsets.zero,
-                        itemCount: items.length + 1,
+                        itemCount: state.data.length + 1,
                         // 헤더 + 아이템
                         separatorBuilder: (_, i) => i == 0
                             ? const SizedBox.shrink()
@@ -102,12 +113,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                               padding: EdgeInsets.fromLTRB(2.w, 0, 2.w, 8.h),
                               child: CountInline(
                                 label: '전체',
-                                count: items.length,
+                                count: state.data.length,
                                 showSuffix: false,
                               ),
                             );
                           }
-                          final e = items[i - 1];
+                          final e = state.data[i - 1];
                           return ChatListItem(
                             title: e.name,
                             participants: e.participants,

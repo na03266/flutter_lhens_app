@@ -7,6 +7,7 @@ import 'package:lhens_app/common/components/icon_with_dot.dart';
 import 'package:lhens_app/common/components/label_value_line.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:lhens_app/common/utils/data_utils.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/home/my_page/view/my_page_screen.dart';
 
@@ -123,7 +124,7 @@ class DrawerHeaderSection extends StatelessWidget {
                     label1: '사번',
                     value1: empNo,
                     label2: '입사일',
-                    value2: joinDate,
+                    value2: DataUtils.datetimeParse(joinDate),
                   ),
                   SizedBox(height: 16.h),
                   AppButton(

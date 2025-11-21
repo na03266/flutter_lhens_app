@@ -1,31 +1,38 @@
+import 'package:debounce_throttle/debounce_throttle.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../model/cursor_pagination_model.dart';
-import '../model/model_with_id.dart';
 import '../model/cursor_pagination_params.dart';
 import '../repository/base_pagination_repository.dart';
 
 class _PaginationInfo {
   final int fetchCount;
+  final List<String> fetchOrder;
   final bool fetchMore;
   final bool forceRefetch;
 
   _PaginationInfo({
     this.fetchCount = 20,
     this.fetchMore = false,
+    this.fetchOrder = const ['id_DESC'],
     this.forceRefetch = false,
   });
 }
 
-class PaginationProvider<
-  T extends IModelWithIdString,
-  U extends IBaseCursorPaginationRepository<T>
->
+class PaginationProvider<T, U extends IBaseCursorPaginationRepository<T>>
     extends StateNotifier<CursorPaginationBase> {
   final U repository;
+  final paginationThrottle = Throttle(
+    Duration(seconds: 3),
+    initialValue: _PaginationInfo(),
+    checkEquality: false,
+  );
 
   PaginationProvider({required this.repository})
     : super(CursorPaginationLoading()) {
+    paginationThrottle.values.listen((state) {
+      _throttledPaginate(state);
+    });
     paginate();
   }
 
@@ -35,20 +42,25 @@ class PaginationProvider<
     // true = 더 가져오기
     // false = 새로고침
     bool fetchMore = false,
+    List<String> fetchOrder = const ['id_DESC'],
     // 강제로 다시 로딩하기
     // true - CursorPaginationLoading()
     bool forceRefetch = false,
   }) async {
-    // paginationThrottle.setValue(_PaginationInfo(
-    //   fetchCount: fetchCount,
-    //   fetchMore: fetchMore,
-    //   forceRefetch: forceRefetch,
-    // ));
+    paginationThrottle.setValue(
+      _PaginationInfo(
+        fetchCount: fetchCount,
+        fetchMore: fetchMore,
+        fetchOrder: fetchOrder,
+        forceRefetch: forceRefetch,
+      ),
+    );
   }
 
   _throttledPaginate(_PaginationInfo info) async {
     final fetchCount = info.fetchCount;
     final fetchMore = info.fetchMore;
+    final fetchOrder = info.fetchOrder;
     final forceRefetch = info.forceRefetch;
     // 5가지 가능성
     // State의 상태
@@ -66,7 +78,7 @@ class PaginationProvider<
       if (state is CursorPagination && !forceRefetch) {
         final pState = state as CursorPagination;
 
-        if (!pState.meta.hasMore) {
+        if (pState.meta.nextCursor == null) {
           return;
         }
       }
@@ -80,7 +92,8 @@ class PaginationProvider<
 
       // PaginationParams 생성
       CursorPaginationParams paginationParams = CursorPaginationParams(
-        count: fetchCount,
+        take: fetchCount,
+        order: fetchOrder,
       );
 
       // fetchMore
@@ -93,7 +106,7 @@ class PaginationProvider<
         );
 
         paginationParams = paginationParams.copyWith(
-          after: pState.data.last.id,
+          cursor: pState.meta.nextCursor,
         );
       }
 

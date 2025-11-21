@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -44,7 +42,7 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
       backgroundColor: AppColors.white,
       body: ReportListScaffoldV2<PostModel>(
         tabs: item.boCategoryList.split('|'),
-        filters: item.bo1.split('|'),
+        filters: ['전체', ...item.bo1.split('|')],
         selectTabName: (String selectedTab) {
           setState(() {
             caName = selectedTab.replaceAll(" ", "");
@@ -86,7 +84,7 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
                 pathParameters: {'rid': model.wrId.toString()},
               );
             },
-            child: BaseListItem.fromNoticeModel(model: model),
+            child: BaseListItem.fromPostModel(model: model),
           );
         },
       ),

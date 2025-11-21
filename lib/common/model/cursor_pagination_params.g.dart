@@ -9,10 +9,15 @@ part of 'cursor_pagination_params.dart';
 CursorPaginationParams _$CursorPaginationParamsFromJson(
   Map<String, dynamic> json,
 ) => CursorPaginationParams(
-  count: (json['count'] as num?)?.toInt(),
-  after: json['after'] as String?,
+  take: (json['take'] as num?)?.toInt(),
+  cursor: json['cursor'] as String?,
+  order: (json['order'] as List<dynamic>?)?.map((e) => e as String).toList(),
 );
 
 Map<String, dynamic> _$CursorPaginationParamsToJson(
   CursorPaginationParams instance,
-) => <String, dynamic>{'after': instance.after, 'count': instance.count};
+) => <String, dynamic>{
+  'cursor': instance.cursor,
+  'take': instance.take,
+  'order': instance.order,
+};

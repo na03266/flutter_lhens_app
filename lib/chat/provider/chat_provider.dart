@@ -3,11 +3,6 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../repository/chat_socket.dart'; // 앞서 만든 ChatGatewayClient
 
-
-// 로그인 상태에서 JWT 보관
-
-
-// 실시간 메시지 스트림
 final chatMessagesProvider = StreamProvider<Map<String, dynamic>>((ref) {
   final client = ref.watch(chatGatewayClientProvider);
   if (client == null) return const Stream.empty();

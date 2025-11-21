@@ -4,15 +4,25 @@ part 'cursor_pagination_params.g.dart';
 
 @JsonSerializable()
 class CursorPaginationParams {
-  final String? after;
-  final int? count;
+  final String? cursor;
+  final int? take;
+  final List<String>? order;
 
-  const CursorPaginationParams({this.count, this.after});
+  const CursorPaginationParams({
+    this.take,
+    this.cursor,
+    this.order ,
+  });
 
-  CursorPaginationParams copyWith({String? after, int? count}) {
+  CursorPaginationParams copyWith({
+    String? cursor,
+    List<String>? order,
+    int? take,
+  }) {
     return CursorPaginationParams(
-      after: after ?? this.after,
-      count: count ?? this.count,
+      cursor: cursor ?? this.cursor,
+      order: order ?? this.order,
+      take: take ?? this.take,
     );
   }
 

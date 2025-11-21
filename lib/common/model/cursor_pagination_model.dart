@@ -44,20 +44,20 @@ class CursorPagination<T> extends CursorPaginationBase {
 @JsonSerializable()
 class CursorPaginationMeta {
   final int count;
-  final bool hasMore;
+  final String? nextCursor;
 
   CursorPaginationMeta({
     required this.count,
-    required this.hasMore,
+    required this.nextCursor,
   });
 
   CursorPaginationMeta copyWith({
     int? count,
-    bool? hasMore,
+    String? nextCursor,
   }) {
     return CursorPaginationMeta(
       count: count ?? this.count,
-      hasMore: hasMore ?? this.hasMore,
+      nextCursor: nextCursor ?? this.nextCursor,
     );
   }
 

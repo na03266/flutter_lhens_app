@@ -10,6 +10,7 @@ import 'package:lhens_app/drawer/complaint/view/complaint_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/drawer/survey/view/survey_screen.dart';
+import '../../common/utils/data_utils.dart';
 import '../../user/model/user_model.dart';
 import '../../user/provider/user_me_provier.dart';
 import '../my_page/view/my_page_screen.dart';
@@ -117,7 +118,7 @@ class GreetingCard extends StatelessWidget {
                   label1: '사번',
                   value1: condition ? mb.mbId : '',
                   label2: '입사일',
-                  value2: condition ? mb.mb3 : '',
+                  value2: condition ? DataUtils.datetimeParse(mb.mb3) : '',
                 ),
               ],
             ),

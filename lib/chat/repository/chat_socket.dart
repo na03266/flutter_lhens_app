@@ -12,8 +12,8 @@ final chatGatewayClientProvider = Provider<ChatGatewayClient?>((ref) {
   if (jwt == null) return null;
 
   final client = ChatGatewayClient(baseUrl: baseUrl, jwt: jwt);
-  client.connect();                   // 로그인 시 자동 연결
-  ref.onDispose(client.dispose);      // 로그아웃/앱 종료 시 정리
+  client.connect(); // 로그인 시 자동 연결
+  ref.onDispose(client.dispose); // 로그아웃/앱 종료 시 정리
   return client;
 });
 
@@ -23,6 +23,7 @@ class ChatGatewayClient {
   late final IO.Socket _socket;
 
   final _messages = StreamController<Map<String, dynamic>>.broadcast();
+
   Stream<Map<String, dynamic>> get messages => _messages.stream;
 
   ChatGatewayClient({required this.baseUrl, required this.jwt});
@@ -35,9 +36,6 @@ class ChatGatewayClient {
         .setTransports(['websocket'])
         .enableAutoConnect()
         .enableReconnection()
-        .setReconnectionDelay(500)
-        .setReconnectionDelayMax(5000)
-        .setTimeout(10000)
         .setPath('/socket.io');
 
     // 모바일/데스크톱 네이티브: 헤더 사용
@@ -53,7 +51,7 @@ class ChatGatewayClient {
     _socket.onConnect((_) {
       // 서버가 접속 즉시 'ready'를 emit합니다.
       // 필요 시 여기서 로비 조인
-      // joinLobby();
+      joinLobby();
     });
 
     _socket.onConnectError((e) => print('connect_error: $e'));
@@ -119,6 +117,11 @@ class ChatGatewayClient {
 
   bool get _isWeb {
     // 간단 판별: dart:io Platform 사용 불가 시 웹로 간주
-    try { Platform.isAndroid; return false; } catch (_) { return true; }
+    try {
+      Platform.isAndroid;
+      return false;
+    } catch (_) {
+      return true;
+    }
   }
 }
