@@ -218,7 +218,11 @@ class _ReportListScaffoldState<T>
       floatingActionButton: widget.addPost != null
           ? Padding(
               padding: EdgeInsets.only(bottom: 20.h),
-              child: FabAddButton(onTap: () => widget.addPost),
+              child: FabAddButton(
+                onTap: () {
+                  widget.addPost!();
+                },
+              ),
             )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,

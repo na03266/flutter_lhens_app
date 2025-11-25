@@ -3,6 +3,7 @@ import 'package:lhens_app/chat/view/chat_name_screen.dart';
 import 'package:lhens_app/drawer/complaint/view/complaint_detail_screen.dart';
 import 'package:lhens_app/drawer/complaint/view/complaint_form_screen.dart';
 import 'package:lhens_app/drawer/complaint/view/complaint_screen.dart';
+import 'package:lhens_app/drawer/notice/view/notice_form_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_auth_screen.dart';
 import 'package:lhens_app/drawer/notice/view/notice_detail_screen.dart';
@@ -89,10 +90,13 @@ List<RouteBase> get routes => [
                     const NoTransitionPage(child: ComplaintFormScreen()),
               ),
               GoRoute(
-                path: 'detail',
+                path: ':rid',
                 name: ComplaintDetailScreen.routeName,
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: ComplaintDetailScreen()),
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: ComplaintDetailScreen(
+                    wrId: state.pathParameters['rid']!,
+                  ),
+                ),
               ),
             ],
           ),
@@ -103,12 +107,28 @@ List<RouteBase> get routes => [
                 const NoTransitionPage(child: NoticeScreen()),
             routes: [
               GoRoute(
+                path: 'update/:rid',
+                name: NoticeFormScreen.routeNameUpdate,
+                pageBuilder: (context, state) =>
+                    NoTransitionPage(
+                      child: NoticeFormScreen(
+                          wrId: state.pathParameters['rid']!),
+                    ),
+              ),
+              GoRoute(
+                path: 'create',
+                name: NoticeFormScreen.routeNameCreate,
+                pageBuilder: (context, state) =>
+                    NoTransitionPage(
+                      child: NoticeFormScreen(),
+                    ),
+              ),
+              GoRoute(
                 path: ':rid',
                 name: NoticeDetailScreen.routeName,
-                pageBuilder: (context, state) =>
-                     NoTransitionPage(child: NoticeDetailScreen(
-                      wrId: state.pathParameters['rid']!,
-                    )),
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: NoticeDetailScreen(wrId: state.pathParameters['rid']!),
+                ),
               ),
             ],
           ),
@@ -119,10 +139,12 @@ List<RouteBase> get routes => [
                 const NoTransitionPage(child: EduEventScreen()),
             routes: [
               GoRoute(
-                path: 'detail',
+                path: ':rid',
                 name: EduEventDetailScreen.routeName,
                 pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: EduEventDetailScreen()),
+                     NoTransitionPage(child: EduEventDetailScreen(
+                        wrId: state.pathParameters['rid']!
+                    )),
               ),
             ],
           ),
@@ -175,10 +197,13 @@ List<RouteBase> get routes => [
                 ),
                 routes: [
                   GoRoute(
-                    path: 'detail',
+                    path: ':rid',
                     name: '내 민원제안 상세',
-                    pageBuilder: (_, __) =>
-                        const NoTransitionPage(child: ComplaintDetailScreen()),
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: ComplaintDetailScreen(
+                        wrId: state.pathParameters['rid']!,
+                      ),
+                    ),
                   ),
                   GoRoute(
                     path: 'form',

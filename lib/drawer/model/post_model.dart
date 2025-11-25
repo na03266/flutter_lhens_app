@@ -10,6 +10,10 @@ class PostModel {
   final String wrDatetime;
   final String caName;
   final String wr1;
+  final String wr2;
+  final String wr3;
+  final String wr4;
+  final String wr5;
 
   PostModel({
     required this.wrId,
@@ -18,6 +22,10 @@ class PostModel {
     required this.wrDatetime,
     required this.caName,
     required this.wr1,
+    required this.wr2,
+    required this.wr3,
+    required this.wr4,
+    required this.wr5,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) =>

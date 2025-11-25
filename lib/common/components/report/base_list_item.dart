@@ -4,6 +4,7 @@ import 'package:lhens_app/common/components/status_chip.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/common/utils/data_utils.dart';
+import 'package:lhens_app/drawer/edu_event/provider/edu_provider.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
@@ -19,6 +20,7 @@ class BaseListItem extends StatelessWidget {
   final int? commentCount; // 댓글 수 (선택)
   final bool secret; // 비밀글 여부 (선택)
   final VoidCallback? onTap;
+  final bool isEdu;
 
   const BaseListItem({
     super.key,
@@ -29,6 +31,7 @@ class BaseListItem extends StatelessWidget {
     required this.dateText,
     this.commentCount,
     this.secret = false,
+    this.isEdu = false,
     this.onTap,
   });
 
@@ -37,10 +40,23 @@ class BaseListItem extends StatelessWidget {
     bool isDetail = false,
   }) {
     return BaseListItem(
-      typeName: model.caName,
-      title: '[${model.wr1 == '' ? '기타' : model.wr1}] ${model.wrSubject}',
+      typeName: '${model.caName} ${model.wr1 == '' ? '' : '[${model.wr1}]'} ',
+      title: model.wrSubject,
       author: model.wrName,
       dateText: DataUtils.datetimeParse(model.wrDatetime),
+    );
+  }
+
+  factory BaseListItem.fromPostModelForEdu({
+    required PostModel model,
+    bool isDetail = false,
+  }) {
+    return BaseListItem(
+      isEdu: true,
+      typeName: model.caName,
+      title: model.wrSubject,
+      author: model.wr3,
+      dateText: model.wr4,
     );
   }
 
@@ -93,18 +109,46 @@ class BaseListItem extends StatelessWidget {
                 // 작성자 · 날짜 · (댓글)
                 Row(
                   children: [
-                    Text(
-                      author,
-                      style: AppTextStyles.pr13.copyWith(
-                        color: AppColors.textTer,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isEdu ? '수신부서' : author,
+                          style: AppTextStyles.pr13.copyWith(
+                            color: AppColors.textTer,
+                          ),
+                        ),
+                        if (isEdu) ...[
+                          SizedBox(height: 5.h),
+                          Text(
+                            '기간',
+                            style: AppTextStyles.pr13.copyWith(
+                              color: AppColors.textTer,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                     SizedBox(width: 10.w),
-                    Text(
-                      dateText,
-                      style: AppTextStyles.pr13.copyWith(
-                        color: AppColors.textTer,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isEdu ? author : dateText,
+                          style: AppTextStyles.pr13.copyWith(
+                            color: AppColors.textTer,
+                          ),
+                        ),
+                        if (isEdu) ...[
+                          SizedBox(height: 5.h),
+                          Text(
+                            dateText,
+                            style: AppTextStyles.pr13.copyWith(
+                              color: AppColors.textTer,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                     if (commentCount != null) ...[
                       SizedBox(width: 8.w),

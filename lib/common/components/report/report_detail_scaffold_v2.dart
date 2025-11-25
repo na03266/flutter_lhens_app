@@ -21,7 +21,7 @@ import '../buttons/app_button.dart';
 import '../label_value_line.dart';
 
 class ReportDetailScaffoldV2 extends StatefulWidget {
-  final bool Function()? onUpdate;
+  final Function()? onUpdate;
   final bool Function()? onDelete;
   final Function()? postComment;
   final Function()? postReply;
@@ -31,6 +31,8 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
   final String wrName;
   final String wrDatetime;
   final String wrHit;
+  final String? wr3;
+  final String? wr4;
   final List<PostCommentModel> comments;
   final List<FileModel> files;
   final bool showBackToList;
@@ -47,6 +49,8 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     this.wrName = '',
     this.wrDatetime = '',
     this.wrHit = '',
+    this.wr3,
+    this.wr4,
     this.comments = const [],
     this.files = const [],
     this.showBackToList = false,
@@ -57,13 +61,12 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
 
   factory ReportDetailScaffoldV2.fromModel(
     PostDetailModel? model, {
-    bool Function()? onUpdate,
+    Function()? onUpdate,
     bool Function()? onDelete,
     Function()? postComment,
     Function()? postReply,
   }) {
     return ReportDetailScaffoldV2(
-      //
       onUpdate: onUpdate,
       onDelete: onDelete,
       postComment: postComment,
@@ -76,6 +79,8 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
       wrHit: model?.wrHit.toString() ?? '',
       comments: model?.comments ?? [],
       files: model?.files ?? [],
+      wr3: model?.wr3,
+      wr4: model?.wr4,
     );
   }
 }
@@ -99,19 +104,14 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
     final sel = await showActionSheet(
       context,
       actions: [
-        ActionItem('edit', '수정'),
+        if (widget.onUpdate != null) ActionItem('edit', '수정'),
         ActionItem('delete', '삭제', destructive: true),
       ],
     );
     if (!mounted || sel == null) return;
 
     if (sel == 'edit') {
-      final ok = widget.onUpdate ?? false;
-      if (ok == true && mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('저장되었습니다.')));
-      }
+      widget.onUpdate!();
       return;
     }
 
@@ -191,6 +191,16 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if(widget.wr3 != null && widget.wr3!.isNotEmpty)
+                          LabelValueLine.single(
+                            label1: '수신부서',
+                            value1: widget.wr3!,
+                          ),
+                          if(widget.wr4 != null && widget.wr4!.isNotEmpty)
+                          LabelValueLine.single(
+                            label1: '기간',
+                            value1: widget.wr4!,
+                          ),
                           LabelValueLine.single(
                             label1: '작성자',
                             value1: widget.wrName,

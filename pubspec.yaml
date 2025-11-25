@@ -28,6 +28,7 @@ dependencies:
   debounce_throttle: ^2.0.0
   flutter_html: ^3.0.0
   url_launcher: ^6.3.2
+  html_editor_enhanced: ^2.7.1
 
 dev_dependencies:
   flutter_test:

@@ -5,22 +5,22 @@ import 'package:lhens_app/common/dio/dio.dart';
 import 'package:lhens_app/common/model/page_pagination_model.dart';
 import 'package:lhens_app/common/model/page_pagination_params.dart';
 import 'package:lhens_app/common/repository/base_pagination_repository.dart';
-import 'package:lhens_app/drawer/model/create_post_dto.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:retrofit/retrofit.dart';
 
-part 'notice_repository.g.dart';
 
-final noticeRepositoryProvider = Provider<NoticeRepository>((ref) {
+part 'edu_repository.g.dart';
+
+final eduRepositoryProvider = Provider<EduRepository>((ref) {
   final dio = ref.watch(dioProvider);
-  return NoticeRepository(dio, baseUrl: '$ip/board-notice');
+  return EduRepository(dio, baseUrl: '$ip/board-edu');
 });
 
 @RestApi()
-abstract class NoticeRepository
+abstract class EduRepository
     implements IBasePagePaginationRepository<PostModel> {
-  factory NoticeRepository(Dio dio, {String baseUrl}) = _NoticeRepository;
+  factory EduRepository(Dio dio, {String baseUrl}) = _EduRepository;
 
   @override
   @GET('')
@@ -32,13 +32,7 @@ abstract class NoticeRepository
 
   @GET('/{wrId}')
   @Headers({'accessToken': 'true'})
-  Future<PostDetailModel> getNoticeDetail({@Path('wrId') required String wrId});
-
-  @POST('')
-  @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
-  Future<String?> postPost({@Body() required CreatePostDto dto});
-
-  @PATCH('')
-  @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
-  Future<String?> patchPost({@Body() required CreatePostDto dto});
+  Future<PostDetailModel> getEduDetail({
+    @Path('wrId') required String wrId,
+  });
 }

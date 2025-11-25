@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:characters/characters.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
 
 import 'package:lhens_app/common/components/buttons/app_button.dart';
 import 'package:lhens_app/common/components/report/editor_container.dart';
@@ -28,6 +29,7 @@ class _ReportFormScaffoldState extends State<ReportFormScaffold> {
   static const int _maxContentLen = 600;
   final _title = TextEditingController();
   final _content = TextEditingController();
+  final HtmlEditorController _htmlController = HtmlEditorController();  // ★ 추가
 
   String? _type;
   String? _status;
@@ -49,6 +51,12 @@ class _ReportFormScaffoldState extends State<ReportFormScaffold> {
     _files.addAll(c.initialFiles);
     _pickedDepts = List.of(c.initialTargetDepts);
     _pickedUsers = List.of(c.initialTargetUsers);
+    // HTML 에디터 초기값 (c.initialContent 가 HTML이라면 그대로 사용)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (c.initialContent != null && c.initialContent!.isNotEmpty) {
+        _htmlController.setText(c.initialContent!);
+      }
+    });
   }
 
   bool get _doneLocked => widget.config.isEdit && _status == '완료';
@@ -162,19 +170,28 @@ class _ReportFormScaffoldState extends State<ReportFormScaffold> {
               EditorContainer(
                 height: 248,
                 showCounter: true,
-                counterText:
-                    '${_content.text.characters.length}/$_maxContentLen',
+                // 단순 길이 카운터를 유지하려면 컨텐츠를 가져와서 계산해야 함
+                counterText: '',
+                // 일단 비워두거나, 필요하면 별도 처리
                 locked: _locked,
                 dimOnLocked: false,
-                child: TextEditorAdapter(
-                  dimOnLocked: false,
-                  controller: _content,
-                  hint: cfg.contentHint,
-                  locked: _locked,
-                  onChanged: (_) {
-                    _enforceContentMax();
-                    setState(() {});
-                  },
+                child: IgnorePointer(
+                  ignoring: _locked,
+                  child: Opacity(
+                    opacity: _locked ? 0.6 : 1,
+                    child: HtmlEditor(
+                      controller: _htmlController,
+                      htmlEditorOptions: HtmlEditorOptions(
+                        hint: cfg.contentHint,
+                        // 초기 HTML은 initState에서 setText로 넣으므로 여기선 생략 가능
+                        // initialText: widget.config.initialContent ?? '',
+                      ),
+                      htmlToolbarOptions: const HtmlToolbarOptions(
+                        toolbarType: ToolbarType.nativeScrollable,
+                      ),
+                      otherOptions: const OtherOptions(height: 230),
+                    ),
+                  ),
                 ),
               ),
               SizedBox(height: 12.h),

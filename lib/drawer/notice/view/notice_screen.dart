@@ -7,6 +7,7 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/drawer/model/board_info_model.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/drawer/notice/provider/notice_provider.dart';
+import 'package:lhens_app/drawer/notice/view/notice_form_screen.dart';
 
 import '../../provider/board_provider.dart';
 import 'notice_detail_screen.dart';
@@ -38,6 +39,7 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
     final item = board.items.firstWhere(
       (element) => element.boTable == 'comm08',
     );
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: ReportListScaffoldV2<PostModel>(
@@ -53,7 +55,11 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
         },
         selectFilterName: (String selectedFilter) {
           setState(() {
-            wr1 = selectedFilter;
+            if (selectedFilter == '전체') {
+              wr1 = '';
+            } else {
+              wr1 = selectedFilter;
+            }
           });
         },
         onSearched: (String input) {
@@ -64,7 +70,9 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
               .read(noticeProvider.notifier)
               .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
         },
-        addPost: () {},
+        addPost: () {
+          context.pushNamed(NoticeFormScreen.routeNameCreate);
+        },
         provider: noticeProvider,
         changePage: (int page) {
           ref
@@ -76,7 +84,7 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
                 title: title,
               );
         },
-        itemBuilder: <NoticeModel>(_, index, model) {
+        itemBuilder: (_, index, model) {
           return GestureDetector(
             onTap: () {
               context.goNamed(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/report/report_form_config.dart';
 import 'package:lhens_app/common/components/report/report_form_scaffold.dart';
+import 'package:lhens_app/common/components/report/report_form_scaffold_v2.dart';
 
 class ComplaintFormScreen extends StatelessWidget {
   static String get routeName => '민원제안 등록';
@@ -20,6 +21,7 @@ class ComplaintFormScreen extends StatelessWidget {
     final initialContent = isEdit ? '내용이 표시되는\n영역입니다.' : null;
     final initialFiles = isEdit ? const ['첨부파일명.pdf'] : const <String>[];
 
+    // return ReportFormScaffoldV2(config: config);
     return ReportFormScaffold(
       config: ReportFormConfig(
         titleHint: '제목',

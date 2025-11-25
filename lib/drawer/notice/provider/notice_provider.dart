@@ -4,6 +4,8 @@ import 'package:lhens_app/common/provider/page_pagination_providar.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/drawer/notice/repository/notice_repository.dart';
 
+import '../../model/create_post_dto.dart';
+
 final noticeDetailProvider = Provider.family<PostModel?, String>((ref, id) {
   final state = ref.watch(noticeProvider);
   if (state is! PagePagination) {
@@ -46,6 +48,20 @@ class NoticeStateNotifier
             .map<PostModel>((e) => e.wrId == parsedWrId ? resp : e)
             .toList(),
       );
+    }
+  }
+
+  postPost({required CreatePostDto dto}) async {
+    final resp = await repository.postPost(dto: dto);
+    if (resp != null) {
+      paginate(forceRefetch: true);
+    }
+  }
+
+  patchPost({required CreatePostDto dto}) async {
+    final resp = await repository.patchPost(dto: dto);
+    if (resp != null) {
+      paginate(forceRefetch: true);
     }
   }
 }

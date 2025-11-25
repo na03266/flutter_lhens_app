@@ -14,7 +14,7 @@ class FabAddButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PressScale(
-      onTap: onTap,
+      onTap: () {onTap();} ,
       child: Container(
         height: 48.h,
         padding: EdgeInsets.only(

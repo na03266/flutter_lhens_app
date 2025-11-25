@@ -29,12 +29,14 @@ class BoardInfoItem extends BoardInfoBase {
   final String boSubject;
   final String boCategoryList;
   final String bo1;
+  final String bo2;
 
   BoardInfoItem({
     required this.boTable,
     required this.boSubject,
     required this.boCategoryList,
     required this.bo1,
+    required this.bo2,
   });
 
   factory BoardInfoItem.fromJson(Map<String, dynamic> json) =>

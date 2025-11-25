@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/report/report_detail_scaffold_v2.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:lhens_app/drawer/notice/provider/notice_provider.dart';
-
+import 'package:lhens_app/drawer/notice/view/notice_form_screen.dart';
 
 class NoticeDetailScreen extends ConsumerStatefulWidget {
   static String get routeName => '공지사항 상세';
@@ -32,10 +33,12 @@ class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
     final isDetail = state is PostDetailModel;
     return ReportDetailScaffoldV2.fromModel(
       isDetail ? state : null,
-      postComment: () {
-
+      onUpdate: () {
+        context.goNamed(NoticeFormScreen.routeNameUpdate,
+          pathParameters: {'rid': widget.wrId},
+        );
       },
+      postComment: () {},
     );
   }
 }
-

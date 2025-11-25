@@ -33,9 +33,7 @@ class ChatRoomStateNotifier
 
   createChatRoom({required CreateChatRoomDto dto}) async {
     final resp = await repository.createChatRoom(dto: dto);
-    if (resp is Int) {
-      paginate(forceRefetch: true);
-    }
+    if (resp != null) paginate(forceRefetch: true);
   }
 
   // getDetail({

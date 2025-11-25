@@ -30,10 +30,9 @@ abstract class ChatRoomRepository
     CursorPaginationParams? paginationParams = const CursorPaginationParams(),
   });
 
-  //
   @POST('')
-  @Headers({'accessToken': 'true'})
-  Future<int> createChatRoom({@Body() required CreateChatRoomDto dto});
+  @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
+  Future<String?> createChatRoom({@Body() required CreateChatRoomDto dto});
 
   @GET('/')
   @Headers({'accessToken': 'true'})
