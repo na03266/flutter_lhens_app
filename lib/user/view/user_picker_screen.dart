@@ -8,10 +8,13 @@ import 'package:lhens_app/common/components/buttons/app_button.dart';
 import 'package:lhens_app/common/components/empty_state.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_shadows.dart';
+import 'package:lhens_app/department/model/department_model.dart';
+import 'package:lhens_app/department/provider/department_provider.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
 import 'package:lhens_app/mock/user_tree/mock_user_tree_models.dart';
 import 'package:lhens_app/user/component/user_tree.dart';
+import 'package:lhens_app/user/component/user_tree_v2.dart';
 import 'package:lhens_app/user/model/user_pick_result.dart';
 
 import 'package:lhens_app/mock/user_tree/mock_org_adapter.dart'
@@ -32,27 +35,21 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
   String _appliedQuery = '';
 
   // 펼침/선택 상태
-  final _expandedDepts = <String>{};
-  final _expandedTeams = <String>{};
-  final _selDepts = <String>{};
-  final _selTeams = <String>{};
-  final _selectedMemberIds = <String>{};
+  final _expTeams = <int>{};
+  final _selTeams = <int>{};
+  final _selMbNo = <int>{};
 
   bool _scrolled = false;
 
   // 데이터
-  List<Department> get _data => kMockDepartments;
 
   // 선택 가능 여부
-  bool get _canSubmit =>
-      _selectedMemberIds.isNotEmpty ||
-      _selDepts.isNotEmpty ||
-      _selTeams.isNotEmpty;
+  bool get _canSubmit => _selTeams.isNotEmpty || _selMbNo.isNotEmpty;
 
   @override
   void initState() {
     super.initState();
-    if (_data.isNotEmpty) _expandedDepts.add(_data.first.name);
+    ref.read(departmentProvider.notifier);
   }
 
   @override
@@ -61,167 +58,9 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
     super.dispose();
   }
 
-  // 헬퍼
-  Department? _findDept(String name) {
-    for (final d in _data) {
-      if (d.name == name) return d;
-    }
-    return null;
-  }
-
-  Team? _findTeam(String dept, String team) {
-    final d = _findDept(dept);
-    if (d == null) return null;
-    for (final t in d.teams) {
-      if (t.name == team) return t;
-    }
-    return null;
-  }
-
-  Iterable<Employee> _employeesInDept(String dept) sync* {
-    final d = _findDept(dept);
-    if (d == null) return;
-    for (final t in d.teams) {
-      yield* t.members;
-    }
-  }
-
-  Iterable<Employee> _employeesInTeam(String dept, String team) sync* {
-    final t = _findTeam(dept, team);
-    if (t == null) return;
-    yield* t.members;
-  }
-
-  Employee? _employeeById(String id) {
-    for (final d in _data) {
-      for (final t in d.teams) {
-        for (final m in t.members) {
-          if (m.id == id) return m;
-        }
-      }
-    }
-    return null;
-  }
-
-  ({Department dept, Team team})? _pathByMemberId(String id) {
-    for (final d in _data) {
-      for (final t in d.teams) {
-        for (final m in t.members) {
-          if (m.id == id) return (dept: d, team: t);
-        }
-      }
-    }
-    return null;
-  }
-
-  bool _areAllTeamMembersSelected(String dept, String team) {
-    for (final m in _employeesInTeam(dept, team)) {
-      if (!_selectedMemberIds.contains(m.id)) return false;
-    }
-    return true;
-  }
-
-  bool _areAllDeptMembersSelected(String dept) {
-    for (final m in _employeesInDept(dept)) {
-      if (!_selectedMemberIds.contains(m.id)) return false;
-    }
-    return true;
-  }
-
-  void _applyDeptSelection(String dept, bool selected) {
-    final d = _findDept(dept);
-    if (d == null) return;
-
-    if (selected) {
-      _selDepts.add(dept);
-      for (final t in d.teams) {
-        _selTeams.add('$dept/${t.name}');
-        for (final m in t.members) {
-          _selectedMemberIds.add(m.id);
-        }
-      }
-    } else {
-      _selDepts.remove(dept);
-      for (final t in d.teams) {
-        _selTeams.remove('$dept/${t.name}');
-        for (final m in t.members) {
-          _selectedMemberIds.remove(m.id);
-        }
-      }
-    }
-  }
-
-  void _applyTeamSelection(String dept, String team, bool selected) {
-    final key = '$dept/$team';
-    final members = _employeesInTeam(dept, team);
-
-    if (selected) {
-      _selTeams.add(key);
-      for (final m in members) {
-        _selectedMemberIds.add(m.id);
-      }
-      if (_areAllDeptMembersSelected(dept)) _selDepts.add(dept);
-    } else {
-      _selTeams.remove(key);
-      for (final m in members) {
-        _selectedMemberIds.remove(m.id);
-      }
-      _selDepts.remove(dept);
-    }
-  }
-
-  void _syncParentsAfterMemberToggle(String memberId) {
-    final path = _pathByMemberId(memberId);
-    if (path == null) return;
-    final dept = path.dept.name;
-    final team = path.team.name;
-
-    if (_areAllTeamMembersSelected(dept, team)) {
-      _selTeams.add('$dept/$team');
-    } else {
-      _selTeams.remove('$dept/$team');
-    }
-    if (_areAllDeptMembersSelected(dept)) {
-      _selDepts.add(dept);
-    } else {
-      _selDepts.remove(dept);
-    }
-  }
-
-  // 검색 필터
-  List<Department> _filter(List<Department> src, String q) {
-    if (q.isEmpty) return src;
-    final lower = q.toLowerCase();
-
-    return src
-        .map((d) {
-          final teams = d.teams
-              .map((t) {
-                final members = t.members
-                    .where(
-                      (m) =>
-                          m.name.toLowerCase().contains(lower) ||
-                          m.id.toLowerCase().contains(lower) ||
-                          m.position.toLowerCase().contains(lower),
-                    )
-                    .toList();
-                if (members.isEmpty) return null;
-                return Team(name: t.name, members: members);
-              })
-              .whereType<Team>()
-              .toList();
-          if (teams.isEmpty) return null;
-          return Department(name: d.name, teams: teams);
-        })
-        .whereType<Department>()
-        .toList();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final filtered = _filter(_data, _appliedQuery);
-    final noData = _data.isEmpty;
-    final noResult = !noData && filtered.isEmpty;
+    final state = ref.watch(departmentProvider);
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -265,14 +104,14 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                   child: ListView(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     children: [
-                      if (noData) ...[
+                      if (state is! DepartmentModelList) ...[
                         SizedBox(height: 40.h),
                         EmptyState(
                           iconPath: Assets.icons.user.path,
                           message: '선택할 직원이 없습니다.',
                         ),
                         SizedBox(height: 48.h),
-                      ] else if (noResult) ...[
+                      ] else if (state.data.isEmpty) ...[
                         SizedBox(height: 40.h),
                         EmptyState(
                           iconPath: Assets.icons.search.path,
@@ -280,52 +119,41 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                         ),
                         SizedBox(height: 48.h),
                       ] else ...[
-                        UserTree<Department, Team, Employee>(
-                          data: filtered,
-                          // 부서
-                          deptName: (d) => d.name,
-                          teamsOf: (d) => d.teams,
-                          isDeptExpanded: (d) =>
-                              _expandedDepts.contains(d.name),
-                          onToggleDept: (d) => setState(() {
-                            if (!_expandedDepts.add(d.name)) {
-                              _expandedDepts.remove(d.name);
-                            }
-                          }),
-                          isDeptSelected: (d) => _selDepts.contains(d.name),
-                          onToggleDeptSelected: (d, v) => setState(() {
-                            _applyDeptSelection(d.name, v);
-                          }),
-                          // 팀
-                          teamName: (t) => t.name,
-                          membersOf: (t) => t.members,
-                          isTeamExpanded: (d, t) =>
-                              _expandedTeams.contains('${d.name}/${t.name}') &&
-                              _expandedDepts.contains(d.name),
-                          onToggleTeam: (d, t) => setState(() {
-                            final key = '${d.name}/${t.name}';
-                            if (!_expandedTeams.add(key)) {
-                              _expandedTeams.remove(key);
-                            }
-                          }),
-                          isTeamSelected: (d, t) =>
-                              _selTeams.contains('${d.name}/${t.name}'),
-                          onToggleTeamSelected: (d, t, v) => setState(() {
-                            _applyTeamSelection(d.name, t.name, v);
-                          }),
-                          // 멤버
-                          isMemberSelected: (e) =>
-                              _selectedMemberIds.contains(e.id),
-                          onToggleMember: (e, selected) => setState(() {
-                            if (selected) {
-                              _selectedMemberIds.add(e.id);
-                            } else {
-                              _selectedMemberIds.remove(e.id);
-                            }
-                            _syncParentsAfterMemberToggle(e.id);
-                          }),
-                          memberTitle: (e) => e.name,
-                          memberSubTitle: (e) => '${e.id} ${e.position}',
+                        UserTreeV2(
+                          departmentList: state.data,
+                          onTeamExpanded: (state, id) async {
+                            await ref
+                                .read(departmentProvider.notifier)
+                                .getDetail(id);
+                            setState(() {
+                              if (state) {
+                                _expTeams.add(id);
+                              } else {
+                                _expTeams.remove(id);
+                              }
+                            });
+                          },
+                          onTeamSelected: (state, id) {
+                            setState(() {
+                              if (state) {
+                                _selTeams.add(id);
+                              } else {
+                                _selTeams.remove(id);
+                              }
+                            });
+                          },
+                          onMbSelected: (state, id) {
+                            setState(() {
+                              if (state) {
+                                _selMbNo.add(id);
+                              } else {
+                                _selMbNo.remove(id);
+                              }
+                            });
+                          },
+                          expandedTeam: _expTeams,
+                          selectedTeam: _selTeams,
+                          selectedMb: _selMbNo,
                         ),
                         SizedBox(height: 24.h),
                       ],
@@ -336,17 +164,10 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                         type: AppButtonType.secondary,
                         onTap: _canSubmit
                             ? () {
-                                final memberLabels = _selectedMemberIds
-                                    .map(_employeeById)
-                                    .whereType<Employee>()
-                                    .map((e) => e.label)
-                                    .toList();
-                                final deptNames = _selDepts.toList();
-
                                 context.pop<UserPickResult>(
                                   UserPickResult(
-                                    departments: deptNames,
-                                    members: memberLabels,
+                                    departments: _selTeams.toList(),
+                                    members: _selMbNo.toList(),
                                   ),
                                 );
                               }

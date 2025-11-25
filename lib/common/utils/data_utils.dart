@@ -2,9 +2,9 @@ import 'dart:convert';
 
 class DataUtils {
   static String datetimeParse(String value) {
-    return DateTime.parse(
+    return DateTime.tryParse(
       value,
-    ).toLocal().toString().split(' ')[0].replaceAll('-', '. ');
+    )?.toLocal().toString().split(' ')[0].replaceAll('-', '. ')?? '';
   }
 
   static String plainToBase64(String plain) {

@@ -32,7 +32,7 @@ class RiskFormScreen extends StatelessWidget {
           final base = GoRouterState.of(context).matchedLocation;
           final res = await context.push<UserPickResult>('$base/user-picker');
           if (res == null) return null;
-          return (depts: res.departments, users: res.members);
+          // return (depts: res.departments, users: res.members);
         },
         isEdit: isEdit,
         submitText: isEdit ? '저장' : '등록',

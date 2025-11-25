@@ -18,6 +18,9 @@ import 'package:lhens_app/chat/view/chat_detail_screen.dart';
 import 'package:lhens_app/user/model/user_picker_args.dart';
 import 'package:lhens_app/user/model/user_pick_result.dart';
 
+import '../model/chat_room_model.dart';
+import 'chat_name_screen.dart';
+
 class ChatScreen extends ConsumerStatefulWidget {
   static String get routeName => '커뮤니케이션';
 
@@ -32,7 +35,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   String _category = '전체';
 
   // Mock 데이터 (추후 provider로 대체)
-  // final List<({String name, int participants, int unread})> _items = [];
   final List<({String name, int participants, int unread})> _items = [
     (name: 'LH E&S 기획팀', participants: 5, unread: 2),
     (name: 'LH E&S 기획팀', participants: 5, unread: 0),
@@ -60,7 +62,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     // final asyncItems = ref.watch(chatItemsProvider); // 추후 전환
     final state = ref.watch(chatRoomProvider);
-    print(state is CursorPagination ? state.data :'');
+    print(state is CursorPagination ? state.data : '');
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: Padding(
@@ -99,35 +101,42 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         }
                         return false;
                       },
-                      child: ListView.separated(
-                        physics: const ClampingScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        itemCount: state.data.length + 1,
-                        // 헤더 + 아이템
-                        separatorBuilder: (_, i) => i == 0
-                            ? const SizedBox.shrink()
-                            : SizedBox(height: 10.h),
-                        itemBuilder: (_, i) {
-                          if (i == 0) {
-                            return Padding(
-                              padding: EdgeInsets.fromLTRB(2.w, 0, 2.w, 8.h),
-                              child: CountInline(
-                                label: '전체',
-                                count: state.data.length,
-                                showSuffix: false,
-                              ),
-                            );
-                          }
-                          final e = state.data[i - 1];
-                          return ChatListItem(
-                            title: e.name,
-                            participants: e.participants,
-                            unreadCount: e.unread,
-                            onTap: () => GoRouter.of(
-                              context,
-                            ).pushNamed(ChatDetailScreen.routeName),
-                          );
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          ref
+                              .read(chatRoomProvider.notifier)
+                              .paginate(fetchOrder: ['roomId_DESC']);
                         },
+                        child: ListView.separated(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: state.data.length + 1,
+                          // 헤더 + 아이템
+                          separatorBuilder: (_, i) => i == 0
+                              ? const SizedBox.shrink()
+                              : SizedBox(height: 10.h),
+                          itemBuilder: (_, i) {
+                            if (i == 0) {
+                              return Padding(
+                                padding: EdgeInsets.fromLTRB(2.w, 0, 2.w, 8.h),
+                                child: CountInline(
+                                  label: '전체',
+                                  count: state.data.length,
+                                  showSuffix: false,
+                                ),
+                              );
+                            }
+                            final e = state.data[i - 1];
+                            return ChatListItem(
+                              title: e.name,
+                              participants: e.memberCount,
+                              unreadCount: e.newMessageCount,
+                              onTap: () => GoRouter.of(
+                                context,
+                              ).pushNamed(ChatDetailScreen.routeName),
+                            );
+                          },
+                        ),
                       ),
                     )
                   : EmptyState(
@@ -147,7 +156,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             // 1) 채팅방 이름 설정 화면으로 이동
             final roomName = await GoRouter.of(
               context,
-            ).pushNamed<String>('채팅방 정보');
+            ).pushNamed<String>(ChatNameScreen.routeName);
 
             if (!context.mounted ||
                 roomName == null ||

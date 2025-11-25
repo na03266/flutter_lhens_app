@@ -1,12 +1,14 @@
+import 'dart:ffi';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../common/model/cursor_pagination_model.dart';
 import '../../common/provider/pagination_providar.dart';
 import '../model/chat_room_model.dart';
+import '../model/create_chat_room_dto.dart';
 import '../repository/chat_room_repository.dart';
 
-final chatRoomDetailProvider =
-Provider.family<ChatRoom?, String>((ref, id) {
+final chatRoomDetailProvider = Provider.family<ChatRoom?, String>((ref, id) {
   final state = ref.watch(chatRoomProvider);
 
   if (state is! CursorPagination) {
@@ -17,21 +19,24 @@ Provider.family<ChatRoom?, String>((ref, id) {
 });
 
 final chatRoomProvider =
-StateNotifierProvider<ChatRoomStateNotifier, CursorPaginationBase>(
-      (ref) {
-    final repository = ref.watch(chatRoomRepositoryProvider);
+    StateNotifierProvider<ChatRoomStateNotifier, CursorPaginationBase>((ref) {
+      final repository = ref.watch(chatRoomRepositoryProvider);
 
-    final notifier = ChatRoomStateNotifier(repository: repository);
+      final notifier = ChatRoomStateNotifier(repository: repository);
 
-    return notifier;
-  },
-);
+      return notifier;
+    });
 
 class ChatRoomStateNotifier
     extends PaginationProvider<ChatRoom, ChatRoomRepository> {
-  ChatRoomStateNotifier({
-    required super.repository,
-  });
+  ChatRoomStateNotifier({required super.repository});
+
+  createChatRoom({required CreateChatRoomDto dto}) async {
+    final resp = await repository.createChatRoom(dto: dto);
+    if (resp is Int) {
+      paginate(forceRefetch: true);
+    }
+  }
 
   // getDetail({
   //   required String id,

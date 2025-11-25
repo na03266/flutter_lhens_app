@@ -42,7 +42,7 @@ class PaginationProvider<T, U extends IBaseCursorPaginationRepository<T>>
     // true = 더 가져오기
     // false = 새로고침
     bool fetchMore = false,
-    List<String> fetchOrder = const ['id_DESC'],
+    List<String> fetchOrder = const ['roomId_DESC'],
     // 강제로 다시 로딩하기
     // true - CursorPaginationLoading()
     bool forceRefetch = false,

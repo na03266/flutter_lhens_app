@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart' hide Headers;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lhens_app/chat/model/chat_room_model.dart';
+import 'package:lhens_app/chat/model/create_chat_room_dto.dart';
 import 'package:lhens_app/common/const/data.dart';
 import 'package:lhens_app/common/dio/dio.dart';
 import 'package:lhens_app/common/model/cursor_pagination_model.dart';
@@ -30,9 +31,9 @@ abstract class ChatRoomRepository
   });
 
   //
-  @POST('/')
+  @POST('')
   @Headers({'accessToken': 'true'})
-  Future<int> createChatRoom(@Body() Map<String, dynamic> body);
+  Future<int> createChatRoom({@Body() required CreateChatRoomDto dto});
 
   @GET('/')
   @Headers({'accessToken': 'true'})

@@ -14,6 +14,7 @@ class UserModelError extends UserModelBase {
 
 @JsonSerializable()
 class UserModel extends UserModelBase {
+  final int mbNo;
   final String mbId;
   final String mbName;
   final String mbNick;
@@ -25,6 +26,7 @@ class UserModel extends UserModelBase {
   final String mbDepart; // 소속
 
   UserModel({
+    required this.mbNo,
     required this.mbId,
     required this.mbName,
     required this.mbNick,
