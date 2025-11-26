@@ -88,7 +88,7 @@ class _ComplaintScreenState extends ConsumerState<ComplaintScreen> {
               .read(complaintProvider.notifier)
               .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
         },
-        addPost: () => context.pushNamed(ComplaintFormScreen.routeName),
+        addPost: () => context.pushNamed(ComplaintFormScreen.routeNameCreate),
         provider: complaintProvider,
         changePage: (int page) {
           ref
@@ -108,7 +108,7 @@ class _ComplaintScreenState extends ConsumerState<ComplaintScreen> {
                 pathParameters: {'rid': model.wrId.toString()},
               );
             },
-            child: BaseListItem.fromPostModel(model: model),
+            child: BaseListItem.fromPostModelForComplaint(model: model),
           );
         },
       ),

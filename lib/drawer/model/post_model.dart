@@ -9,6 +9,7 @@ class PostModel {
   final String wrName;
   final String wrDatetime;
   final String caName;
+  final List<String> wrOption;
   final String wr1;
   final String wr2;
   final String wr3;
@@ -21,6 +22,7 @@ class PostModel {
     required this.wrName,
     required this.wrDatetime,
     required this.caName,
+    required this.wrOption,
     required this.wr1,
     required this.wr2,
     required this.wr3,

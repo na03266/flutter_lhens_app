@@ -78,8 +78,8 @@ List<RouteBase> get routes => [
                 const NoTransitionPage(child: ComplaintScreen()),
             routes: [
               GoRoute(
-                path: 'form',
-                name: ComplaintFormScreen.routeName, // '민원제안 작성'
+                path: 'create',
+                name: ComplaintFormScreen.routeNameCreate, // '민원제안 작성'
                 pageBuilder: (context, state) =>
                     const NoTransitionPage(child: ComplaintFormScreen()),
               ),
@@ -109,19 +109,15 @@ List<RouteBase> get routes => [
               GoRoute(
                 path: 'update/:rid',
                 name: NoticeFormScreen.routeNameUpdate,
-                pageBuilder: (context, state) =>
-                    NoTransitionPage(
-                      child: NoticeFormScreen(
-                          wrId: state.pathParameters['rid']!),
-                    ),
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: NoticeFormScreen(wrId: state.pathParameters['rid']!),
+                ),
               ),
               GoRoute(
                 path: 'create',
                 name: NoticeFormScreen.routeNameCreate,
                 pageBuilder: (context, state) =>
-                    NoTransitionPage(
-                      child: NoticeFormScreen(),
-                    ),
+                    NoTransitionPage(child: NoticeFormScreen()),
               ),
               GoRoute(
                 path: ':rid',
@@ -141,10 +137,11 @@ List<RouteBase> get routes => [
               GoRoute(
                 path: ':rid',
                 name: EduEventDetailScreen.routeName,
-                pageBuilder: (context, state) =>
-                     NoTransitionPage(child: EduEventDetailScreen(
-                        wrId: state.pathParameters['rid']!
-                    )),
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: EduEventDetailScreen(
+                    wrId: state.pathParameters['rid']!,
+                  ),
+                ),
               ),
             ],
           ),
@@ -168,10 +165,13 @@ List<RouteBase> get routes => [
                 ),
                 routes: [
                   GoRoute(
-                    path: 'detail',
+                    path: ':id',
                     name: '내 위험신고 상세',
-                    pageBuilder: (_, __) =>
-                        const NoTransitionPage(child: RiskDetailScreen()),
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: RiskDetailScreen(
+                        wrId: state.pathParameters['rid']!,
+                      ),
+                    ),
                   ),
                   GoRoute(
                     path: 'form',
@@ -290,10 +290,11 @@ List<RouteBase> get routes => [
           ),
           // 상세
           GoRoute(
-            path: 'detail',
+            path: ':rid',
             name: RiskDetailScreen.routeName,
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: RiskDetailScreen()),
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: RiskDetailScreen(wrId: state.pathParameters['rid']!),
+            ),
           ),
         ],
       ),

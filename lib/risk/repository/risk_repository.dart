@@ -10,17 +10,17 @@ import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:retrofit/retrofit.dart';
 
-part 'complaint_repository.g.dart';
+part 'risk_repository.g.dart';
 
-final complaintRepositoryProvider = Provider<ComplaintRepository>((ref) {
+final riskRepositoryProvider = Provider<RiskRepository>((ref) {
   final dio = ref.watch(dioProvider);
-  return ComplaintRepository(dio, baseUrl: '$ip/board-suggest');
+  return RiskRepository(dio, baseUrl: '$ip/board-risk');
 });
 
 @RestApi()
-abstract class ComplaintRepository
+abstract class RiskRepository
     implements IBasePagePaginationRepository<PostModel> {
-  factory ComplaintRepository(Dio dio, {String baseUrl}) = _ComplaintRepository;
+  factory RiskRepository(Dio dio, {String baseUrl}) = _RiskRepository;
 
   @override
   @GET('')
@@ -32,7 +32,7 @@ abstract class ComplaintRepository
 
   @GET('/{wrId}')
   @Headers({'accessToken': 'true'})
-  Future<PostDetailModel> getComplaintDetail({
+  Future<PostDetailModel> getRiskDetail({
     @Path('wrId') required String wrId,
   });
 

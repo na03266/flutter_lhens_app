@@ -4,7 +4,6 @@ import 'package:lhens_app/common/components/status_chip.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/common/utils/data_utils.dart';
-import 'package:lhens_app/drawer/edu_event/provider/edu_provider.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
@@ -57,6 +56,24 @@ class BaseListItem extends StatelessWidget {
       title: model.wrSubject,
       author: model.wr3,
       dateText: model.wr4,
+    );
+  }
+
+  factory BaseListItem.fromPostModelForComplaint({
+    required PostModel model,
+    bool isDetail = false,
+  }) {
+    return BaseListItem(
+      status: model.wr2 == '접수'
+          ? ItemStatus.received
+          : model.wr2 == '처리중'
+          ? ItemStatus.processing
+          : ItemStatus.done,
+      secret: model.wrOption.contains('secret'),
+      typeName: model.caName,
+      title: model.wrSubject,
+      author: model.wrName,
+      dateText: DataUtils.datetimeParse(model.wrDatetime),
     );
   }
 

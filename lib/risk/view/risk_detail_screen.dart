@@ -11,8 +11,9 @@ import 'package:lhens_app/mock/comment/mock_comment_models.dart';
 
 class RiskDetailScreen extends ConsumerStatefulWidget {
   static String get routeName => '위험신고 상세';
+  final String wrId;
 
-  const RiskDetailScreen({super.key});
+  const RiskDetailScreen({super.key, required this.wrId});
 
   @override
   ConsumerState<RiskDetailScreen> createState() => _RiskDetailScreenState();

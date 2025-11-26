@@ -7,7 +7,7 @@ class CreatePostDto {
   final String wrSubject;
   final String wrContent;
   final String? caName;
-  final String? wrOption;     // 'html1,secret,mail'
+  final String? wrOption;
   final String? wrLink1;
   final String? wrLink2;
   final String? wr1;
@@ -23,6 +23,28 @@ class CreatePostDto {
     this.wr1,
     this.wr2,
   });
+
+  CreatePostDto copyWith({
+    String? wrSubject,
+    String? wrContent,
+    String? caName,
+    String? wrOption,
+    String? wrLink1,
+    String? wrLink2,
+    String? wr1,
+    String? wr2,
+  }) {
+    return CreatePostDto(
+      wrSubject: wrSubject ?? this.wrSubject,
+      wrContent: wrContent ?? this.wrContent,
+      caName: caName ?? this.caName,
+      wrOption: wrOption ?? this.wrOption,
+      wrLink1: wrLink1 ?? this.wrLink1,
+      wrLink2: wrLink2 ?? this.wrLink2,
+      wr1: wr1 ?? this.wr1,
+      wr2: wr2 ?? this.wr2,
+    );
+  }
 
   factory CreatePostDto.fromJson(Map<String, dynamic> json) =>
       _$CreatePostDtoFromJson(json);

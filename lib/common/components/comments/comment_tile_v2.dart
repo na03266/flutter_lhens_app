@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/common/components/user_avatar.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:lhens_app/common/utils/data_utils.dart';
 import 'package:lhens_app/drawer/model/post_comment_model.dart';
 import 'package:lhens_app/mock/comment/mock_comment_models.dart';
 import 'reply_tile.dart';
@@ -103,7 +104,7 @@ class CommentTileV2<T> extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            comment.wrDatetime,
+                            DataUtils.datetimeParse(comment.wrDatetime),
                             style: AppTextStyles.pl14.copyWith(
                               color: AppColors.textTer,
                             ),

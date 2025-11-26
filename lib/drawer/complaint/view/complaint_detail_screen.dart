@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/label_value_line.dart';
 import 'package:lhens_app/common/components/report/report_detail_header.dart';
 import 'package:lhens_app/common/components/report/report_detail_scaffold.dart';
+import 'package:lhens_app/common/components/report/report_detail_scaffold_v2.dart';
 import 'package:lhens_app/drawer/complaint/provider/complaint_provider.dart';
+import 'package:lhens_app/drawer/model/post_detail_model.dart';
+import 'package:lhens_app/drawer/notice/view/notice_form_screen.dart';
 
 class ComplaintDetailScreen extends ConsumerStatefulWidget {
   static String get routeName => '민원제안 상세';
@@ -25,26 +29,20 @@ class _ComplaintDetailScreenState extends ConsumerState<ComplaintDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const type = '민원제안유형명';
-    const title = '민원 제목이 표시되는 영역입니다. 민원 제목이 표시되는 영역입니다.';
+    final state = ref.watch(complaintDetailProvider(widget.wrId));
 
-    return ReportDetailScaffold(
-      config: ReportDetailConfig(
-        typeName: type,
-        title: title,
-        headerBuilder: (onMore) =>
-            ReportDetailHeader(typeName: type, title: title, onMoreTap: onMore),
-        metaRows: const [
-          LabelValueLine.single(label1: '작성자', value1: '조예빈(1001599)'),
-          LabelValueLine.single(label1: '등록일', value1: '2025. 08. 28'),
-          LabelValueLine.single(label1: '진행상황', value1: '접수'),
-          LabelValueLine.single(label1: '공개여부', value1: '공개'),
-        ],
-        body: const Text('내용이 표시되는\n영역입니다.'),
-        attachments: const ['첨부파일명.pdf'],
-        editRouteName: '민원제안 수정',
-        myEditRouteName: '내 민원제안 수정',
-      ),
+    if (state == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+    final isDetail = state is PostDetailModel;
+    return ReportDetailScaffoldV2.fromModel(
+      isDetail ? state : null,
+      onUpdate: () {
+        context.goNamed(NoticeFormScreen.routeNameUpdate,
+          pathParameters: {'rid': widget.wrId},
+        );
+      },
+      postComment: () {},
     );
   }
 }

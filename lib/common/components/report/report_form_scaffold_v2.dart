@@ -44,9 +44,7 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
   bool _secret = false;
 
   String? _ca1Name;
-
   String? _ca2Name;
-
   String? _ca3Name;
 
   @override
@@ -56,7 +54,6 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
     _ca1Name = widget.post?.caName;
     _ca2Name = widget.post?.wr1;
     _ca3Name = widget.post?.wr2;
-
   }
 
   Future<bool> get _canSubmit async {

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lhens_app/common/model/page_pagination_model.dart';
 import 'package:lhens_app/common/provider/page_pagination_providar.dart';
+import 'package:lhens_app/drawer/model/create_post_dto.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/drawer/complaint/repository/complaint_repository.dart';
 
@@ -46,6 +47,18 @@ class ComplaintStateNotifier
             .map<PostModel>((e) => e.wrId == parsedWrId ? resp : e)
             .toList(),
       );
+    }
+  }
+  postPost({required CreatePostDto dto}) async {
+    final resp = await repository.postPost(dto: dto);
+    if (resp != null) {
+      paginate(forceRefetch: true);
+    }
+  }
+  patchPost({required CreatePostDto dto}) async {
+    final resp = await repository.patchPost(dto: dto);
+    if (resp != null) {
+      paginate(forceRefetch: true);
     }
   }
 }

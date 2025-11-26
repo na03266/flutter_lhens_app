@@ -17,6 +17,7 @@ class PostCommentModel extends PostModel {
     required super.wrName,
     required super.wrDatetime,
     required super.caName,
+    required super.wrOption,
     required super.wr1,
     required super.wr2,
     required super.wr3,
