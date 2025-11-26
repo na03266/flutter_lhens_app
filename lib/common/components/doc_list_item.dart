@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/common/components/feedback/press_scale.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
 class DocListItem extends StatelessWidget {
@@ -18,6 +19,12 @@ class DocListItem extends StatelessWidget {
     this.onPreview,
     this.onDownload,
   });
+  factory DocListItem.fromModel({required PostModel model}){
+    return DocListItem(
+      category: model.wr1,
+      title: model.wrSubject,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

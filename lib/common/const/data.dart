@@ -7,7 +7,7 @@ const AUTO_LOGIN = 'AUTO_LOGIN';
 const SAVE_MB_NO = 'SAVE_MB_NO';
 
 // localhost
-final defaultIp = '192.168.0.74:3000';
+final defaultIp = '110.10.147.37/app';
 final ws = 'ws://$defaultIp';
 final emulatorIp = 'http://$defaultIp';
 final simulatorIp = 'http://$defaultIp';

@@ -58,7 +58,9 @@ class _ReportListScaffoldState<T>
   @override
   void initState() {
     super.initState();
-    _selectedFilter = widget.filters[0];
+    if (widget.filters.length > 0) {
+      _selectedFilter = widget.filters[0];
+    }
   }
 
   @override
@@ -117,18 +119,19 @@ class _ReportListScaffoldState<T>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 탭
-            AppSegmentedTabs(
-              index: _tabIndex,
-              rightTabs: widget.tabs,
-              onChanged: (tabIndex) => setState(() {
-                _tabIndex = tabIndex;
-                if (tabIndex == 0) {
-                  widget.selectTabName('');
-                } else {
-                  widget.selectTabName(widget.tabs[tabIndex - 1]);
-                }
-              }),
-            ),
+            if (widget.tabs.length > 1)
+              AppSegmentedTabs(
+                index: _tabIndex,
+                rightTabs: widget.tabs,
+                onChanged: (tabIndex) => setState(() {
+                  _tabIndex = tabIndex;
+                  if (tabIndex == 0) {
+                    widget.selectTabName('');
+                  } else {
+                    widget.selectTabName(widget.tabs[tabIndex - 1]);
+                  }
+                }),
+              ),
             SizedBox(height: 16.h),
 
             // 검색바

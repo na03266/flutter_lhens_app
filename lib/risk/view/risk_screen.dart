@@ -49,7 +49,6 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
       body: ReportListScaffoldV2<PostModel>(
         tabs: item.boCategoryList.split('|'),
         filters: [
-          '전체',
           ...item.bo1.split('|').length > 1 ? item.bo1.split('|') : [],
         ],
         selectTabName: (String selectedTab) {
