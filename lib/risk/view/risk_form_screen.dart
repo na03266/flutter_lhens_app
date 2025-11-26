@@ -1,53 +1,93 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lhens_app/common/components/report/report_form_config.dart';
-import 'package:lhens_app/common/components/report/report_form_scaffold.dart';
-import 'package:lhens_app/user/model/user_pick_result.dart';
+import 'package:lhens_app/common/components/report/report_form_scaffold_v2.dart';
+import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/drawer/model/board_info_model.dart';
+import 'package:lhens_app/drawer/model/post_detail_model.dart';
+import 'package:lhens_app/drawer/provider/board_provider.dart';
+import 'package:lhens_app/risk/provider/risk_provider.dart';
+import 'package:lhens_app/risk/view/risk_detail_screen.dart';
+import 'package:lhens_app/risk/view/risk_screen.dart';
 
-class RiskFormScreen extends StatelessWidget {
-  static String get routeName => '위험신고 등록';
+class RiskFormScreen extends ConsumerStatefulWidget {
+  static String get routeNameCreate => '위험신고 등록';
 
-  const RiskFormScreen({super.key});
+  static String get routeNameUpdate => '위험신고 수정';
+  final String? wrId;
+
+  const RiskFormScreen({super.key, this.wrId});
+
+  @override
+  ConsumerState<RiskFormScreen> createState() => _RiskFormScreenState();
+}
+
+class _RiskFormScreenState extends ConsumerState<RiskFormScreen> {
+  String ca1Name = '';
+  String ca2Name = '';
+  String ca3Name = '';
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.wrId != null) {
+      ref.read(riskProvider.notifier).getDetail(wrId: widget.wrId!);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final state = GoRouterState.of(context);
-    final isEdit = state.name == '위험신고 수정' || state.name == '내 위험신고 수정';
+    final board = ref.watch(boardProvider);
+    if (board is! BoardInfo) {
+      return Scaffold(
+        backgroundColor: AppColors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
-    final initialType = isEdit ? '신고유형명' : null;
-    final initialTitle = isEdit
-        ? '신고 제목이 표시되는 영역입니다. 신고 제목이 표시되는 영역입니다.'
-        : null;
-    final initialContent = isEdit ? '내용이 표시되는\n영역입니다.' : null;
-    final initialFiles = isEdit ? const ['첨부파일명.pdf'] : const <String>[];
+    final item = board.items.firstWhere(
+      (element) => element.boTable == 'comm21',
+    );
+    if (widget.wrId != null) {
+      final state = ref.watch(riskDetailProvider(widget.wrId!));
 
-    return ReportFormScaffold(
-      config: ReportFormConfig(
-        titleHint: '제목',
-        contentHint: '내용',
-        typeItems: const ['신고유형명', '신고유형명2', '신고유형명3'],
-        showTargets: true,
-        fixedTargets: const ['안전보건팀', '임의지사'],
-        onPickTargets: () async {
-          final base = GoRouterState.of(context).matchedLocation;
-          final res = await context.push<UserPickResult>('$base/user-picker');
-          if (res == null) return null;
-          // return (depts: res.departments, users: res.members);
+      if (state == null || state is! PostDetailModel) {
+        return Center(child: CircularProgressIndicator());
+      }
+
+      return ReportFormScaffoldV2(
+        ca1Names: item.boCategoryList.isNotEmpty
+            ? item.boCategoryList.split('|')
+            : [],
+        ca3Names: item.bo1.isNotEmpty ? item.bo2.split('|') : [],
+        submitText: '수정',
+        post: state,
+        onSubmit: (dto) async {
+          await ref
+              .read(riskProvider.notifier)
+              .patchPost(wrId: state.wrId.toString(), dto: dto);
+          context.goNamed(
+            RiskDetailScreen.routeName,
+            pathParameters: {'rid': state.wrId.toString()},
+          );
         },
-        isEdit: isEdit,
-        submitText: isEdit ? '저장' : '등록',
-        canEditStatus: isEdit,
-        canEditSecret: true,
-        statusItems: const ['접수', '처리중', '완료'],
-        initialType: initialType,
-        initialTitle: initialTitle,
-        initialContent: initialContent,
-        initialFiles: initialFiles,
-        onSubmit: (v) async {
-          // TODO: 저장 처리
-          Navigator.pop(context, true);
-        },
-      ),
+      );
+    }
+
+    return ReportFormScaffoldV2(
+      ca1Names: item.boCategoryList.isNotEmpty
+          ? item.boCategoryList.split('|')
+          : [],
+      ca2Names: item.bo1.isNotEmpty ? item.bo1.split('|') : [],
+      submitText: '등록',
+      onSubmit: (dto) {
+        final fixed = dto.copyWith(
+          wr2: '접수',
+          wrOption: dto.caName == '요청(비공개)' ? 'secret' : dto.wrOption,
+        );
+        ref.read(riskProvider.notifier).postPost(dto: fixed);
+        context.pop();
+      },
     );
   }
 }

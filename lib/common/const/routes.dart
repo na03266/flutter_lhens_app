@@ -262,7 +262,7 @@ List<RouteBase> get routes => [
         routes: [
           GoRoute(
             path: 'form',
-            name: RiskFormScreen.routeName,
+            name: RiskFormScreen.routeNameCreate,
             pageBuilder: (c, s) =>
                 const NoTransitionPage(child: RiskFormScreen()),
             routes: [
@@ -275,10 +275,11 @@ List<RouteBase> get routes => [
             ],
           ),
           GoRoute(
-            path: 'edit',
+            path: 'update/:rid',
             name: '위험신고 수정',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: RiskFormScreen()),
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: RiskFormScreen(wrId: state.pathParameters['rid']!),
+            ),
             routes: [
               GoRoute(
                 path: 'user-picker',

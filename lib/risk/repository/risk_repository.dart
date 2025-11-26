@@ -32,9 +32,7 @@ abstract class RiskRepository
 
   @GET('/{wrId}')
   @Headers({'accessToken': 'true'})
-  Future<PostDetailModel> getRiskDetail({
-    @Path('wrId') required String wrId,
-  });
+  Future<PostDetailModel> getRiskDetail({@Path('wrId') required String wrId});
 
   @POST('')
   @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
@@ -42,5 +40,8 @@ abstract class RiskRepository
 
   @PATCH('')
   @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
-  Future<String?> patchPost({@Body() required CreatePostDto dto});
+  Future<String?> patchPost({
+    @Body() required CreatePostDto dto,
+    @Query('wrId') required String wrId,
+  });
 }

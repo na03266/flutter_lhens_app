@@ -9,6 +9,7 @@ import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/drawer/provider/board_provider.dart';
 import 'package:lhens_app/risk/provider/risk_provider.dart';
 import 'package:lhens_app/risk/view/risk_detail_screen.dart';
+import 'package:lhens_app/risk/view/risk_form_screen.dart';
 
 class RiskScreen extends ConsumerStatefulWidget {
   static String get routeName => '위험신고';
@@ -41,7 +42,7 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
     }
 
     final item = board.items.firstWhere(
-          (element) => element.boTable == 'comm22',
+          (element) => element.boTable == 'comm21',
     );
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -87,6 +88,9 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
             wr1: wr1,
             title: title,
           );
+        },
+        addPost: (){
+          context.goNamed(RiskFormScreen.routeNameCreate);
         },
         itemBuilder: (_, index, model) {
           return GestureDetector(

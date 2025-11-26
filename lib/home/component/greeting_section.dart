@@ -80,12 +80,14 @@ class GreetingCard extends StatelessWidget {
     final gap = 12.h;
     final reservedRight = imgSize * .6 + 12.w;
     final mb = ref.watch(userMeProvider);
+    final labelTextStyle = AppTextStyles.psb14.copyWith(color: AppColors.text);
+    final valueTextStyle = AppTextStyles.pr14.copyWith(color: AppColors.text);
 
     final condition = mb is UserModel;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: AppShadows.card,
       ),
@@ -99,12 +101,12 @@ class GreetingCard extends StatelessWidget {
               children: [
                 Text(
                   '${condition ? mb.mbName : ''}님',
-                  style: AppTextStyles.jm18.copyWith(color: AppColors.white),
+                  style: AppTextStyles.jm18,
                 ),
                 SizedBox(height: 6.h),
                 Text(
                   '오늘도 화이팅하세요!',
-                  style: AppTextStyles.jm16.copyWith(color: AppColors.white),
+                  style: AppTextStyles.jm16,
                 ),
                 SizedBox(height: gap),
                 LabelValueLine.double(
@@ -112,6 +114,8 @@ class GreetingCard extends StatelessWidget {
                   value1: condition ? mb.mbDepart : '',
                   label2: '직위',
                   value2: condition ? mb.mb2 : '',
+                  labelStyle: labelTextStyle,
+                  valueStyle: valueTextStyle,
                 ),
                 SizedBox(height: 4.h),
                 LabelValueLine.double(
@@ -119,18 +123,22 @@ class GreetingCard extends StatelessWidget {
                   value1: condition ? mb.mbId : '',
                   label2: '입사일',
                   value2: condition ? DataUtils.datetimeParse(mb.mb3) : '',
+                  labelStyle: labelTextStyle,
+                  valueStyle: valueTextStyle,
                 ),
               ],
             ),
           ),
-          Positioned(
-            right: -16,
-            bottom: 0,
-            child: Image.asset(
-              Assets.illustrations.mainGreeting.path,
-              width: imgSize,
-              height: imgSize,
-              fit: BoxFit.contain,
+          Positioned.fill(
+            right: 8,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Image.asset(
+                Assets.illustrations.mainGreeting.path,
+                width: imgSize,
+                height: imgSize,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
         ],

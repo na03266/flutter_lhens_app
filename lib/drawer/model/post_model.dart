@@ -8,13 +8,13 @@ class PostModel {
   final String wrSubject;
   final String wrName;
   final String wrDatetime;
-  final String caName;
   final List<String> wrOption;
-  final String wr1;
-  final String wr2;
-  final String wr3;
-  final String wr4;
-  final String wr5;
+  final String caName; // 1차 분류
+  final String wr1; // 2차 분류
+  final String wr2; // 접수/처리중/완료
+  final String wr3; // 수신 부서
+  final String wr4; // 기간
+  final String wr5; // 썸네일 이미지 주소
 
   PostModel({
     required this.wrId,

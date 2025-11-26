@@ -1,13 +1,12 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
-import 'package:lhens_app/common/components/label_value_line.dart';
-import 'package:lhens_app/common/components/report/report_detail_scaffold.dart';
-import 'package:lhens_app/common/components/report/report_detail_header.dart';
-import 'package:lhens_app/common/components/comments/comments_section.dart';
-import 'package:lhens_app/common/components/comments/comment_tile.dart';
-import 'package:lhens_app/mock/comment/mock_comment_data.dart';
+import 'package:lhens_app/common/components/report/report_detail_scaffold_v2.dart';
+import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:lhens_app/mock/comment/mock_comment_models.dart';
+import 'package:lhens_app/risk/provider/risk_provider.dart';
+import 'package:lhens_app/risk/view/risk_form_screen.dart';
 
 class RiskDetailScreen extends ConsumerStatefulWidget {
   static String get routeName => '위험신고 상세';
@@ -21,6 +20,12 @@ class RiskDetailScreen extends ConsumerStatefulWidget {
 
 class _RiskDetailScreenState extends ConsumerState<RiskDetailScreen> {
   final deletingIds = <String>{};
+
+  @override
+  void initState() {
+    super.initState();
+    ref.read(riskProvider.notifier).getDetail(wrId: widget.wrId);
+  }
 
   void _handleDelete(CommentModel c) async {
     final ok = await ConfirmDialog.show(
@@ -45,40 +50,20 @@ class _RiskDetailScreenState extends ConsumerState<RiskDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const type = '신고유형명';
-    const title = '신고 제목이 표시되는 영역입니다.';
+    final state = ref.watch(riskDetailProvider(widget.wrId));
 
-    // 로그인 사용자 (임시)
-    const currentUser = '조예빈(1001599)';
-
-    return ReportDetailScaffold(
-      config: ReportDetailConfig(
-        typeName: type,
-        title: title,
-        headerBuilder: (onMore) =>
-            ReportDetailHeader(typeName: type, title: title, onMoreTap: onMore),
-        metaRows: const [
-          LabelValueLine.single(label1: '작성자', value1: '조예빈(1001599)'),
-          LabelValueLine.single(label1: '등록일', value1: '2025. 08. 28'),
-          LabelValueLine.single(label1: '진행상황', value1: '접수'),
-          LabelValueLine.single(label1: '공개여부', value1: '공개'),
-        ],
-        body: const Text('내용이 표시되는\n영역입니다.'),
-        attachments: const ['첨부파일명.pdf'],
-        editRouteName: '위험신고 수정',
-        myEditRouteName: '내 위험신고 수정',
-      ),
-      commentsBuilder: (onReplyTap) => CommentsSection(
-        comments: mockComments,
-        onTapReply: onReplyTap,
-        tileBuilder: (c) => CommentTile(
-          comment: c,
-          canDeleteOf: (m) => m.user == currentUser,
-          deletingOf: (m) => deletingIds.contains(m.id),
-          onRequestDelete: _handleDelete,
-          onTapReply: onReplyTap,
-        ),
-      ),
+    if (state == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+    final isDetail = state is PostDetailModel;
+    return ReportDetailScaffoldV2.fromModel(
+      isDetail ? state : null,
+      onUpdate: () {
+        context.goNamed(RiskFormScreen.routeNameUpdate,
+          pathParameters: {'rid': widget.wrId},
+        );
+      },
+      postComment: () {},
     );
   }
 }

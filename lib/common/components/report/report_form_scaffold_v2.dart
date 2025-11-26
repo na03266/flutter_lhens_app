@@ -189,13 +189,11 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  IgnorePointer(
-                    child: AppCheckbox(
-                      label: '비공개',
-                      value: _secret,
-                      onChanged: (v) => setState(() => _secret = v),
-                      style: AppCheckboxStyle.secondary,
-                    ),
+                  AppCheckbox(
+                    label: '비공개',
+                    value: _secret,
+                    onChanged: (v) => setState(() => _secret = v),
+                    style: AppCheckboxStyle.secondary,
                   ),
                 ],
               ),
