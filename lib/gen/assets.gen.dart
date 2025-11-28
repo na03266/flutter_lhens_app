@@ -167,21 +167,36 @@ class $AssetsIllustrationsGen {
   AssetGenImage get mainGreeting =>
       const AssetGenImage('assets/illustrations/main_greeting.png');
 
+  /// File path: assets/illustrations/main_greeting_v2.png
+  AssetGenImage get mainGreetingV2 =>
+      const AssetGenImage('assets/illustrations/main_greeting_v2.png');
+
   /// File path: assets/illustrations/salary.png
   AssetGenImage get salary =>
       const AssetGenImage('assets/illustrations/salary.png');
 
+  /// File path: assets/illustrations/salary_character.png
+  AssetGenImage get salaryCharacter =>
+      const AssetGenImage('assets/illustrations/salary_character.png');
+
   /// File path: assets/illustrations/survey.png
   AssetGenImage get survey =>
       const AssetGenImage('assets/illustrations/survey.png');
+
+  /// File path: assets/illustrations/survey_character.png
+  AssetGenImage get surveyCharacter =>
+      const AssetGenImage('assets/illustrations/survey_character.png');
 
   /// List of all assets
   List<AssetGenImage> get values => [
     complaint,
     illustComplete,
     mainGreeting,
+    mainGreetingV2,
     salary,
+    salaryCharacter,
     survey,
+    surveyCharacter,
   ];
 }
 
@@ -204,6 +219,14 @@ class $AssetsImagesGen {
   AssetGenImage get bgComplete4 =>
       const AssetGenImage('assets/images/bg_complete4.png');
 
+  /// File path: assets/images/brand_intro_hug.png
+  AssetGenImage get brandIntroHug =>
+      const AssetGenImage('assets/images/brand_intro_hug.png');
+
+  /// File path: assets/images/brand_intro_white.png
+  AssetGenImage get brandIntroWhite =>
+      const AssetGenImage('assets/images/brand_intro_white.png');
+
   /// File path: assets/images/chat.png
   AssetGenImage get chat => const AssetGenImage('assets/images/chat.png');
 
@@ -216,16 +239,23 @@ class $AssetsImagesGen {
   /// File path: assets/images/splash.png
   AssetGenImage get splash => const AssetGenImage('assets/images/splash.png');
 
+  /// File path: assets/images/splash_v2.png
+  AssetGenImage get splashV2 =>
+      const AssetGenImage('assets/images/splash_v2.png');
+
   /// List of all assets
   List<AssetGenImage> get values => [
     bgComplete,
     bgComplete2,
     bgComplete3,
     bgComplete4,
+    brandIntroHug,
+    brandIntroWhite,
     chat,
     event,
     notice,
     splash,
+    splashV2,
   ];
 }
 

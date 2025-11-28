@@ -90,10 +90,8 @@ flutter_gen:
     flutter_svg: true
 
 flutter_native_splash:
-  color: "#FFFFFF"               # 배경색 (또는 background_image 사용 가능)
-  image: assets/images/splash_v2.png  # 지금 쓰는 스플래시 이미지 경로
+  background_image: assets/images/splash_v2.png
   android: true
   ios: true
   android_12:
-    image: assets/images/splash_v2.png
-    color: "#FFFFFF"
+    background_image: assets/images/splash_v2.png

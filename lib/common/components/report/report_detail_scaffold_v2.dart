@@ -97,6 +97,9 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
   String? _replyToName;
   double _scale = 1.0;
 
+  int _pointerCount = 0; // 현재 화면을 누르고 있는 손가락 수
+  bool _isMultiTouch = false; // 2개 이상일 때 true
+
   @override
   void dispose() {
     _comment.dispose();
@@ -148,161 +151,197 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
 
     return Scaffold(
       backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: ScrollConfiguration(
-            behavior: const _NoBounceGlowBehavior(),
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(bottom: 24.h),
-              physics: const ClampingScrollPhysics(),
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(height: 24.h),
+      body: Listener(
+        onPointerDown: (_) {
+          _pointerCount++;
+          if (_pointerCount > 1 && !_isMultiTouch) {
+            setState(() {
+              _isMultiTouch = true; // 두 손가락 이상 눌리면 스크롤 비활성
+            });
+          }
+        },
+        onPointerUp: (_) {
+          _pointerCount = (_pointerCount - 1).clamp(0, 10);
+          if (_pointerCount <= 1 && _isMultiTouch) {
+            setState(() {
+              _isMultiTouch = false; // 한 손가락 이하가 되면 다시 스크롤 가능
+            });
+          }
+        },
+        onPointerCancel: (_) {
+          _pointerCount = 0;
+          if (_isMultiTouch) {
+            setState(() {
+              _isMultiTouch = false;
+            });
+          }
+        },
+        child: SafeArea(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: ScrollConfiguration(
+              behavior: const _NoBounceGlowBehavior(),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(bottom: 24.h),
+                physics: _isMultiTouch
+                    ? const NeverScrollableScrollPhysics()
+                    : const ClampingScrollPhysics(),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                child: InteractiveViewer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: 24.h),
 
-                  ReportDetailHeader(
-                    typeName: widget.caName,
-                    title: widget.wrSubject,
-                    onMoreTap: _onMore,
-                  ),
-
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: TextSizer(
-                        value: _scale,
-                        onChanged: (v) => setState(() => _scale = v),
+                      ReportDetailHeader(
+                        typeName: widget.caName,
+                        title: widget.wrSubject,
+                        onMoreTap: _onMore,
                       ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
 
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(color: AppColors.border, width: 1),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: TextSizer(
+                            value: _scale,
+                            onChanged: (v) => setState(() => _scale = v),
+                          ),
                         ),
                       ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 4.w,
-                        vertical: 20.h,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (widget.wr3 != null && widget.wr3!.isNotEmpty)
-                            LabelValueLine.single(
-                              label1: '수신부서',
-                              value1: widget.wr3!,
-                            ),
-                          if (widget.wr4 != null && widget.wr4!.isNotEmpty)
-                            LabelValueLine.single(
-                              label1: '기간',
-                              value1: widget.wr4!,
-                            ),
-                          LabelValueLine.single(
-                            label1: '작성자',
-                            value1: widget.wrName,
-                          ),
-                          LabelValueLine.single(
-                            label1: '등록일',
-                            value1: DataUtils.datetimeParse(widget.wrDatetime),
-                          ),
-                          LabelValueLine.single(
-                            label1: '조회수',
-                            value1: widget.wrHit,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                      SizedBox(height: 12.h),
 
-                  SizedBox(height: 16.h),
-
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hPad),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: double.infinity,
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: AppColors.border,
+                                width: 1,
+                              ),
+                            ),
+                          ),
                           padding: EdgeInsets.symmetric(
-                            horizontal: 6.w,
-                            vertical: 4.h,
+                            horizontal: 4.w,
+                            vertical: 20.h,
                           ),
-                          child: MediaQuery(
-                            data: MediaQuery.of(context).copyWith(
-                              // 전체 텍스트 스케일 조정 (1.0 = 기본, 1.2 = 20% 확대)
-                              textScaler: TextScaler.linear(_scale),
-                            ),
-                            child: Html(
-                              data: widget.wrContent,
-                              onLinkTap: (url, _, __) {
-                                if (url == null) return;
-                                final uri = Uri.parse(url);
-                                launchUrl(
-                                  uri,
-                                  mode: LaunchMode.externalApplication,
-                                );
-                              },
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (widget.wr3 != null && widget.wr3!.isNotEmpty)
+                                LabelValueLine.single(
+                                  label1: '수신부서',
+                                  value1: widget.wr3!,
+                                ),
+                              if (widget.wr4 != null && widget.wr4!.isNotEmpty)
+                                LabelValueLine.single(
+                                  label1: '기간',
+                                  value1: widget.wr4!,
+                                ),
+                              LabelValueLine.single(
+                                label1: '작성자',
+                                value1: widget.wrName,
+                              ),
+                              LabelValueLine.single(
+                                label1: '등록일',
+                                value1: DataUtils.datetimeParse(
+                                  widget.wrDatetime,
+                                ),
+                              ),
+                              LabelValueLine.single(
+                                label1: '조회수',
+                                value1: widget.wrHit,
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(height: 16.h),
-
-                        for (final f in widget.files) ...[
-                          AttachmentFileRow(
-                            filename: f.fileName,
-                            onPreview: () => debugPrint('미리보기: $f'),
-                            onDownload: () {
-                              final uri = Uri.parse(f.url);
-                              launchUrl(
-                                uri,
-                                mode: LaunchMode.externalApplication,
-                              );
-                            },
-                          ),
-                          SizedBox(height: 8.h),
-                        ],
-                        SizedBox(height: 16.h),
-                        const Divider(
-                          color: AppColors.border,
-                          thickness: 1,
-                          height: 1,
-                        ),
-                        SizedBox(height: 16.h),
-                      ],
-                    ),
-                  ),
-
-                  //댓글및 대댓글
-                  if (widget.comments.isNotEmpty)
-                    CommentsSectionV2(
-                      comments: widget.comments,
-                      onTapReply: widget.postReply != null
-                          ? handleReplyTap
-                          : null,
-                    ),
-
-                  if (!widget.showBackToList) ...[
-                    SizedBox(height: 16.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: AppButton(
-                        text: '목록으로',
-                        onTap: context.pop,
-                        type: AppButtonType.secondary,
                       ),
-                    ),
-                    SizedBox(height: 24.h),
-                  ],
-                ],
+
+                      SizedBox(height: 16.h),
+
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: hPad),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6.w,
+                                vertical: 4.h,
+                              ),
+                              child: MediaQuery(
+                                data: MediaQuery.of(context).copyWith(
+                                  // 전체 텍스트 스케일 조정 (1.0 = 기본, 1.2 = 20% 확대)
+                                  textScaler: TextScaler.linear(_scale),
+                                ),
+                                child: Html(
+                                  data: widget.wrContent,
+                                  onLinkTap: (url, _, __) {
+                                    if (url == null) return;
+                                    final uri = Uri.parse(url);
+                                    launchUrl(
+                                      uri,
+                                      mode: LaunchMode.externalApplication,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 16.h),
+
+                            for (final f in widget.files) ...[
+                              AttachmentFileRow(
+                                filename: f.fileName,
+                                onPreview: () => debugPrint('미리보기: $f'),
+                                onDownload: () {
+                                  final uri = Uri.parse(f.url);
+                                  launchUrl(
+                                    uri,
+                                    mode: LaunchMode.externalApplication,
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 8.h),
+                            ],
+                            SizedBox(height: 16.h),
+                            const Divider(
+                              color: AppColors.border,
+                              thickness: 1,
+                              height: 1,
+                            ),
+                            SizedBox(height: 16.h),
+                          ],
+                        ),
+                      ),
+
+                      //댓글및 대댓글
+                      if (widget.comments.isNotEmpty)
+                        CommentsSectionV2(
+                          comments: widget.comments,
+                          onTapReply: widget.postReply != null
+                              ? handleReplyTap
+                              : null,
+                        ),
+
+                      if (!widget.showBackToList) ...[
+                        SizedBox(height: 16.h),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          child: AppButton(
+                            text: '목록으로',
+                            onTap: context.pop,
+                            type: AppButtonType.secondary,
+                          ),
+                        ),
+                        SizedBox(height: 24.h),
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -365,9 +404,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                       onAction: () {
                         final text = _comment.text.trim();
                         if (text.isEmpty) return;
-                        final dto = CreatePostDto(
-                          wrContent: text,
-                        );
+                        final dto = CreatePostDto(wrContent: text);
                         if (_replyToId == null) {
                           widget.postComment!(widget.wrId, dto);
                         } else {

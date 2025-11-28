@@ -43,7 +43,8 @@ class DocListItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (category != null) ...[
+                  if (category != null && category!.trim().isNotEmpty) ...[
+                    // 공백 문자열 UI 깨짐 방지
                     Text(
                       category!,
                       style: AppTextStyles.pr13.copyWith(

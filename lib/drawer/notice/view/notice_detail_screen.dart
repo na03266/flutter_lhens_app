@@ -27,9 +27,13 @@ class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(noticeDetailProvider(widget.wrId));
 
+
     if (state == null || state is! PostDetailModel) {
-      return Center(child: CircularProgressIndicator());
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
+
     return ReportDetailScaffoldV2.fromModel(
       model: state,
       onUpdate: () {

@@ -87,45 +87,57 @@ class _SalaryAuthScreenState extends ConsumerState<SalaryAuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bg,
-      body: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Assets.illustrations.salaryCharacter.image(
-                width: 140.w,
-                height: 140.w,
-                fit: BoxFit.contain,
-              ),
-              SizedBox(height: 32.h),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF197487), Color(0xFF30AA88), Color(0xFF79BD38)],
+            stops: [0.0, 0.3, 1.0],
+          ),
+        ),
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Assets.illustrations.salaryCharacter.image(
+                  width: 140.w,
+                  height: 140.w,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(height: 32.h),
 
-              Text('주민등록번호 뒷자리를 입력해주세요', style: AppTextStyles.psb18),
-              SizedBox(height: 32.h),
+                Text('주민등록번호 뒷자리를 입력해주세요', style: AppTextStyles.psb18),
+                SizedBox(height: 32.h),
 
-              AppTextField(
-                hint: '주민등록번호 뒷자리',
-                keyboard: TextInputType.number,
-                textAlign: TextAlign.center,
-                isPassword: true,
-                formatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(7),
-                ],
-                controller: _rrnTail,
-                onSubmitted: (_) => _onSubmit(),
-              ),
-              SizedBox(height: 28.h),
+                AppTextField(
+                  hint: '주민등록번호 뒷자리',
+                  keyboard: TextInputType.number,
+                  textAlign: TextAlign.center,
+                  isPassword: true,
+                  formatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(7),
+                  ],
+                  controller: _rrnTail,
+                  onSubmitted: (_) => _onSubmit(),
+                ),
+                SizedBox(height: 28.h),
 
-              AppButton(
-                text: '다음',
-                type: AppButtonType.secondary,
-                onTap: _onSubmit,
-                height: 56.h,
-              ),
-            ],
+                AppButton(
+                  text: '다음',
+                  type: AppButtonType.secondary,
+                  onTap: _onSubmit,
+                  height: 56.h,
+                ),
+              ],
+            ),
           ),
         ),
       ),
