@@ -21,9 +21,12 @@ class UserModel extends UserModelBase {
   final String jobDuty;
   final String mb2; // 직위
   final String mb3; // 입사일
+  final String mb5; // 직무
   final String mbHp;
   final String mbEmail;
   final String mbDepart; // 소속
+  final String registerNum;
+  final int mbLevel;
 
   UserModel({
     required this.mbNo,
@@ -33,9 +36,12 @@ class UserModel extends UserModelBase {
     this.jobDuty = '',
     this.mb2 = '',
     this.mb3 = '',
+    this.mb5 = '',
     this.mbHp = '',
     this.mbEmail = '',
     this.mbDepart = '',
+    this.registerNum = '',
+    this.mbLevel = 0,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

@@ -7,6 +7,8 @@ import 'package:lhens_app/common/components/empty_state.dart';
 import 'package:lhens_app/common/components/selector/selector.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_shadows.dart';
+import 'package:lhens_app/drawer/salary/model/salary_model.dart';
+import 'package:lhens_app/drawer/salary/provider/salary_provider.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_auth_screen.dart';
 
@@ -20,16 +22,26 @@ class SalaryScreen extends ConsumerStatefulWidget {
 }
 
 class _SalaryScreenState extends ConsumerState<SalaryScreen> {
-  final List<String> years = ['2025', '2024', '2023'];
-  String? year = '2025';
-
+  int year = DateTime.now().year;
   bool _scrolled = false; // 스크롤 시 셀렉터 하단 그림자
+  @override
+  void initState() {
+    super.initState();
+    ref.read(salaryProvider.notifier);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final items = _itemsFor(year!);
-    final noData = items.isEmpty;
+    final state = ref.watch(salaryProvider);
 
+    if (state is SalaryModelLoading) {
+      return Scaffold(
+        backgroundColor: AppColors.bg,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final isSalaries = state is SalaryModel;
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: Padding(
@@ -43,18 +55,21 @@ class _SalaryScreenState extends ConsumerState<SalaryScreen> {
                 color: AppColors.white,
                 boxShadow: _scrolled ? AppShadows.stickyBar : null,
               ),
-              child: Selector<String>(
-                items: years,
+              child: Selector<int>(
+                items: isSalaries ? [year, ...state.years] : [year],
                 selected: year,
                 getLabel: (y) => '$y년',
-                onSelected: (v) => setState(() => year = v),
+                onSelected: (v) {
+                  setState(() => year = v);
+                  ref.read(salaryProvider.notifier).getSalaries(year: year);
+                },
               ),
             ),
             SizedBox(height: 12.h),
 
             // 리스트 영역
             Expanded(
-              child: noData
+              child: state is! SalaryModel || state.data.isEmpty
                   ? EmptyState(
                       iconPath: Assets.icons.document.path,
                       message: '조회 가능한 급여명세서가 없습니다.',
@@ -71,9 +86,22 @@ class _SalaryScreenState extends ConsumerState<SalaryScreen> {
                       },
                       child: ListView.separated(
                         physics: const ClampingScrollPhysics(),
-                        itemCount: items.length,
+                        itemCount: state.data.length,
                         separatorBuilder: (_, __) => SizedBox(height: 10.h),
-                        itemBuilder: (_, i) => items[i],
+                        itemBuilder: (_, i) {
+                          final salary = state.data[i];
+                          return DocListItem(
+                            title: '${salary.year}년 ${salary.month}월 급여명세서',
+                            onPreview: () => context.pushNamed(
+                              SalaryAuthScreen.routeName,
+                              pathParameters: {'id': salary.saId.toString()},
+                            ),
+                            onDownload: () => context.pushNamed(
+                              SalaryAuthScreen.routeName,
+                              pathParameters: {'id': salary.saId.toString()},
+                            ),
+                          );
+                        },
                       ),
                     ),
             ),
@@ -81,18 +109,5 @@ class _SalaryScreenState extends ConsumerState<SalaryScreen> {
         ),
       ),
     );
-  }
-
-  List<Widget> _itemsFor(String y) {
-    final months = [9, 8, 7, 6, 5, 4, 3, 2, 1];
-    return months
-        .map(
-          (m) => DocListItem(
-            title: '$y년 $m월 급여명세서',
-            onPreview: () => context.pushNamed(SalaryAuthScreen.routeName),
-            onDownload: () => context.pushNamed(SalaryAuthScreen.routeName),
-          ),
-        )
-        .toList();
   }
 }

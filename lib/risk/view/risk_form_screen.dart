@@ -65,7 +65,7 @@ class _RiskFormScreenState extends ConsumerState<RiskFormScreen> {
         onSubmit: (dto) async {
           await ref
               .read(riskProvider.notifier)
-              .patchPost(wrId: state.wrId.toString(), dto: dto);
+              .patchPost(wrId: state.wrId, dto: dto);
           context.goNamed(
             RiskDetailScreen.routeName,
             pathParameters: {'rid': state.wrId.toString()},
@@ -83,7 +83,7 @@ class _RiskFormScreenState extends ConsumerState<RiskFormScreen> {
       onSubmit: (dto) {
         final fixed = dto.copyWith(
           wr2: '접수',
-          wrOption: dto.caName == '요청(비공개)' ? 'secret' : dto.wrOption,
+          wrOption: dto.caName == '요청(비공개)' ? 'html1,secret' : dto.wrOption,
         );
         ref.read(riskProvider.notifier).postPost(dto: fixed);
         context.pop();

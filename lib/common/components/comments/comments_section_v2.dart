@@ -10,7 +10,7 @@ import 'comment_tile_v2.dart';
 
 class CommentsSectionV2 extends StatelessWidget {
   final List<PostCommentModel> comments;
-  final void Function(String id, String name) onTapReply;
+  final void Function(int id, String name)? onTapReply;
 
   const CommentsSectionV2({
     super.key,

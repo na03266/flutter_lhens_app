@@ -57,7 +57,10 @@ class HomeEventCard extends StatelessWidget {
               SizedBox(width: 4.w),
               Text(
                 periodText,
-                style: AppTextStyles.pr12.copyWith(color: AppColors.textTer),
+                style: AppTextStyles.pr12.copyWith(color: AppColors.textTer,
+                  letterSpacing: -0.5
+                ),
+
               ),
             ],
           ),

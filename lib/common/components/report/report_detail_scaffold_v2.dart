@@ -12,6 +12,7 @@ import 'package:lhens_app/common/components/sheets/action_sheet.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/common/utils/data_utils.dart';
+import 'package:lhens_app/drawer/model/create_post_dto.dart';
 import 'package:lhens_app/drawer/model/file_model.dart';
 import 'package:lhens_app/drawer/model/post_comment_model.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
@@ -23,8 +24,9 @@ import '../label_value_line.dart';
 class ReportDetailScaffoldV2 extends StatefulWidget {
   final Function()? onUpdate;
   final bool Function()? onDelete;
-  final Function()? postComment;
-  final Function()? postReply;
+  final Function(int, CreatePostDto)? postComment;
+  final Function(int, int, CreatePostDto)? postReply;
+  final int wrId;
   final String wrSubject;
   final String caName;
   final String wrContent;
@@ -43,6 +45,7 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     this.onDelete,
     this.postComment,
     this.postReply,
+    required this.wrId,
     this.caName = '',
     this.wrSubject = '',
     this.wrContent = '',
@@ -59,28 +62,29 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
   @override
   State<ReportDetailScaffoldV2> createState() => _ReportDetailScaffoldV2State();
 
-  factory ReportDetailScaffoldV2.fromModel(
-    PostDetailModel? model, {
+  factory ReportDetailScaffoldV2.fromModel({
+    required PostDetailModel model,
     Function()? onUpdate,
     bool Function()? onDelete,
-    Function()? postComment,
-    Function()? postReply,
+    Function(int, CreatePostDto)? postComment,
+    Function(int, int, CreatePostDto)? postReply,
   }) {
     return ReportDetailScaffoldV2(
       onUpdate: onUpdate,
       onDelete: onDelete,
       postComment: postComment,
       postReply: postReply,
-      caName: model?.caName ?? '',
-      wrSubject: model?.wrSubject ?? '',
-      wrContent: model?.wrContent ?? '',
-      wrName: model?.wrName ?? '',
-      wrDatetime: model?.wrDatetime ?? '',
-      wrHit: model?.wrHit.toString() ?? '',
-      comments: model?.comments ?? [],
-      files: model?.files ?? [],
-      wr3: model?.wr3,
-      wr4: model?.wr4,
+      wrId: model.wrId,
+      caName: model.caName,
+      wrSubject: model.wrSubject,
+      wrContent: model.wrContent,
+      wrName: model.wrName,
+      wrDatetime: model.wrDatetime,
+      wrHit: model.wrHit.toString(),
+      comments: model.comments,
+      files: model.files,
+      wr3: model.wr3,
+      wr4: model.wr4,
     );
   }
 }
@@ -89,7 +93,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
   final _comment = TextEditingController();
   final _inputFocus = FocusNode();
 
-  String? _replyToId;
+  int? _replyToId;
   String? _replyToName;
   double _scale = 1.0;
 
@@ -105,7 +109,8 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
       context,
       actions: [
         if (widget.onUpdate != null) ActionItem('edit', '수정'),
-        ActionItem('delete', '삭제', destructive: true),
+        if (widget.onDelete != null)
+          ActionItem('delete', '삭제', destructive: true),
       ],
     );
     if (!mounted || sel == null) return;
@@ -129,7 +134,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
     }
   }
 
-  void handleReplyTap(String id, String name) {
+  void handleReplyTap(int id, String name) {
     setState(() {
       _replyToId = id;
       _replyToName = name;
@@ -191,16 +196,16 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if(widget.wr3 != null && widget.wr3!.isNotEmpty)
-                          LabelValueLine.single(
-                            label1: '수신부서',
-                            value1: widget.wr3!,
-                          ),
-                          if(widget.wr4 != null && widget.wr4!.isNotEmpty)
-                          LabelValueLine.single(
-                            label1: '기간',
-                            value1: widget.wr4!,
-                          ),
+                          if (widget.wr3 != null && widget.wr3!.isNotEmpty)
+                            LabelValueLine.single(
+                              label1: '수신부서',
+                              value1: widget.wr3!,
+                            ),
+                          if (widget.wr4 != null && widget.wr4!.isNotEmpty)
+                            LabelValueLine.single(
+                              label1: '기간',
+                              value1: widget.wr4!,
+                            ),
                           LabelValueLine.single(
                             label1: '작성자',
                             value1: widget.wrName,
@@ -276,10 +281,13 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                     ),
                   ),
 
+                  //댓글및 대댓글
                   if (widget.comments.isNotEmpty)
                     CommentsSectionV2(
                       comments: widget.comments,
-                      onTapReply: handleReplyTap,
+                      onTapReply: widget.postReply != null
+                          ? handleReplyTap
+                          : null,
                     ),
 
                   if (!widget.showBackToList) ...[
@@ -357,6 +365,14 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                       onAction: () {
                         final text = _comment.text.trim();
                         if (text.isEmpty) return;
+                        final dto = CreatePostDto(
+                          wrContent: text,
+                        );
+                        if (_replyToId == null) {
+                          widget.postComment!(widget.wrId, dto);
+                        } else {
+                          widget.postReply!(widget.wrId, _replyToId!, dto);
+                        }
                         setState(() {
                           _comment.clear();
                           _replyToId = null;

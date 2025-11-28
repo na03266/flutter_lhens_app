@@ -29,7 +29,7 @@ class CustomDrawer extends ConsumerWidget {
           DrawerHeaderSection(
             userName: state ? mb.mbName : '',
             dept: state ? mb.mbDepart : '',
-            position: state ? mb.mb2 : '',
+            position: state ? mb.mb5 : '',
             empNo: state ? mb.mbId : '',
             joinDate: state ? mb.mb3 : '',
             hasNewAlarm: hasNewAlarm,

@@ -38,6 +38,21 @@ abstract class RiskRepository
   @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
   Future<String?> postPost({@Body() required CreatePostDto dto});
 
+  @POST('/comment')
+  @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
+  Future<String?> postComment({
+    @Body() required CreatePostDto dto,
+    @Query('parentId') required String parentId,
+  });
+
+  @POST('/comment/reply')
+  @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
+  Future<String?> postReComment({
+    @Body() required CreatePostDto dto,
+    @Query('parentId') required String parentId,
+    @Query('commentId') required String commentId,
+  });
+
   @PATCH('')
   @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
   Future<String?> patchPost({

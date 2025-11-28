@@ -100,7 +100,7 @@ class _EventSectionState extends State<EventSection> {
   @override
   Widget build(BuildContext context) {
     final hPad = 16.w;
-    const visibleCards = 1.8; // 약 1.8장 보이도록
+    const visibleCards = 2; // 약 1.8장 보이도록
     final gap = 16.w;
     final minW = 160.w;
     final maxW = 220.w;

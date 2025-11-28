@@ -11,7 +11,7 @@ import 'reply_tile.dart';
 class CommentTileV2<T> extends StatelessWidget {
   final PostCommentModel comment;
   final bool isReply;
-  final void Function(String id, String name)? onTapReply;
+  final void Function(int id, String name)? onTapReply;
   final bool Function(PostCommentModel c)? canDeleteOf;
   final bool Function(PostCommentModel c)? deletingOf;
   final void Function(PostCommentModel c)? onRequestDelete;
@@ -112,7 +112,7 @@ class CommentTileV2<T> extends StatelessWidget {
                           SizedBox(width: 8.w),
                           GestureDetector(
                             onTap: () => onTapReply?.call(
-                              comment.wrId.toString(),
+                              comment.wrId,
                               comment.wrName,
                             ),
                             child: Padding(

@@ -19,7 +19,7 @@ class HomeNavCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double cardHeight = 110.h;
-    final double iconSize = 52.w;
+    final double iconSize = 45.w;
 
     return GestureDetector(
       onTap: onTap,
@@ -39,7 +39,8 @@ class HomeNavCard extends StatelessWidget {
               title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.jb14.copyWith(color: AppColors.text),
+              style: AppTextStyles.jb14.copyWith(color: AppColors.text,fontSize: 17.sp
+              ),
             ),
             Align(
               alignment: Alignment.bottomRight,

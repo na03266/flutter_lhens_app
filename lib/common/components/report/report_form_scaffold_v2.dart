@@ -54,6 +54,7 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
     _ca1Name = widget.post?.caName;
     _ca2Name = widget.post?.wr1;
     _ca3Name = widget.post?.wr2;
+    _secret = widget.post?.wrOption.contains('secret') ?? false;
   }
 
   Future<bool> get _canSubmit async {
@@ -96,6 +97,9 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                   selected: _ca1Name,
                   getLabel: (v) => v,
                   onSelected: (v) => setState(() {
+                    if (v == '외부 공지사항' || v == '내부 공지사항') {
+                      _ca2Name = null;
+                    }
                     _ca1Name = v;
                   }),
                 ),
@@ -104,10 +108,17 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
               if (widget.ca2Names.isNotEmpty) ...[
                 Selector<String>(
                   hint: '유형2 선택',
-                  items: widget.ca2Names,
+                  items: _ca1Name != '외부 공지사항'
+                      ? widget.ca2Names
+                            .where((e) => !['공고문', '언론보도'].contains(e))
+                            .toList()
+                      : widget.ca2Names
+                            .where((e) => ['공고문', '언론보도'].contains(e))
+                            .toList(),
                   selected: _ca2Name,
                   getLabel: (v) => v,
                   onSelected: (v) => setState(() {
+                    if (['공고문', '언론보도'].contains(v)) {}
                     _ca2Name = v;
                   }),
                 ),

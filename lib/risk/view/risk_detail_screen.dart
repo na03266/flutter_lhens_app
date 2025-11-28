@@ -52,18 +52,25 @@ class _RiskDetailScreenState extends ConsumerState<RiskDetailScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(riskDetailProvider(widget.wrId));
 
-    if (state == null) {
+    if (state == null || state is! PostDetailModel) {
       return Center(child: CircularProgressIndicator());
     }
-    final isDetail = state is PostDetailModel;
     return ReportDetailScaffoldV2.fromModel(
-      isDetail ? state : null,
+      model: state,
       onUpdate: () {
-        context.goNamed(RiskFormScreen.routeNameUpdate,
+        context.goNamed(
+          RiskFormScreen.routeNameUpdate,
           pathParameters: {'rid': widget.wrId},
         );
       },
-      postComment: () {},
+      postComment: (wrId, dto) {
+        ref.read(riskProvider.notifier).postComment(wrId: wrId, dto: dto);
+      },
+      postReply: (wrId, coId, dto) {
+        ref
+            .read(riskProvider.notifier)
+            .postReComment(wrId: wrId, dto: dto, coId: coId);
+      },
     );
   }
 }

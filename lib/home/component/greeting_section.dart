@@ -45,7 +45,7 @@ class GreetingSection extends ConsumerWidget {
             SizedBox(width: 14.w),
             Expanded(
               child: HomeNavCard(
-                title: '민원제안접수',
+                title: '민원제안\n접수',
                 imagePath: Assets.illustrations.complaint.path,
                 onTap: () {
                   context.pushNamed(ComplaintScreen.routeName);
@@ -113,7 +113,7 @@ class GreetingCard extends StatelessWidget {
                   label1: '소속',
                   value1: condition ? mb.mbDepart : '',
                   label2: '직위',
-                  value2: condition ? mb.mb2 : '',
+                  value2: condition ? mb.mb5 : '',
                   labelStyle: labelTextStyle,
                   valueStyle: valueTextStyle,
                 ),
@@ -134,7 +134,7 @@ class GreetingCard extends StatelessWidget {
             child: Align(
               alignment: Alignment.centerRight,
               child: Image.asset(
-                Assets.illustrations.mainGreeting.path,
+                Assets.illustrations.mainGreetingV2.path,
                 width: imgSize,
                 height: imgSize,
                 fit: BoxFit.contain,

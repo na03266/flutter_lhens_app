@@ -14,9 +14,12 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   jobDuty: json['jobDuty'] as String? ?? '',
   mb2: json['mb2'] as String? ?? '',
   mb3: json['mb3'] as String? ?? '',
+  mb5: json['mb5'] as String? ?? '',
   mbHp: json['mbHp'] as String? ?? '',
   mbEmail: json['mbEmail'] as String? ?? '',
   mbDepart: json['mbDepart'] as String? ?? '',
+  registerNum: json['registerNum'] as String? ?? '',
+  mbLevel: (json['mbLevel'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
@@ -27,7 +30,10 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'jobDuty': instance.jobDuty,
   'mb2': instance.mb2,
   'mb3': instance.mb3,
+  'mb5': instance.mb5,
   'mbHp': instance.mbHp,
   'mbEmail': instance.mbEmail,
   'mbDepart': instance.mbDepart,
+  'registerNum': instance.registerNum,
+  'mbLevel': instance.mbLevel,
 };

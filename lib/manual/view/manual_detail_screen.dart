@@ -28,18 +28,16 @@ class _ManualDetailScreenState extends ConsumerState<ManualDetailScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(manualDetailProvider(widget.wrId));
 
-    if (state == null) {
+    if (state == null|| state is! PostDetailModel) {
       return Center(child: CircularProgressIndicator());
     }
-    final isDetail = state is PostDetailModel;
     return ReportDetailScaffoldV2.fromModel(
-      isDetail ? state : null,
+      model: state,
       onUpdate: () {
         context.goNamed(NoticeFormScreen.routeNameUpdate,
           pathParameters: {'rid': widget.wrId},
         );
       },
-      postComment: () {},
     );
   }
 }

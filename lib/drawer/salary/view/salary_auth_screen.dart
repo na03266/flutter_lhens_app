@@ -1,23 +1,34 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lhens_app/common/components/buttons/app_button.dart';
 import 'package:lhens_app/common/components/inputs/app_text_field.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:lhens_app/drawer/salary/provider/salary_provider.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
-import 'package:lhens_app/common/components/buttons/app_button.dart';
+import 'package:lhens_app/user/model/user_model.dart';
+import 'package:lhens_app/user/provider/user_me_provier.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
-class SalaryAuthScreen extends StatefulWidget {
+class SalaryAuthScreen extends ConsumerStatefulWidget {
   static String get routeName => 'salary-auth';
+  final String id;
 
-  const SalaryAuthScreen({super.key});
+  const SalaryAuthScreen({super.key, required this.id});
 
   @override
-  State<SalaryAuthScreen> createState() => _SalaryAuthScreenState();
+  ConsumerState<SalaryAuthScreen> createState() => _SalaryAuthScreenState();
 }
 
-class _SalaryAuthScreenState extends State<SalaryAuthScreen> {
+class _SalaryAuthScreenState extends ConsumerState<SalaryAuthScreen> {
   final TextEditingController _rrnTail = TextEditingController();
+  String? _filePath;
 
   @override
   void dispose() {
@@ -25,7 +36,7 @@ class _SalaryAuthScreenState extends State<SalaryAuthScreen> {
     super.dispose();
   }
 
-  void _onSubmit() {
+  Future<void> _onSubmit() async {
     final value = _rrnTail.text.trim();
     if (value.isEmpty) {
       ScaffoldMessenger.of(
@@ -33,8 +44,43 @@ class _SalaryAuthScreenState extends State<SalaryAuthScreen> {
       ).showSnackBar(const SnackBar(content: Text('주민등록번호 뒷자리를 입력해주세요.')));
       return;
     }
+    final user = ref.read(userMeProvider) as UserModel;
+    if (value == user.registerNum) {
+      await _prepareHtmlFile();
+      await _openExternal();
+    }
     // TODO: 실제 인증 처리 로직
     debugPrint('[AUTH] 주민번호 뒷자리 입력됨: $value');
+  }
+
+  Future<void> _prepareHtmlFile() async {
+    // 1. 서버에서 HTML 문자열 가져오기
+    final html = await ref
+        .read(salaryProvider.notifier)
+        .getSalary(id: int.parse(widget.id));
+
+    // 2. 임시 디렉터리 경로
+    final dir = await getTemporaryDirectory();
+    final path = '${dir.path}/salary_${widget.id}.html';
+
+    // 3. 파일로 저장 (UTF-8)
+    final file = File(path);
+    await file.writeAsString(html, encoding: utf8);
+
+    if (!mounted) return;
+
+    setState(() {
+      _filePath = path;
+    });
+  }
+
+  Future<void> _openExternal() async {
+    if (_filePath == null) return;
+
+    final result = await OpenFilex.open(_filePath!, type: 'text/html');
+
+    debugPrint('OpenFilex result: ${result.type}  message: ${result.message}');
+    // 필요하면 result 보고 에러 스낵바 처리
   }
 
   @override
@@ -49,9 +95,9 @@ class _SalaryAuthScreenState extends State<SalaryAuthScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Assets.illustrations.salary.image(
-                width: 120.w,
-                height: 120.w,
+              Assets.illustrations.salaryCharacter.image(
+                width: 140.w,
+                height: 140.w,
                 fit: BoxFit.contain,
               ),
               SizedBox(height: 32.h),
@@ -66,7 +112,7 @@ class _SalaryAuthScreenState extends State<SalaryAuthScreen> {
                 isPassword: true,
                 formatters: [
                   FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(6),
+                  LengthLimitingTextInputFormatter(7),
                 ],
                 controller: _rrnTail,
                 onSubmitted: (_) => _onSubmit(),

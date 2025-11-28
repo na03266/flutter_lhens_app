@@ -9,6 +9,8 @@ import 'package:lhens_app/common/components/link_text.dart';
 import 'package:lhens_app/common/components/inputs/app_checkbox.dart';
 import 'package:lhens_app/common/const/data.dart';
 import 'package:lhens_app/common/secure_storage/secure_storage.dart';
+import 'package:lhens_app/common/view/splash_screen.dart';
+import 'package:lhens_app/home/view/home_screen.dart';
 import 'package:lhens_app/user/model/user_model.dart';
 import '../../common/components/dialogs/confirm_dialog.dart';
 import '../../gen/assets.gen.dart';
@@ -167,8 +169,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleLogin(BuildContext context, WidgetRef ref) async {
-    id.text = '0000001';
-    pw.text = '9999';
+    // id.text = '0000001';
+    // pw.text = '9999';
 
     final username = id.text.trim();
     final password = pw.text;
@@ -191,6 +193,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         message: state.message,
         destructive: true,
       );
+      return;
     }
+    context.goNamed(HomeScreen.routeName);
   }
 }

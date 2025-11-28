@@ -65,10 +65,11 @@ List<RouteBase> get routes => [
                 const NoTransitionPage(child: SalaryScreen()),
             routes: [
               GoRoute(
-                path: 'auth',
+                path: ':id',
                 name: SalaryAuthScreen.routeName,
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: SalaryAuthScreen()),
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: SalaryAuthScreen(id: state.pathParameters['id']!),
+                ),
               ),
             ],
           ),

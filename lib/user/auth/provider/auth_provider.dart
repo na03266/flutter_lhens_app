@@ -45,7 +45,8 @@ class AuthProvider extends ChangeNotifier {
     if (path == '/') return '/home';
 
     // 스플래시는 통과점: 로그인 여부에 따라 바로 보냄
-    if (path == '/splash') {
+    if (path == '/login') {
+      await Future.delayed(Duration(seconds: 3));
       if (user is UserModel) {
         return autologin != null ? '/home' : '/login';
       }

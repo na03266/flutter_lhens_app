@@ -48,7 +48,7 @@ class _NoticeScreenState extends ConsumerState<NoticeFormScreen> {
     );
     if (widget.wrId != null) {
       final state = ref.watch(noticeDetailProvider(widget.wrId!));
-      if (state == null) {
+      if (state == null || state is! PostDetailModel) {
         return Center(child: CircularProgressIndicator());
       }
 
@@ -58,9 +58,11 @@ class _NoticeScreenState extends ConsumerState<NoticeFormScreen> {
             : [],
         ca2Names: item.bo1.isNotEmpty ? item.bo1.split('|') : [],
         submitText: '수정',
-        post: state as PostDetailModel,
+        post: state,
         onSubmit: (dto) {
-          ref.read(noticeProvider.notifier).patchPost(dto: dto);
+          ref
+              .read(noticeProvider.notifier)
+              .patchPost(wrId: state.wrId, dto: dto);
         },
       );
     }

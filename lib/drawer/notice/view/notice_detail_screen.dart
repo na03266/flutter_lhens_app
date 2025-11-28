@@ -27,18 +27,25 @@ class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(noticeDetailProvider(widget.wrId));
 
-    if (state == null) {
+    if (state == null || state is! PostDetailModel) {
       return Center(child: CircularProgressIndicator());
     }
-    final isDetail = state is PostDetailModel;
     return ReportDetailScaffoldV2.fromModel(
-      isDetail ? state : null,
+      model: state,
       onUpdate: () {
-        context.goNamed(NoticeFormScreen.routeNameUpdate,
+        context.goNamed(
+          NoticeFormScreen.routeNameUpdate,
           pathParameters: {'rid': widget.wrId},
         );
       },
-      postComment: () {},
+      postComment: (wrId, dto) {
+        ref.read(noticeProvider.notifier).postComment(wrId: wrId, dto: dto);
+      },
+      postReply: (wrId, coId, dto) {
+        ref
+            .read(noticeProvider.notifier)
+            .postReComment(wrId: wrId, dto: dto, coId: coId);
+      },
     );
   }
 }

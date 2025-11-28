@@ -77,7 +77,10 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
       state = userResp;
       return userResp;
     } catch (e) {
-      state = UserModelError(message: '로그인에 실패했습니다.');
+      state = UserModelError(message:
+      e.toString()
+      // '로그인에 실패했습니다.',
+      );
       return Future.value(state);
     }
   }
