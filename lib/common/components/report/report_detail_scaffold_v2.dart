@@ -38,6 +38,8 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
   final List<PostCommentModel> comments;
   final List<FileModel> files;
   final bool showBackToList;
+  final bool Function(PostCommentModel c)? canCommentDeleteOf;
+  final void Function(PostCommentModel c)? onCommentDelete;
 
   const ReportDetailScaffoldV2({
     super.key,
@@ -57,6 +59,8 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     this.comments = const [],
     this.files = const [],
     this.showBackToList = false,
+    this.canCommentDeleteOf,
+    this.onCommentDelete,
   });
 
   @override
@@ -235,25 +239,56 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                                 LabelValueLine.single(
                                   label1: '수신부서',
                                   value1: widget.wr3!,
+                                  verticalPadding: EdgeInsets.symmetric(
+                                    vertical: 2.h,
+                                  ),
+                                  labelWidth: 80.w,
+                                  labelStyle: AppTextStyles.psb16,
+                                  valueStyle: AppTextStyles.pr16,
                                 ),
+
                               if (widget.wr4 != null && widget.wr4!.isNotEmpty)
                                 LabelValueLine.single(
                                   label1: '기간',
                                   value1: widget.wr4!,
+                                  labelWidth: 80.w,
+                                  labelStyle: AppTextStyles.psb16,
+                                  valueStyle: AppTextStyles.pr16,
+                                  verticalPadding: EdgeInsets.symmetric(
+                                    vertical: 2.h,
+                                  ),
                                 ),
                               LabelValueLine.single(
                                 label1: '작성자',
                                 value1: widget.wrName,
+                                labelWidth: 80.w,
+                                labelStyle: AppTextStyles.psb16,
+                                valueStyle: AppTextStyles.pr16,
+                                verticalPadding: EdgeInsets.symmetric(
+                                  vertical: 2.h,
+                                ),
                               ),
                               LabelValueLine.single(
                                 label1: '등록일',
                                 value1: DataUtils.datetimeParse(
                                   widget.wrDatetime,
                                 ),
+                                labelWidth: 80.w,
+                                labelStyle: AppTextStyles.psb16,
+                                valueStyle: AppTextStyles.pr16,
+                                verticalPadding: EdgeInsets.symmetric(
+                                  vertical: 2.h,
+                                ),
                               ),
                               LabelValueLine.single(
                                 label1: '조회수',
                                 value1: widget.wrHit,
+                                labelWidth: 80.w,
+                                labelStyle: AppTextStyles.psb16,
+                                valueStyle: AppTextStyles.pr16,
+                                verticalPadding: EdgeInsets.symmetric(
+                                  vertical: 2.h,
+                                ),
                               ),
                             ],
                           ),
@@ -325,6 +360,8 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                           onTapReply: widget.postReply != null
                               ? handleReplyTap
                               : null,
+                          canDeleteOf: widget.canCommentDeleteOf,
+                          onDelete: widget.onCommentDelete,
                         ),
 
                       if (!widget.showBackToList) ...[

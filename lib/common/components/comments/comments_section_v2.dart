@@ -11,11 +11,15 @@ import 'comment_tile_v2.dart';
 class CommentsSectionV2 extends StatelessWidget {
   final List<PostCommentModel> comments;
   final void Function(int id, String name)? onTapReply;
+  final bool Function(PostCommentModel c)? canDeleteOf;
+  final void Function(PostCommentModel c)? onDelete;
 
   const CommentsSectionV2({
     super.key,
     required this.comments,
     required this.onTapReply,
+    this.canDeleteOf,
+    this.onDelete,
   });
 
   @override
@@ -40,6 +44,8 @@ class CommentsSectionV2 extends StatelessWidget {
                   comment: c,
                   onTapReply: onTapReply,
                   isReply: c.wrCommentReply.isNotEmpty,
+                  canDeleteOf: canDeleteOf,
+                  onDelete: onDelete,
                 ),
                 SizedBox(height: 2.h),
               ],

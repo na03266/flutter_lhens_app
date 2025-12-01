@@ -8,13 +8,12 @@ import 'package:lhens_app/drawer/model/post_comment_model.dart';
 import 'package:lhens_app/mock/comment/mock_comment_models.dart';
 import 'reply_tile.dart';
 
-class CommentTileV2<T> extends StatelessWidget {
+class CommentTileV2 extends StatelessWidget {
   final PostCommentModel comment;
   final bool isReply;
   final void Function(int id, String name)? onTapReply;
   final bool Function(PostCommentModel c)? canDeleteOf;
-  final bool Function(PostCommentModel c)? deletingOf;
-  final void Function(PostCommentModel c)? onRequestDelete;
+  final void Function(PostCommentModel c)? onDelete;
 
   const CommentTileV2({
     super.key,
@@ -22,32 +21,20 @@ class CommentTileV2<T> extends StatelessWidget {
     required this.isReply,
     this.onTapReply,
     this.canDeleteOf,
-    this.deletingOf,
-    this.onRequestDelete,
+    this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     final canDeleteMe = canDeleteOf?.call(comment) ?? false;
-    final deletingMe = deletingOf?.call(comment) ?? false;
 
     Widget? deleteBtn;
     if (canDeleteMe) {
       deleteBtn = GestureDetector(
-        onTap: deletingMe ? null : () => onRequestDelete?.call(comment),
+        onTap:  () => onDelete?.call(comment),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-          child: deletingMe
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    strokeCap: StrokeCap.round,
-                    valueColor: AlwaysStoppedAnimation(AppColors.subtle),
-                  ),
-                )
-              : Text(
+          child:  Text(
                   '삭제',
                   style: AppTextStyles.pr14.copyWith(color: AppColors.textTer),
                 ),

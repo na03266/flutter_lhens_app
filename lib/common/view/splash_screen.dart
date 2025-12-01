@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     // 3초 딜레이 후 로그인 화면으로 이동
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 1), () {
       if (!mounted) return; // 위젯이 이미 dispose 된 경우 방지
       context.goNamed(LoginScreen.routeName);
     });

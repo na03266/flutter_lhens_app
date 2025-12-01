@@ -159,7 +159,38 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                   ),
                   htmlToolbarOptions: const HtmlToolbarOptions(
                     toolbarType: ToolbarType.nativeScrollable,
-                    // 굵게, 기울임, 정렬, 링크, 이미지 등 툴바 구성
+                    defaultToolbarButtons: [
+                      FontButtons(
+                        // 굵게, 기울임, 밑줄 등
+                        bold: true,
+                        italic: true,
+                        underline: true,
+                        clearAll: false,
+                        strikethrough: false,
+                        subscript: false,
+                        superscript: false,
+                      ),
+                      ParagraphButtons(
+                        alignLeft: true,
+                        alignCenter: true,
+                        alignRight: true,
+                        alignJustify: false,
+                        lineHeight: false,
+                        increaseIndent: false,
+                        decreaseIndent: false,
+                        textDirection: false,
+                        caseConverter: false,
+                      ),
+                      ListButtons(ul: true, ol: true, listStyles: false),
+                      InsertButtons(
+                        link: true,
+                        picture: true,
+                        audio: false,
+                        video: false,
+                        table: false,
+                        hr: false,
+                      ),
+                    ],
                   ),
                   otherOptions: const OtherOptions(height: 230),
                   callbacks: Callbacks(

@@ -8,7 +8,6 @@ import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:lhens_app/drawer/provider/board_provider.dart';
 import 'package:lhens_app/risk/provider/risk_provider.dart';
 import 'package:lhens_app/risk/view/risk_detail_screen.dart';
-import 'package:lhens_app/risk/view/risk_screen.dart';
 
 class RiskFormScreen extends ConsumerStatefulWidget {
   static String get routeNameCreate => '위험신고 등록';

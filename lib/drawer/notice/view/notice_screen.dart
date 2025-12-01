@@ -73,7 +73,7 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
               .read(noticeProvider.notifier)
               .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
         },
-        addPost: me is UserModel && me.mbLevel == 10
+        addPost: me is UserModel && me.mbLevel >= 4
             ? () {
                 context.pushNamed(NoticeFormScreen.routeNameCreate);
               }
