@@ -9,10 +9,8 @@ import 'package:lhens_app/mock/survey/mock_survey_models.dart';
 
 class SurveyListItem extends StatelessWidget {
   final SurveyStatus status;
-  final SurveyNameType nameType;
   final String title;
   final String dateRangeText;
-  final String target;
   final String author;
   final bool participated;
   final VoidCallback? onTap;
@@ -20,10 +18,8 @@ class SurveyListItem extends StatelessWidget {
   const SurveyListItem({
     super.key,
     required this.status,
-    required this.nameType,
     required this.title,
     required this.dateRangeText,
-    required this.target,
     required this.author,
     required this.participated,
     this.onTap,
@@ -36,11 +32,6 @@ class SurveyListItem extends StatelessWidget {
         ? StatusChipType.processing
         : StatusChipType.done;
     final statusLabel = status == SurveyStatus.ongoing ? '진행중' : '마감';
-
-    // 이름 공개 여부 칩
-    final nameTypeChip = nameType == SurveyNameType.realname
-        ? StatusChipType.realname
-        : StatusChipType.anonymous;
 
     return GestureDetector(
       onTap: onTap,
@@ -58,7 +49,6 @@ class SurveyListItem extends StatelessWidget {
               children: [
                 StatusChip(type: statusType, text: statusLabel),
                 SizedBox(width: 8.w),
-                StatusChip(type: nameTypeChip),
                 const Spacer(),
               ],
             ),
@@ -75,7 +65,7 @@ class SurveyListItem extends StatelessWidget {
                 letterSpacing: -0.40,
               ),
             ),
-            SizedBox(height: 6.h),
+            SizedBox(height: 8.h),
 
             // 기간
             Row(
@@ -92,7 +82,7 @@ class SurveyListItem extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 2.h),
 
             // 대상 / 작성자 / 참여여부
             Row(
@@ -103,22 +93,9 @@ class SurveyListItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       LabelValueLine.single(
-                        label1: '설문대상',
-                        value1: target,
-                        labelWidth: 52,
-                        labelStyle: AppTextStyles.pb14.copyWith(
-                          color: AppColors.textTer,
-                        ),
-                        valueStyle: AppTextStyles.pr14.copyWith(
-                          color: AppColors.textTer,
-                        ),
-                        gapBetween: 8,
-                      ),
-                      SizedBox(height: 6.h),
-                      LabelValueLine.single(
-                        label1: '작성자',
+                        label1: '참여자 수',
                         value1: author,
-                        labelWidth: 52,
+                        labelWidth: 62,
                         labelStyle: AppTextStyles.pb14.copyWith(
                           color: AppColors.textTer,
                         ),

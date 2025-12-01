@@ -158,30 +158,8 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                     initialText: widget.post?.wrContent ?? '',
                   ),
                   htmlToolbarOptions: const HtmlToolbarOptions(
-                    toolbarType: ToolbarType.nativeScrollable,
+                    toolbarType: ToolbarType.nativeGrid,
                     defaultToolbarButtons: [
-                      FontButtons(
-                        // 굵게, 기울임, 밑줄 등
-                        bold: true,
-                        italic: true,
-                        underline: true,
-                        clearAll: false,
-                        strikethrough: false,
-                        subscript: false,
-                        superscript: false,
-                      ),
-                      ParagraphButtons(
-                        alignLeft: true,
-                        alignCenter: true,
-                        alignRight: true,
-                        alignJustify: false,
-                        lineHeight: false,
-                        increaseIndent: false,
-                        decreaseIndent: false,
-                        textDirection: false,
-                        caseConverter: false,
-                      ),
-                      ListButtons(ul: true, ol: true, listStyles: false),
                       InsertButtons(
                         link: true,
                         picture: true,
@@ -190,6 +168,7 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                         table: false,
                         hr: false,
                       ),
+                      //
                     ],
                   ),
                   otherOptions: const OtherOptions(height: 230),

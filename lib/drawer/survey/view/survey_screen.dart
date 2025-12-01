@@ -31,8 +31,6 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       backgroundColor: AppColors.white,
       body: ReportListScaffoldV2<SurveyModel>(
@@ -68,11 +66,11 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
           ref
               .read(surveyProvider.notifier)
               .paginate(
-            fetchPage: page,
-            caName: caName,
-            wr1: wr1,
-            title: title,
-          );
+                fetchPage: page,
+                caName: caName,
+                wr1: wr1,
+                title: title,
+              );
         },
         itemBuilder: (_, index, model) {
           return GestureDetector(
@@ -83,68 +81,33 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
               );
             },
             child: SurveyListItem(
-              status: SurveyStatus.closed,
-              nameType: SurveyNameType.anonymous,
-              title: 'item.title',
-              dateRangeText: 'item.dateRangeText',
-              target: 'item.target',
-              author: 'item.author',
-              participated: true,
+              status: _getSurveyStatus(model),
+              title: model.poSubject,
+              dateRangeText: '${model.poDate} ~ ${model.poDateEnd}',
+              author: model.poCnt1.toString(),
+              participated: model.isSurvey,
             ),
           );
         },
       ),
     );
-    // final config = ReportListConfig<SurveyItem>(
-    //   tabs: const ['진행', '마감'],
-    //   filters: const ['전체'],
-    //   emptyMessage: (tab, {required bool mineOnly}) {
-    //     if (mineOnly) return '참여한 설문이 없습니다.';
-    //     return switch (tab) {
-    //       2 => '마감된 설문이 없습니다.',
-    //       1 => '진행중인 설문이 없습니다.',
-    //       _ => '등록된 설문이 없습니다.',
-    //     };
-    //   },
-    //   emptyIconPath: Assets.icons.features.surveyDoc.path,
-    //   showFab: false,
-    //   detailRouteName: '설문 상세',
-    //   myDetailRouteName: '내 설문 상세',
-    //   formRouteName: '설문 작성',
-    //
-    //   load: () async => generateSurveyItems(10),
-    //
-    //   tabPredicate: (e, tab) => switch (tab) {
-    //     1 => e.status == SurveyStatus.ongoing,
-    //     2 => e.status == SurveyStatus.closed,
-    //     _ => true,
-    //   },
-    //
-    //   searchPredicate: (e, f, q) {
-    //     if (q.isEmpty) return true;
-    //     final title = e.title.toLowerCase();
-    //     final author = e.author.toLowerCase();
-    //     final target = e.target.toLowerCase();
-    //     return switch (f) {
-    //       '작성자' => author.contains(q),
-    //       '대상' => target.contains(q),
-    //       _ => title.contains(q) || author.contains(q) || target.contains(q),
-    //     };
-    //   },
-    //   mineOnlyPredicate: (e) => e.participated,
-    //
-    //   itemBuilder: (ctx, item) => SurveyListItem(
-    //     status: item.status,
-    //     nameType: item.nameType,
-    //     title: item.title,
-    //     dateRangeText: item.dateRangeText,
-    //     target: item.target,
-    //     author: item.author,
-    //     participated: item.participated,
-    //     onTap: () => ctx.pushNamed('설문 상세'),
-    //   ),
-    // );
-    //
-    // return ReportListScaffold<SurveyItem>(config: config, mineOnly: mineOnly);
+  }
+
+  SurveyStatus _getSurveyStatus(SurveyModel model) {
+    final now = DateTime.now();
+
+    // 종료일 문자열을 DateTime 으로 변환
+    final end = DateTime.parse(model.poDateEnd);
+
+    // 종료일 하루의 끝(23:59:59)까지를 "진행"으로 보고 싶다면
+    final endOfDay = DateTime(end.year, end.month, end.day, 23, 59, 59);
+
+    if (now.isAfter(endOfDay)) {
+      // 종료일 하루의 끝을 지난 시점 → 마감
+      return SurveyStatus.closed;
+    } else {
+      // 그 전까지는 모두 진행중
+      return SurveyStatus.ongoing;
+    }
   }
 }

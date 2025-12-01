@@ -9,6 +9,8 @@ import 'package:lhens_app/drawer/edu_event/view/edu_event_detail_screen.dart';
 import 'package:lhens_app/drawer/model/board_info_model.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/drawer/provider/board_provider.dart';
+import 'package:lhens_app/user/model/user_model.dart';
+import 'package:lhens_app/user/provider/user_me_provier.dart';
 
 class EduEventScreen extends ConsumerStatefulWidget {
   static String get routeName => '교육행사정보';
@@ -38,7 +40,7 @@ class _EduEventScreenState extends ConsumerState<EduEventScreen> {
     final item = board.items.firstWhere(
       (element) => element.boTable == 'comm22',
     );
-
+    final me = ref.read(userMeProvider);
     return Scaffold(
       backgroundColor: AppColors.white,
       body: ReportListScaffoldV2<PostModel>(
@@ -72,7 +74,11 @@ class _EduEventScreenState extends ConsumerState<EduEventScreen> {
               .read(eduProvider.notifier)
               .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
         },
-
+        addPost: me is UserModel && me.mbLevel >= 4
+            ? () {
+                // context.pushNamed(NoticeFormScreen.routeNameCreate);
+              }
+            : null,
         provider: eduProvider,
         changePage: (int page) {
           ref
