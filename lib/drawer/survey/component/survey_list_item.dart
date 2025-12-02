@@ -8,7 +8,7 @@ import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/mock/survey/mock_survey_models.dart';
 
 class SurveyListItem extends StatelessWidget {
-  final SurveyStatus status;
+  final bool isProcessing;
   final String title;
   final String dateRangeText;
   final String author;
@@ -17,7 +17,7 @@ class SurveyListItem extends StatelessWidget {
 
   const SurveyListItem({
     super.key,
-    required this.status,
+    required this.isProcessing,
     required this.title,
     required this.dateRangeText,
     required this.author,
@@ -28,10 +28,10 @@ class SurveyListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 진행 상태 칩 타입 및 라벨 설정
-    final statusType = status == SurveyStatus.ongoing
+    final statusType = isProcessing
         ? StatusChipType.processing
         : StatusChipType.done;
-    final statusLabel = status == SurveyStatus.ongoing ? '진행중' : '마감';
+    final statusLabel = isProcessing ? '진행중' : '마감';
 
     return GestureDetector(
       onTap: onTap,

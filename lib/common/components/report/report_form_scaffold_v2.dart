@@ -105,7 +105,7 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                 ),
                 SizedBox(height: 12.h),
               ],
-              if (widget.ca2Names.isNotEmpty) ...[
+              if (widget.ca2Names.isNotEmpty && _ca1Name != null) ...[
                 Selector<String>(
                   hint: '유형2 선택',
                   items: _ca1Name != '외부 공지사항'
@@ -118,8 +118,12 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                   selected: _ca2Name,
                   getLabel: (v) => v,
                   onSelected: (v) => setState(() {
-                    if (['공고문', '언론보도'].contains(v)) {}
                     _ca2Name = v;
+                    // if (['공고문', '언론보도'].contains(v)) {
+                    //   _ca1Name = '외부 공지사항';
+                    // }else{
+                    //   _ca1Name = '내부 공지사항';
+                    // }
                   }),
                 ),
                 SizedBox(height: 12.h),
@@ -158,8 +162,20 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                     initialText: widget.post?.wrContent ?? '',
                   ),
                   htmlToolbarOptions: const HtmlToolbarOptions(
-                    toolbarType: ToolbarType.nativeGrid,
+                    toolbarType: ToolbarType.nativeScrollable,
                     defaultToolbarButtons: [
+                      FontButtons(
+                        // 굵게, 기울임, 밑줄 등
+                        bold: true,
+                        italic: true,
+                        underline: true,
+                        clearAll: false,
+                        strikethrough: false,
+                        subscript: false,
+                        superscript: false,
+                      ),
+
+                      ListButtons(ul: true, ol: true, listStyles: false),
                       InsertButtons(
                         link: true,
                         picture: true,
@@ -168,7 +184,6 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                         table: false,
                         hr: false,
                       ),
-                      //
                     ],
                   ),
                   otherOptions: const OtherOptions(height: 230),

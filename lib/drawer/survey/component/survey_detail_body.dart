@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:lhens_app/common/components/report/text_sizer.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SurveyDetailBody extends StatelessWidget {
   final double textScale;
@@ -86,19 +88,34 @@ class _IntroWithDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cleanedHtml = text
+        .replaceAll(r'\"', '"'); // \" -> " 로 치환
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: hpad),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
-            child: Text(
-              text,
-              style: AppTextStyles.pr16.copyWith(
-                color: AppColors.text,
-                height: 1.5,
-                fontSize: 16.sp * textScale,
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              horizontal: 6.w,
+              vertical: 4.h,
+            ),
+            child: MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                // 전체 텍스트 스케일 조정 (1.0 = 기본, 1.2 = 20% 확대)
+                textScaler: TextScaler.linear(textScale),
+              ),
+              child: Html(
+                data: cleanedHtml,
+                onLinkTap: (url, _, __) {
+                  if (url == null) return;
+                  final uri = Uri.parse(url);
+                  launchUrl(
+                    uri,
+                    mode: LaunchMode.externalApplication,
+                  );
+                },
               ),
             ),
           ),

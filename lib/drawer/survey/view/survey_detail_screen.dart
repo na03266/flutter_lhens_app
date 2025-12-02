@@ -10,38 +10,44 @@ import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/drawer/survey/component/survey_detail_header.dart';
 import 'package:lhens_app/drawer/survey/component/survey_detail_body.dart';
 import 'package:lhens_app/drawer/survey/component/survey_question.dart';
+import 'package:lhens_app/drawer/survey/model/join_survey_dto.dart';
+import 'package:lhens_app/drawer/survey/model/survey_detail_model.dart';
+import 'package:lhens_app/drawer/survey/provider/survey_provider.dart';
+import 'package:lhens_app/drawer/survey/utils/survey_utils.dart';
 import 'package:lhens_app/mock/survey/mock_survey_models.dart';
 
 class SurveyDetailScreen extends ConsumerStatefulWidget {
   static String get routeName => '설문 상세';
+  final String poId;
 
-  const SurveyDetailScreen({super.key});
+  const SurveyDetailScreen({super.key, required this.poId});
 
   @override
   ConsumerState<SurveyDetailScreen> createState() => _SurveyDetailScreenState();
 }
 
 class _SurveyDetailScreenState extends ConsumerState<SurveyDetailScreen> {
-  // mock 데이터 옵션
-  static const _mockQ1 = ['항목 1', '항목 2', '항목 3'];
-  static const _mockQ2 = ['항목 1', '항목 2', '기타'];
-  static const _msgReq = '필수 문항을 확인해주세요.';
+  int _pointerCount = 0; // 현재 화면을 누르고 있는 손가락 수
+  bool _isMultiTouch = false; // 2개 이상일 때 true
 
-  // 로컬 상태
-  double _scale = 1.0;
+  double _scale = 1.3;
+
+  Set<JoinSurveyDto> selectedItems = {};
+
   final Set<int> _selQ1 = {};
   int? _selQ2;
-
-  final _q2EtcCon = TextEditingController();
-  final _q3Con = TextEditingController();
 
   // 주관식 임시 플래그
   final bool _q3Required = false;
 
   @override
+  void initState() {
+    super.initState();
+    ref.read(surveyProvider.notifier).getDetail(poId: widget.poId);
+  }
+
+  @override
   void dispose() {
-    _q2EtcCon.dispose();
-    _q3Con.dispose();
     super.dispose();
   }
 
@@ -64,7 +70,7 @@ class _SurveyDetailScreenState extends ConsumerState<SurveyDetailScreen> {
     final hasAnswer = isMulti
         ? (selIdxs?.isNotEmpty ?? false)
         : (selIdx != null);
-    if (isRequired && !hasAnswer) return _msgReq;
+    // if (isRequired && !hasAnswer) return _msgReq;
 
     if (enableEtc && options.isNotEmpty) {
       final etcIdx = options.length - 1;
@@ -79,29 +85,29 @@ class _SurveyDetailScreenState extends ConsumerState<SurveyDetailScreen> {
   }
 
   bool _validateSubmit() {
-    final err1 = _validateChoice(
-      isRequired: true,
-      isMulti: true,
-      options: _mockQ1,
-      selIdxs: _selQ1,
-    );
+    // final err1 = _validateChoice(
+    //   isRequired: true,
+    //   isMulti: true,
+    //   options: _mockQ1,
+    //   selIdxs: _selQ1,
+    // );
+    //
+    // final err2 = _validateChoice(
+    //   isRequired: true,
+    //   isMulti: false,
+    //   options: _mockQ2,
+    //   selIdx: _selQ2,
+    //   enableEtc: true,
+    //   etcCon: _q2EtcCon,
+    // );
+    //
+    // final err3 = (_q3Required && _q3Con.text.trim().isEmpty) ? _msgReq : null;
 
-    final err2 = _validateChoice(
-      isRequired: true,
-      isMulti: false,
-      options: _mockQ2,
-      selIdx: _selQ2,
-      enableEtc: true,
-      etcCon: _q2EtcCon,
-    );
-
-    final err3 = (_q3Required && _q3Con.text.trim().isEmpty) ? _msgReq : null;
-
-    final firstError = err1 ?? err2 ?? err3;
-    if (firstError != null) {
-      _showMsg(firstError);
-      return false;
-    }
+    // final firstError = err1 ?? err2 ?? err3;
+    // if (firstError != null) {
+    //   _showMsg(firstError);
+    //   return false;
+    // }
     return true;
   }
 
@@ -114,134 +120,187 @@ class _SurveyDetailScreenState extends ConsumerState<SurveyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 헤더 메타(mock 데이터)
-    final status = SurveyStatus.ongoing;
-    final nameType = SurveyNameType.realname;
-    final participated = false;
+    final state = ref.watch(surveyDetailProvider(widget.poId));
+
+    if (state == null || state is! SurveyDetailModel) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     final hpad = 16.w;
 
-    final metaRows = _gapList(const [
-      LabelValueLine.single(
-        label1: '설문기간',
-        value1: '2025. 01. 15 ~ 2025. 01. 16',
-      ),
-      LabelValueLine.single(label1: '설문대상', value1: '기획조정실 안전보건팀'),
-      LabelValueLine.single(label1: '작성자', value1: 'LH E&S'),
-      LabelValueLine.single(label1: '등록일', value1: '2025. 01. 05'),
-      LabelValueLine.single(label1: '조회수', value1: '278'),
-    ], 5.h);
-
     return Scaffold(
       backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.viewInsetsOf(context).bottom,
-            ),
-            child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(height: 24.h),
+      body: Listener(
+        onPointerDown: (_) {
+          _pointerCount++;
+          if (_pointerCount > 1 && !_isMultiTouch) {
+            setState(() {
+              _isMultiTouch = true; // 두 손가락 이상 눌리면 스크롤 비활성
+            });
+          }
+        },
+        onPointerUp: (_) {
+          _pointerCount = (_pointerCount - 1).clamp(0, 10);
+          if (_pointerCount <= 1 && _isMultiTouch) {
+            setState(() {
+              _isMultiTouch = false; // 한 손가락 이하가 되면 다시 스크롤 가능
+            });
+          }
+        },
+        onPointerCancel: (_) {
+          _pointerCount = 0;
+          if (_isMultiTouch) {
+            setState(() {
+              _isMultiTouch = false;
+            });
+          }
+        },
+        child: SafeArea(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.viewInsetsOf(context).bottom,
+              ),
+              child: SingleChildScrollView(
+                physics: _isMultiTouch
+                    ? const NeverScrollableScrollPhysics()
+                    : const ClampingScrollPhysics(),
+                child: InteractiveViewer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: 24.h),
 
-                  // 헤더
-                  SurveyDetailHeader(
-                    status: status,
-                    nameType: nameType,
-                    participated: participated,
-                    title: '설문조사 제목이 표시되는 영역입니다. 설문조사 제목이 표시되는 영역입니다.',
-                  ),
-
-                  // 바디(글자크기+메타+소개+구분선)
-                  SurveyDetailBody(
-                    textScale: _scale,
-                    onTextScaleChanged: (v) => setState(() => _scale = v),
-                    metaRows: metaRows,
-                    introText:
-                        '해당 설문조사는 업무속도개선을 위해 실시하고 있습니다. 참여 시 추첨을 통해 스타벅스 기프티콘 증정하고 있습니다. 많은 참여 바랍니다. 감사합니다.',
-                  ),
-
-                  SizedBox(height: 14.h),
-
-                  // 필수 안내
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hpad),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        '* 필수 문항',
-                        style: AppTextStyles.pm14.copyWith(
-                          color: AppColors.danger,
-                        ),
+                      // 헤더
+                      SurveyDetailHeader(
+                        isProcessing: getSurveyStatus(state),
+                        participated: state.isSurvey,
+                        title: state.poSubject,
                       ),
-                    ),
-                  ),
 
-                  // 객관식(중복선택)
-                  SurveyQuestion(
-                    type: SurveyQuestionType.multi,
-                    title: '객관식',
-                    isRequired: true,
-                    options: _mockQ1,
-                    selectedIndexes: _selQ1,
-                    onMultiChanged: (sel, _) => setState(() {
-                      _selQ1
-                        ..clear()
-                        ..addAll(sel);
-                    }),
-                  ),
+                      // 바디(글자크기+메타+소개+구분선)
+                      SurveyDetailBody(
+                        textScale: _scale,
+                        onTextScaleChanged: (v) => setState(() => _scale = v),
+                        metaRows: _gapList([
+                          LabelValueLine.single(
+                            label1: '설문기간',
+                            value1: '${state.poDate} ~ ${state.poDateEnd}',
+                          ),
+                          LabelValueLine.single(
+                            label1: '등록일',
+                            value1: state.poDate,
+                          ),
+                          LabelValueLine.single(
+                            label1: '참여자 수',
+                            value1: state.poCount.toString(),
+                          ),
+                        ], 5.h),
+                        introText: state.poContent,
+                      ),
 
-                  // 객관식(단일) + 기타(마지막 옵션)
-                  SurveyQuestion(
-                    type: SurveyQuestionType.single,
-                    title: '객관식',
-                    isRequired: true,
-                    enableEtc: true,
-                    options: _mockQ2,
-                    selectedIndex: _selQ2,
-                    etcController: _q2EtcCon,
-                    onSingleChanged: (i) => setState(() => _selQ2 = i),
-                  ),
+                      SizedBox(height: 14.h),
 
-                  // 주관식
-                  SurveyQuestion(
-                    type: SurveyQuestionType.text,
-                    title: '주관식 서술형',
-                    isRequired: _q3Required,
-                    textController: _q3Con,
-                  ),
-
-                  // 제출 버튼
-                  SizedBox(height: 16.h),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hpad),
-                    child: Row(
-                      children: [
-                        AppButton(
-                          text: '취소',
-                          type: AppButtonType.plain,
-                          width: 100.w,
-                          onTap: _onCancel,
-                        ),
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          child: AppButton(
-                            text: '제출',
-                            type: AppButtonType.secondary,
-                            onTap: _onSubmit,
+                      // 필수 안내
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: hpad),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            '* 필수 문항',
+                            style: AppTextStyles.pm14.copyWith(
+                              color: AppColors.danger,
+                            ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
 
-                  SizedBox(height: 24.h),
-                ],
+                      if (state.questions.isNotEmpty)
+                        ...state.questions.map(
+                          (e) => SurveyQuestion(
+                            model: e,
+                            selectedItems: selectedItems,
+                            onSelected: (state, sqId, soId){
+                              setState(() {
+                                if (state) {
+                                  selectedItems.add(
+                                      JoinSurveyDto(sqId: sqId, soId: soId));
+                                } else {
+                                  selectedItems.removeWhere(
+                                        (e) => e.sqId == sqId && e.soId == soId,
+                                  );
+                                }
+                              });
+
+                            },
+                          ),
+                        ),
+                      // // 객관식(중복선택)
+                      // SurveyQuestion(
+                      //   type: SurveyQuestionType.multi,
+                      //   title: '객관식',
+                      //   isRequired: true,
+                      //   options: _mockQ1,
+                      //   selectedIndexes: _selQ1,
+                      //   onMultiChanged: (sel, _) =>
+                      //       setState(() {
+                      //         _selQ1
+                      //           ..clear()
+                      //           ..addAll(sel);
+                      //       }),
+                      // ),
+                      //
+                      //
+                      // // 객관식(단일) + 기타(마지막 옵션)
+                      // SurveyQuestion(
+                      //   type: SurveyQuestionType.single,
+                      //   title: '객관식',
+                      //   isRequired: true,
+                      //   enableEtc: true,
+                      //   options: _mockQ2,
+                      //   selectedIndex: _selQ2,
+                      //   etcController: _q2EtcCon,
+                      //   onSingleChanged: (i) => setState(() => _selQ2 = i),
+                      // ),
+                      //
+                      // // 주관식
+                      // SurveyQuestion(
+                      //   type: SurveyQuestionType.text,
+                      //   title: '주관식 서술형',
+                      //   isRequired: _q3Required,
+                      //   textController: _q3Con,
+                      // ),
+
+                      // 제출 버튼
+                      SizedBox(height: 16.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: hpad),
+                        child: Row(
+                          children: [
+                            AppButton(
+                              text: '취소',
+                              type: AppButtonType.plain,
+                              width: 100.w,
+                              onTap: _onCancel,
+                            ),
+                            SizedBox(width: 10.w),
+                            Expanded(
+                              child: AppButton(
+                                text: '제출',
+                                type: AppButtonType.secondary,
+                                onTap: _onSubmit,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: 24.h),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

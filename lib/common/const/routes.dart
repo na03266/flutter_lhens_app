@@ -320,10 +320,12 @@ List<RouteBase> get routes => [
             const NoTransitionPage(child: SurveyScreen()),
         routes: [
           GoRoute(
-            path: 'detail',
+            path: ':rid',
             name: SurveyDetailScreen.routeName,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: SurveyDetailScreen()),
+                 NoTransitionPage(child: SurveyDetailScreen(
+                   poId: state.pathParameters['rid']!,
+                 )),
           ),
           GoRoute(
             path: 'complete',

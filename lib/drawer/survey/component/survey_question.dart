@@ -3,18 +3,20 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_shadows.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:lhens_app/drawer/survey/model/join_survey_dto.dart';
+import 'package:lhens_app/drawer/survey/model/survey_question_model.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
 enum SurveyQuestionType { multi, single, text }
 
 class SurveyQuestion extends StatelessWidget {
-  final SurveyQuestionType type;
-  final String title;
-  final bool isRequired;
+  final SurveyQuestionModel model;
   final double spacing;
+  final Set<JoinSurveyDto> selectedItems;
   final List<String>? options;
   final Set<int>? selectedIndexes;
   final void Function(Set<int> selected, String? etcText)? onMultiChanged;
+  final Function(bool, int, int) onSelected;
   final bool enableEtc; // 마지막 항목 '기타'로 간주
   final TextEditingController? etcController;
   final int? selectedIndex;
@@ -24,13 +26,13 @@ class SurveyQuestion extends StatelessWidget {
 
   const SurveyQuestion({
     super.key,
-    required this.type,
-    required this.title,
-    this.isRequired = false,
+    required this.model,
     this.spacing = 8.0,
     this.options,
     this.selectedIndexes,
+    required this.selectedItems,
     this.onMultiChanged,
+    required this.onSelected,
     this.enableEtc = false,
     this.etcController,
     this.selectedIndex,
@@ -38,12 +40,6 @@ class SurveyQuestion extends StatelessWidget {
     this.textController,
     this.minLines = 3,
   });
-
-  bool get _isMulti => type == SurveyQuestionType.multi;
-
-  bool get _isSingle => type == SurveyQuestionType.single;
-
-  bool get _isText => type == SurveyQuestionType.text;
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +59,10 @@ class SurveyQuestion extends StatelessWidget {
           children: [
             _buildHeader(),
             SizedBox(height: 12.h),
-            if (_isMulti) _buildMulti(),
-            if (_isSingle) _buildSingle(),
-            if (_isText) _buildText(),
+            if (model.sqType == SQType.checkbox) _buildCheckBox(),
+            if (model.sqType == SQType.radio) _buildRadio(),
+            if (model.sqType == SQType.radio_text) _buildRadio(),
+            if (model.sqType == SQType.text) _buildText(),
           ],
         ),
       ),
@@ -75,15 +72,18 @@ class SurveyQuestion extends StatelessWidget {
   Widget _buildHeader() {
     return Row(
       children: [
-        if (isRequired) ...[
+        if (model.sqRequired == 1) ...[
           Text(
             '*',
             style: AppTextStyles.pr16.copyWith(color: AppColors.danger),
           ),
           SizedBox(width: 4.w),
         ],
-        Text(title, style: AppTextStyles.pm16.copyWith(color: AppColors.text)),
-        if (_isMulti)
+        Text(
+          model.sqTitle,
+          style: AppTextStyles.pm16.copyWith(color: AppColors.text),
+        ),
+        if (model.sqType == SQType.checkbox)
           Padding(
             padding: EdgeInsets.only(left: 4.w),
             child: Text(
@@ -95,49 +95,36 @@ class SurveyQuestion extends StatelessWidget {
     );
   }
 
-  Widget _buildMulti() {
-    final opts = options ?? const [];
-    final sel = (selectedIndexes ?? {}).toSet();
-    final hasEtc = enableEtc && opts.isNotEmpty;
-    final etcIdx = hasEtc ? opts.length - 1 : -1;
+  Widget _buildCheckBox() {
+    final options = model.options;
 
     return Column(
       children: [
-        for (int i = 0; i < opts.length; i++)
+        for (int i = 0; i < options.length; i++)
           Padding(
             padding: EdgeInsets.only(
-              bottom: i == opts.length - 1 ? 0 : spacing.h,
+              bottom: i == options.length - 1 ? 0 : spacing.h,
             ),
-            child: (hasEtc && i == etcIdx && sel.contains(etcIdx))
-                ? _EtcOptionTile(
-                    label: opts[i],
-                    controller: etcController,
-                    onTap: () {
-                      final next = sel.toSet()..remove(etcIdx);
-                      onMultiChanged?.call(next, null);
-                    },
-                    onChanged: (text) => onMultiChanged?.call(sel, text.trim()),
-                  )
-                : _OptionTile(
-                    label: opts[i],
-                    selected: sel.contains(i),
-                    onTap: () {
-                      final next = sel.toSet();
-                      next.contains(i) ? next.remove(i) : next.add(i);
-                      onMultiChanged?.call(
-                        next,
-                        (hasEtc && i == etcIdx && next.contains(etcIdx))
-                            ? etcController?.text.trim()
-                            : null,
-                      );
-                    },
-                  ),
+            child: _OptionTile(
+              label: options[i].soText,
+              selected: selectedItems
+                  .map((e) => e.soId)
+                  .toList()
+                  .contains(options[i].soId),
+              onTap: () {
+                final isSelected = selectedItems
+                    .map((e) => e.soId)
+                    .toList()
+                    .contains(options[i].soId);
+                onSelected(!isSelected, options[i].sqId, options[i].soId);
+              },
+            ),
           ),
       ],
     );
   }
 
-  Widget _buildSingle() {
+  Widget _buildRadio() {
     final opts = options ?? const [];
     final cur = selectedIndex;
     final hasEtc = enableEtc && opts.isNotEmpty;

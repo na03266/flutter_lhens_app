@@ -10,22 +10,22 @@ final surveyDetailProvider = Provider.family<SurveyModel?, String>((ref, id) {
     return null;
   }
 
-  return state.data.firstWhere((element) => element.wrId == int.parse(id));
+  return state.data.firstWhere((element) => element.poId == int.parse(id));
 });
 
 final surveyProvider =
-StateNotifierProvider<SurveyStateNotifier, PagePaginationBase>((ref) {
-  final repository = ref.watch(surveyRepositoryProvider);
-  final notifier = SurveyStateNotifier(repository: repository);
+    StateNotifierProvider<SurveyStateNotifier, PagePaginationBase>((ref) {
+      final repository = ref.watch(surveyRepositoryProvider);
+      final notifier = SurveyStateNotifier(repository: repository);
 
-  return notifier;
-});
+      return notifier;
+    });
 
 class SurveyStateNotifier
     extends PagePaginationProvider<SurveyModel, SurveyRepository> {
   SurveyStateNotifier({required super.repository});
 
-  getDetail({required String wrId}) async {
+  getDetail({required String poId}) async {
     if (state is! PagePagination) {
       await paginate();
     }
@@ -35,18 +35,17 @@ class SurveyStateNotifier
 
     final pState = state as PagePagination;
 
-    final resp = await repository.getSurveyDetail(wrId: wrId);
+    final resp = await repository.getSurveyDetail(poId: poId);
 
-    final parsedWrId = int.parse(wrId);
-    if (pState.data.where((e) => e.wrId == parsedWrId).isEmpty) {
+    final parsedWrId = int.parse(poId);
+    if (pState.data.where((e) => e.poId == parsedWrId).isEmpty) {
       state = pState.copyWith(data: <SurveyModel>[...pState.data, resp]);
     } else {
       state = pState.copyWith(
         data: pState.data
-            .map<SurveyModel>((e) => e.wrId == parsedWrId ? resp : e)
+            .map<SurveyModel>((e) => e.poId == parsedWrId ? resp : e)
             .toList(),
       );
     }
   }
-
 }

@@ -6,15 +6,13 @@ import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/mock/survey/mock_survey_models.dart';
 
 class SurveyDetailHeader extends StatelessWidget {
-  final SurveyStatus status;
-  final SurveyNameType nameType;
+  final bool isProcessing;
   final bool participated;
   final String title;
 
   const SurveyDetailHeader({
     super.key,
-    required this.status,
-    required this.nameType,
+    required this.isProcessing,
     required this.participated,
     required this.title,
   });
@@ -30,15 +28,8 @@ class SurveyDetailHeader extends StatelessWidget {
           Row(
             children: [
               StatusChip(
-                type: status == SurveyStatus.ongoing
-                    ? StatusChipType.processing
-                    : StatusChipType.done,
-              ),
-              SizedBox(width: 8.w),
-              StatusChip(
-                type: nameType == SurveyNameType.realname
-                    ? StatusChipType.realname
-                    : StatusChipType.anonymous,
+                type: isProcessing ? StatusChipType.processing : StatusChipType.done,
+                text: isProcessing ? '진행중' : '마감',
               ),
               SizedBox(width: 8.w),
               StatusChip(

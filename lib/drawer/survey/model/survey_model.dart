@@ -8,7 +8,7 @@ class SurveyModel {
   final String poSubject;
   final String poDate;
   final String poDateEnd;
-  final int poCnt1; //참여자수
+  final int poCount; //참여자수
   final bool isSurvey;
 
   SurveyModel({
@@ -16,7 +16,7 @@ class SurveyModel {
     required this.poSubject,
     required this.poDate,
     required this.poDateEnd,
-    required this.poCnt1,
+    required this.poCount,
     required this.isSurvey,
   });
 

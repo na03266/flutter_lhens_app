@@ -8,7 +8,8 @@ import 'package:lhens_app/common/components/report/report_list_scaffold_v2.dart'
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/drawer/survey/component/survey_list_item.dart';
 import 'package:lhens_app/drawer/survey/model/survey_model.dart';
-import 'package:lhens_app/drawer/survey/provider/survey_model.dart';
+import 'package:lhens_app/drawer/survey/provider/survey_provider.dart';
+import 'package:lhens_app/drawer/survey/utils/survey_utils.dart';
 import 'package:lhens_app/drawer/survey/view/survey_detail_screen.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/mock/survey/mock_survey_models.dart';
@@ -57,9 +58,9 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
           setState(() {
             title = input;
           });
-          // ref
-          //     .read(noticeProvider.notifier)
-          //     .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
+          ref
+              .read(surveyProvider.notifier)
+              .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
         },
         provider: surveyProvider,
         changePage: (int page) {
@@ -81,33 +82,15 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
               );
             },
             child: SurveyListItem(
-              status: _getSurveyStatus(model),
+              isProcessing: getSurveyStatus(model),
               title: model.poSubject,
               dateRangeText: '${model.poDate} ~ ${model.poDateEnd}',
-              author: model.poCnt1.toString(),
+              author: model.poCount.toString(),
               participated: model.isSurvey,
             ),
           );
         },
       ),
     );
-  }
-
-  SurveyStatus _getSurveyStatus(SurveyModel model) {
-    final now = DateTime.now();
-
-    // 종료일 문자열을 DateTime 으로 변환
-    final end = DateTime.parse(model.poDateEnd);
-
-    // 종료일 하루의 끝(23:59:59)까지를 "진행"으로 보고 싶다면
-    final endOfDay = DateTime(end.year, end.month, end.day, 23, 59, 59);
-
-    if (now.isAfter(endOfDay)) {
-      // 종료일 하루의 끝을 지난 시점 → 마감
-      return SurveyStatus.closed;
-    } else {
-      // 그 전까지는 모두 진행중
-      return SurveyStatus.ongoing;
-    }
   }
 }

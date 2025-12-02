@@ -33,8 +33,8 @@ abstract class SurveyRepository
     PagePaginationParams? paginationParams = const PagePaginationParams(),
   });
 
-  @GET('/{wrId}')
+  @GET('/{poId}')
   @Headers({'accessToken': 'true'})
-  Future<SurveyDetailModel> getSurveyDetail({@Path('wrId') required String wrId});
+  Future<SurveyDetailModel> getSurveyDetail({@Path('poId') required String poId});
 
 }

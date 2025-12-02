@@ -9,8 +9,6 @@ enum StatusChipType {
   done, // 완료
   participate, // 참여
   notParticipate, // 미참여
-  realname, // 실명
-  anonymous, // 익명
   tag, // 이름 태그 + x
   fixed, // 고정값 (삭제불가)
 }
@@ -96,14 +94,7 @@ class StatusChip extends StatelessWidget {
           fg: AppColors.white,
           fallbackLabel: '미참여',
         );
-      case StatusChipType.realname:
-      case StatusChipType.anonymous:
-        return _ChipStyle(
-          bg: AppColors.white,
-          borderColor: AppColors.textSec,
-          fg: AppColors.text,
-          fallbackLabel: t == StatusChipType.realname ? '실명' : '익명',
-        );
+
       case StatusChipType.tag:
         return _ChipStyle(
           bg: AppColors.subtle,

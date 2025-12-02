@@ -99,7 +99,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
 
   int? _replyToId;
   String? _replyToName;
-  double _scale = 1.0;
+  double _scale = 1.3;
 
   int _pointerCount = 0; // 현재 화면을 누르고 있는 손가락 수
   bool _isMultiTouch = false; // 2개 이상일 때 true
