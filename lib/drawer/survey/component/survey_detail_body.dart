@@ -88,8 +88,10 @@ class _IntroWithDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cleanedHtml = text
-        .replaceAll(r'\"', '"'); // \" -> " 로 치환
+    final sanitized = text
+        .replaceAll('\r\n', '')
+        .replaceAll('\n', '')
+        .replaceAll('\r', '');
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: hpad),
       child: Column(
@@ -107,7 +109,7 @@ class _IntroWithDivider extends StatelessWidget {
                 textScaler: TextScaler.linear(textScale),
               ),
               child: Html(
-                data: cleanedHtml,
+                data: sanitized,
                 onLinkTap: (url, _, __) {
                   if (url == null) return;
                   final uri = Uri.parse(url);

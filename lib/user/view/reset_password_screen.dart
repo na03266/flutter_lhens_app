@@ -8,6 +8,8 @@ import 'package:lhens_app/common/components/buttons/app_button.dart';
 import 'package:lhens_app/common/components/inputs/app_text_field.dart';
 import 'package:lhens_app/common/components/custom_app_bar.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/user/model/change_password_dto.dart';
+import 'package:lhens_app/user/provider/user_me_provier.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   static String get routeName => 'reset-password';
@@ -102,10 +104,24 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
       return;
     }
 
-    // 성공
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('비밀번호가 재설정되었습니다.')));
+    final dto = ChangePasswordDto(
+      mbId: id.text.trim(),
+      newPassword: newPassword.text.trim(),
+      registerNum: rrnTail.text.trim(),
+    );
+
+    try {
+      ref.read(userMeProvider.notifier).changePassword(dto);
+
+      // 성공
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('비밀번호가 재설정되었습니다.')));
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
     if (context.canPop()) context.pop();
   }
 

@@ -9,37 +9,51 @@ import 'package:lhens_app/gen/assets.gen.dart';
 
 enum SurveyQuestionType { multi, single, text }
 
-class SurveyQuestion extends StatelessWidget {
+class SurveyQuestion extends StatefulWidget {
   final SurveyQuestionModel model;
   final double spacing;
   final Set<JoinSurveyDto> selectedItems;
-  final List<String>? options;
-  final Set<int>? selectedIndexes;
-  final void Function(Set<int> selected, String? etcText)? onMultiChanged;
   final Function(bool, int, int) onSelected;
-  final bool enableEtc; // 마지막 항목 '기타'로 간주
-  final TextEditingController? etcController;
-  final int? selectedIndex;
-  final void Function(int index)? onSingleChanged;
-  final TextEditingController? textController;
+
+  // 텍스트 답변을 부모에게 알려주는 콜백
+  final void Function(int sqId, String answer)? onTextChanged; // 주관식
+  final void Function(int sqId, int soId, String answer)?
+  onEtcTextChanged; // 라디오+기타
+
   final int minLines;
 
   const SurveyQuestion({
     super.key,
     required this.model,
     this.spacing = 8.0,
-    this.options,
-    this.selectedIndexes,
     required this.selectedItems,
-    this.onMultiChanged,
     required this.onSelected,
-    this.enableEtc = false,
-    this.etcController,
-    this.selectedIndex,
-    this.onSingleChanged,
-    this.textController,
+    this.onTextChanged,
+    this.onEtcTextChanged,
     this.minLines = 3,
   });
+
+  @override
+  State<SurveyQuestion> createState() => _SurveyQuestionState();
+}
+
+class _SurveyQuestionState extends State<SurveyQuestion> {
+  late final TextEditingController _textController; // 주관식
+  late final TextEditingController _etcController; // 기타 입력
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController();
+    _etcController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _etcController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +73,10 @@ class SurveyQuestion extends StatelessWidget {
           children: [
             _buildHeader(),
             SizedBox(height: 12.h),
-            if (model.sqType == SQType.checkbox) _buildCheckBox(),
-            if (model.sqType == SQType.radio) _buildRadio(),
-            if (model.sqType == SQType.radio_text) _buildRadio(),
-            if (model.sqType == SQType.text) _buildText(),
+            if (widget.model.sqType == SQType.checkbox) _buildCheckBox(),
+            if (widget.model.sqType == SQType.radio) _buildRadio(),
+            if (widget.model.sqType == SQType.radio_text) _buildRadio(),
+            if (widget.model.sqType == SQType.text) _buildText(),
           ],
         ),
       ),
@@ -72,7 +86,7 @@ class SurveyQuestion extends StatelessWidget {
   Widget _buildHeader() {
     return Row(
       children: [
-        if (model.sqRequired == 1) ...[
+        if (widget.model.sqRequired == 1) ...[
           Text(
             '*',
             style: AppTextStyles.pr16.copyWith(color: AppColors.danger),
@@ -80,10 +94,10 @@ class SurveyQuestion extends StatelessWidget {
           SizedBox(width: 4.w),
         ],
         Text(
-          model.sqTitle,
+          widget.model.sqTitle,
           style: AppTextStyles.pm16.copyWith(color: AppColors.text),
         ),
-        if (model.sqType == SQType.checkbox)
+        if (widget.model.sqType == SQType.checkbox)
           Padding(
             padding: EdgeInsets.only(left: 4.w),
             child: Text(
@@ -96,27 +110,31 @@ class SurveyQuestion extends StatelessWidget {
   }
 
   Widget _buildCheckBox() {
-    final options = model.options;
+    final options = widget.model.options;
 
     return Column(
       children: [
         for (int i = 0; i < options.length; i++)
           Padding(
             padding: EdgeInsets.only(
-              bottom: i == options.length - 1 ? 0 : spacing.h,
+              bottom: i == options.length - 1 ? 0 : widget.spacing.h,
             ),
             child: _OptionTile(
               label: options[i].soText,
-              selected: selectedItems
+              selected: widget.selectedItems
                   .map((e) => e.soId)
                   .toList()
                   .contains(options[i].soId),
               onTap: () {
-                final isSelected = selectedItems
+                final isSelected = widget.selectedItems
                     .map((e) => e.soId)
                     .toList()
                     .contains(options[i].soId);
-                onSelected(!isSelected, options[i].sqId, options[i].soId);
+                widget.onSelected(
+                  !isSelected,
+                  options[i].sqId,
+                  options[i].soId,
+                );
               },
             ),
           ),
@@ -125,30 +143,52 @@ class SurveyQuestion extends StatelessWidget {
   }
 
   Widget _buildRadio() {
-    final opts = options ?? const [];
-    final cur = selectedIndex;
-    final hasEtc = enableEtc && opts.isNotEmpty;
-    final etcIdx = hasEtc ? opts.length - 1 : -1;
+    final options = widget.model.options;
 
     return Column(
       children: [
-        for (int i = 0; i < opts.length; i++)
+        for (int i = 0; i < options.length; i++)
           Padding(
             padding: EdgeInsets.only(
-              bottom: i == opts.length - 1 ? 0 : spacing.h,
+              bottom: i == options.length - 1 ? 0 : widget.spacing.h,
             ),
-            child: (hasEtc && i == etcIdx && cur == etcIdx)
+            child: options[i].soHasInput == 1
+                // 기타 텍스트 옵션
                 ? _EtcOptionTile(
-                    label: opts[i],
-                    controller: etcController,
-                    onTap: () => onSingleChanged?.call(-1),
-                    onChanged: (text) =>
-                        onMultiChanged?.call({etcIdx}, text.trim()),
+                    label: options[i].soText,
+                    controller: _etcController,
+                    selected: widget.selectedItems
+                        .map((e) => e.soId)
+                        .contains(options[i].soId),
+                    onTap: () {
+                      // 기타 옵션 선택 처리
+                      widget.onSelected(true, options[i].sqId, options[i].soId);
+                    },
+                    onChanged: (text) {
+                      widget.onEtcTextChanged?.call(
+                        options[i].sqId,
+                        options[i].soId,
+                        text.trim(),
+                      );
+                    },
                   )
+                // 일반 라디오 옵션
                 : _OptionTile(
-                    label: opts[i],
-                    selected: cur == i,
-                    onTap: () => onSingleChanged?.call(i),
+                    label: options[i].soText,
+                    selected: widget.selectedItems
+                        .map((e) => e.soId)
+                        .contains(options[i].soId),
+                    onTap: () {
+                      final isSelected = widget.selectedItems
+                          .map((e) => e.soId)
+                          .contains(options[i].soId);
+
+                      widget.onSelected(
+                        !isSelected,
+                        options[i].sqId,
+                        options[i].soId,
+                      );
+                    },
                   ),
           ),
       ],
@@ -157,7 +197,7 @@ class SurveyQuestion extends StatelessWidget {
 
   Widget _buildText() {
     return ConstrainedBox(
-      constraints: BoxConstraints(minHeight: (minLines * 24).h),
+      constraints: BoxConstraints(minHeight: (widget.minLines * 24).h),
       child: Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
@@ -165,9 +205,9 @@ class SurveyQuestion extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.r),
         ),
         child: TextField(
-          controller: textController,
+          controller: _textController,
           maxLines: null,
-          minLines: minLines,
+          minLines: widget.minLines,
           cursorColor: AppColors.secondary,
           cursorWidth: 1.4,
           cursorHeight: 18.h,
@@ -180,6 +220,9 @@ class SurveyQuestion extends StatelessWidget {
             ),
           ),
           style: AppTextStyles.pr16.copyWith(color: AppColors.text),
+          onChanged: (value) {
+            widget.onTextChanged?.call(widget.model.sqId, value.trim());
+          },
         ),
       ),
     );
@@ -236,10 +279,12 @@ class _EtcOptionTile extends StatelessWidget {
   const _EtcOptionTile({
     required this.label,
     required this.controller,
+    required this.selected,
     required this.onTap,
     required this.onChanged,
   });
 
+  final bool selected;
   final String label;
   final TextEditingController? controller;
   final VoidCallback onTap;
@@ -247,6 +292,10 @@ class _EtcOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = selected
+        ? Assets.icons.checkCirclePrimary
+        : Assets.icons.checkCircle;
+
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
@@ -264,10 +313,7 @@ class _EtcOptionTile extends StatelessWidget {
                 SizedBox(
                   width: 24.w,
                   height: 24.w,
-                  child: Assets.icons.checkCirclePrimary.svg(
-                    width: 24.w,
-                    height: 24.w,
-                  ),
+                  child: icon.svg(width: 24.w, height: 24.w),
                 ),
                 SizedBox(width: 8.w),
                 Expanded(
@@ -279,7 +325,9 @@ class _EtcOptionTile extends StatelessWidget {
               ],
             ),
           ),
+          if(selected)
           SizedBox(height: 8.h),
+          if(selected)
           Container(
             decoration: const BoxDecoration(
               border: Border(

@@ -8,6 +8,7 @@ import 'package:lhens_app/common/repository/base_pagination_repository.dart';
 import 'package:lhens_app/drawer/model/create_post_dto.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
+import 'package:lhens_app/drawer/survey/model/join_survey_dto.dart';
 import 'package:lhens_app/drawer/survey/model/survey_detail_model.dart';
 import 'package:lhens_app/drawer/survey/model/survey_model.dart';
 import 'package:lhens_app/drawer/survey/model/survey_model.dart';
@@ -35,6 +36,14 @@ abstract class SurveyRepository
 
   @GET('/{poId}')
   @Headers({'accessToken': 'true'})
-  Future<SurveyDetailModel> getSurveyDetail({@Path('poId') required String poId});
+  Future<SurveyDetailModel> getSurveyDetail({
+    @Path('poId') required String poId,
+  });
 
+  @POST('/{poId}')
+  @Headers({'accessToken': 'true'})
+  Future<String> joinSurvey({
+    @Path('poId') required String poId,
+    @Body() required Map<String, dynamic> answers,
+  });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lhens_app/common/model/page_pagination_model.dart';
 import 'package:lhens_app/common/provider/page_pagination_providar.dart';
+import 'package:lhens_app/drawer/survey/model/join_survey_dto.dart';
 import 'package:lhens_app/drawer/survey/model/survey_model.dart';
 import 'package:lhens_app/drawer/survey/repository/survey_repository.dart';
 
@@ -47,5 +48,13 @@ class SurveyStateNotifier
             .toList(),
       );
     }
+  }
+
+  joinSurvey({
+    required String poId,
+    required List<JoinSurveyDto> answers,
+  }) async {
+    await repository.joinSurvey(poId: poId, answers: {'answers': answers});
+    await getDetail(poId: poId);
   }
 }

@@ -10,6 +10,16 @@ class JoinSurveyDto {
 
   JoinSurveyDto({required this.sqId, this.soId, this.text});
 
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is JoinSurveyDto &&
+        other.sqId == sqId &&
+        other.soId == soId;
+  }
+  @override
+  int get hashCode => Object.hash(sqId, soId);
+
   factory JoinSurveyDto.fromJson(Map<String, dynamic> json) =>
       _$JoinSurveyDtoFromJson(json);
 

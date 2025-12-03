@@ -49,8 +49,6 @@ class _SalaryAuthScreenState extends ConsumerState<SalaryAuthScreen> {
       await _prepareHtmlFile();
       await _openExternal();
     }
-    // TODO: 실제 인증 처리 로직
-    debugPrint('[AUTH] 주민번호 뒷자리 입력됨: $value');
   }
 
   Future<void> _prepareHtmlFile() async {

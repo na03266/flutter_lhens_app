@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:lhens_app/user/model/change_password_dto.dart';
 
 import '../../common/const/data.dart';
 import '../../common/secure_storage/secure_storage.dart';
@@ -92,5 +93,8 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
       storage.delete(key: REFRESH_TOKEN_KEY),
       storage.delete(key: ACCESS_TOKEN_KEY),
     ]);
+  }
+  changePassword(ChangePasswordDto dto) async {
+    await repository.changePassword(dto: dto);
   }
 }
