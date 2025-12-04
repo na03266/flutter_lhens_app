@@ -14,6 +14,7 @@ class CommentTileV2 extends StatelessWidget {
   final void Function(int id, String name)? onTapReply;
   final bool Function(PostCommentModel c)? canDeleteOf;
   final void Function(PostCommentModel c)? onDelete;
+  final void Function(PostCommentModel c)? onUpdate;
 
   const CommentTileV2({
     super.key,
@@ -22,6 +23,7 @@ class CommentTileV2 extends StatelessWidget {
     this.onTapReply,
     this.canDeleteOf,
     this.onDelete,
+    this.onUpdate,
   });
 
   @override
@@ -36,6 +38,20 @@ class CommentTileV2 extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
           child:  Text(
                   '삭제',
+                  style: AppTextStyles.pr14.copyWith(color: AppColors.textTer),
+                ),
+        ),
+      );
+    }
+
+    Widget? updateBtn;
+    if (canDeleteMe) {
+      updateBtn = GestureDetector(
+        onTap:  () => onUpdate?.call(comment),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+          child:  Text(
+                  '수정',
                   style: AppTextStyles.pr14.copyWith(color: AppColors.textTer),
                 ),
         ),
@@ -76,6 +92,7 @@ class CommentTileV2 extends StatelessWidget {
                               ),
                             ),
                           ),
+                          if (updateBtn != null) updateBtn,
                           if (deleteBtn != null) deleteBtn,
                         ],
                       ),

@@ -80,4 +80,8 @@ class NoticeStateNotifier
     );
     await getDetail(wrId: wrId.toString());
   }
+
+  deletePost({required String wrId}) async {
+    await repository.delete(wrId: wrId);
+  }
 }

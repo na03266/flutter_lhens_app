@@ -23,7 +23,7 @@ import '../label_value_line.dart';
 
 class ReportDetailScaffoldV2 extends StatefulWidget {
   final Function()? onUpdate;
-  final bool Function()? onDelete;
+  final Function()? onDelete;
   final Function(int, CreatePostDto)? postComment;
   final Function(int, int, CreatePostDto)? postReply;
   final int wrId;
@@ -40,6 +40,7 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
   final bool showBackToList;
   final bool Function(PostCommentModel c)? canCommentDeleteOf;
   final void Function(PostCommentModel c)? onCommentDelete;
+  final Function(int, CreatePostDto c)? onCommentUpdate;
 
   const ReportDetailScaffoldV2({
     super.key,
@@ -61,6 +62,7 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     this.showBackToList = false,
     this.canCommentDeleteOf,
     this.onCommentDelete,
+    this.onCommentUpdate,
   });
 
   @override
@@ -69,9 +71,13 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
   factory ReportDetailScaffoldV2.fromModel({
     required PostDetailModel model,
     Function()? onUpdate,
-    bool Function()? onDelete,
+    Function()? onDelete,
     Function(int, CreatePostDto)? postComment,
+    Function(int, CreatePostDto)? updateComment,
     Function(int, int, CreatePostDto)? postReply,
+    bool Function(PostCommentModel c)? canCommentDeleteOf,
+    void Function(PostCommentModel c)? onCommentDelete,
+    void Function(int, CreatePostDto c)? onCommentUpdate,
   }) {
     return ReportDetailScaffoldV2(
       onUpdate: onUpdate,
@@ -89,6 +95,9 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
       files: model.files,
       wr3: model.wr3,
       wr4: model.wr4,
+      canCommentDeleteOf: canCommentDeleteOf,
+      onCommentDelete: onCommentDelete,
+      onCommentUpdate: onCommentUpdate,
     );
   }
 }
@@ -100,6 +109,8 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
   int? _replyToId;
   String? _replyToName;
   double _scale = 1.3;
+  bool updateReply = false;
+  PostCommentModel? replyItem;
 
   int _pointerCount = 0; // 현재 화면을 누르고 있는 손가락 수
   bool _isMultiTouch = false; // 2개 이상일 때 true
@@ -362,6 +373,13 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                               : null,
                           canDeleteOf: widget.canCommentDeleteOf,
                           onDelete: widget.onCommentDelete,
+                          onUpdate: (item) {
+                            setState(() {
+                              _comment.text = item.wrContent;
+                              replyItem = item;
+                              updateReply = true;
+                            });
+                          },
                         ),
 
                       if (!widget.showBackToList) ...[
@@ -437,20 +455,27 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                       controller: _comment,
                       focusNode: _inputFocus,
                       hint: _replyToId == null ? '댓글을 입력해주세요.' : '답글을 입력해주세요.',
-                      actionText: '등록',
+                      actionText: updateReply ? '수정' : '등록',
                       onAction: () {
                         final text = _comment.text.trim();
-                        if (text.isEmpty) return;
-                        final dto = CreatePostDto(wrContent: text);
-                        if (_replyToId == null) {
-                          widget.postComment!(widget.wrId, dto);
+                        if (updateReply) {
+                          final dto = CreatePostDto(wrContent: text);
+                          widget.onCommentUpdate!(replyItem!.wrId, dto);
                         } else {
-                          widget.postReply!(widget.wrId, _replyToId!, dto);
+                          if (text.isEmpty) return;
+                          final dto = CreatePostDto(wrContent: text);
+                          if (_replyToId == null) {
+                            widget.postComment!(widget.wrId, dto);
+                          } else {
+                            widget.postReply!(widget.wrId, _replyToId!, dto);
+                          }
                         }
                         setState(() {
                           _comment.clear();
                           _replyToId = null;
                           _replyToName = null;
+                          replyItem = null;
+                          updateReply = false;
                         });
                       },
                     ),

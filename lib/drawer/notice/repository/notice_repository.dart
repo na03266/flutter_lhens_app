@@ -57,5 +57,10 @@ abstract class NoticeRepository
   @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
   Future<String?> patchPost({
     @Query('wrId') required String wrId,
-    @Body() required CreatePostDto dto});
+    @Body() required CreatePostDto dto,
+  });
+
+  @DELETE('')
+  @Headers({'accessToken': 'true'})
+  Future<String?> delete({@Query('wrId') required String wrId});
 }
