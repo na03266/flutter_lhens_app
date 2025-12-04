@@ -160,7 +160,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                         ),
                         SizedBox(height: 24.h),
                       ],
-
+//
                       // 완료 버튼
                       AppButton(
                         text: '선택완료',
