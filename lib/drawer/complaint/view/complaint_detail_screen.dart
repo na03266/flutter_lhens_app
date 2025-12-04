@@ -31,18 +31,23 @@ class _ComplaintDetailScreenState extends ConsumerState<ComplaintDetailScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(complaintDetailProvider(widget.wrId));
 
-    if (state == null) {
+    if (state == null|| state is! PostDetailModel) {
       return Center(child: CircularProgressIndicator());
     }
-    final isDetail = state is PostDetailModel;
     return ReportDetailScaffoldV2.fromModel(
-      isDetail ? state : null,
+      model: state,
       onUpdate: () {
         context.goNamed(NoticeFormScreen.routeNameUpdate,
           pathParameters: {'rid': widget.wrId},
         );
       },
-      postComment: () {},
-    );
+      postComment: (wrId, dto) {
+        ref.read(complaintProvider.notifier).postComment(wrId: wrId, dto: dto);
+      },
+      postReply: (wrId, coId, dto) {
+        ref
+            .read(complaintProvider.notifier)
+            .postReComment(wrId: wrId, dto: dto, coId: coId);
+      },    );
   }
 }

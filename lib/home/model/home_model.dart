@@ -16,13 +16,20 @@ class HomeModelError extends HomeModelBase {
 @JsonSerializable()
 class HomeModel extends HomeModelBase {
   final List<PostModel> noticeItems;
+  final List<PostModel> eventItems;
 
-  HomeModel({required this.noticeItems});
+  HomeModel({required this.noticeItems, required this.eventItems});
 
   factory HomeModel.fromJson(Map<String, dynamic> json) =>
       _$HomeModelFromJson(json);
 
-  HomeModel copyWith({List<PostModel>? noticeItems}) {
-    return HomeModel(noticeItems: noticeItems ?? this.noticeItems);
+  HomeModel copyWith({
+    List<PostModel>? noticeItems,
+    List<PostModel>? eventItems,
+  }) {
+    return HomeModel(
+      noticeItems: noticeItems ?? this.noticeItems,
+      eventItems: eventItems ?? this.eventItems,
+    );
   }
 }

@@ -19,11 +19,9 @@ class DocListItem extends StatelessWidget {
     this.onPreview,
     this.onDownload,
   });
-  factory DocListItem.fromModel({required PostModel model}){
-    return DocListItem(
-      category: model.wr1,
-      title: model.wrSubject,
-    );
+
+  factory DocListItem.fromModel({required PostModel model}) {
+    return DocListItem(category: model.wr1, title: model.wrSubject);
   }
 
   @override
@@ -45,7 +43,8 @@ class DocListItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (category != null) ...[
+                  if (category != null && category!.trim().isNotEmpty) ...[
+                    // 공백 문자열 UI 깨짐 방지
                     Text(
                       category!,
                       style: AppTextStyles.pr13.copyWith(
@@ -63,21 +62,22 @@ class DocListItem extends StatelessWidget {
             ),
 
             // 아이콘 버튼
-            Row(
-              children: [
-                _icon(
-                  onTap: onPreview,
-                  icon: Assets.icons.document.svg(width: 20.w, height: 20.w),
-                  bgColor: AppColors.surface,
-                ),
-                SizedBox(width: 8.w),
-                _icon(
-                  onTap: onDownload,
-                  icon: Assets.icons.download.svg(width: 20.w, height: 20.w),
-                  bgColor: AppColors.primarySoft,
-                ),
-              ],
-            ),
+            if (onPreview != null)
+              Row(
+                children: [
+                  _icon(
+                    onTap: onPreview,
+                    icon: Assets.icons.document.svg(width: 20.w, height: 20.w),
+                    bgColor: AppColors.surface,
+                  ),
+                  // SizedBox(width: 8.w),
+                  // _icon(
+                  //   onTap: onDownload,
+                  //   icon: Assets.icons.download.svg(width: 20.w, height: 20.w),
+                  //   bgColor: AppColors.primarySoft,
+                  // ),
+                ],
+              ),
           ],
         ),
       ),

@@ -36,7 +36,7 @@ class MyNavCard extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: AppTextStyles.pm12.copyWith(color: AppColors.text),
+                style: AppTextStyles.pm16.copyWith(color: AppColors.text),
               ),
             ],
           ),

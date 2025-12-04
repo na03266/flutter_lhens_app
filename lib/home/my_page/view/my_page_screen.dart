@@ -41,11 +41,16 @@ class MyPageScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(mb.mbName, style: AppTextStyles.psb20),
+                  Text(
+                    mb.mbName,
+                    style: AppTextStyles.psb20.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                   SizedBox(height: 24.h),
-                  ..._buildInfoList( [
+                  ..._buildInfoList([
                     ['소속', mb.mbDepart],
-                    ['직위', mb.mb2],
+                    ['직위', mb.mb5],
                     ['사번', mb.mbId],
                     ['입사일', mb.mb3],
                   ]),
@@ -91,7 +96,9 @@ class MyPageScreen extends ConsumerWidget {
     final children = <Widget>[];
     for (var i = 0; i < items.length; i++) {
       final e = items[i];
-      children.add(LabelValueLine.single(label1: e[0], value1: e[1]));
+      children.add(LabelValueLine.single(label1: e[0], value1: e[1],
+      labelStyle: AppTextStyles.psb18.copyWith(color: AppColors.text),
+      valueStyle: AppTextStyles.pr18.copyWith(color: AppColors.text),));
       if (i != items.length - 1) children.add(SizedBox(height: 8.h));
     }
     return children;

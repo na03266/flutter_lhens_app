@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/drawer/edu_event/view/edu_event_screen.dart';
+import 'package:lhens_app/home/model/home_model.dart';
 
+import '../provider/home_provider.dart';
 import 'home_section_header.dart';
 import 'home_filter_chip.dart';
 import 'home_event_card.dart';
 
-class EventSection extends StatefulWidget {
+class EventSection extends ConsumerStatefulWidget {
   const EventSection({super.key});
 
   @override
-  State<EventSection> createState() => _EventSectionState();
+  ConsumerState<EventSection> createState() => _EventSectionState();
 }
 
-class _EventSectionState extends State<EventSection> {
+class _EventSectionState extends ConsumerState<EventSection> {
   HomeFilter _filter = HomeFilter.all;
   final _scroll = ScrollController();
 
@@ -43,13 +46,18 @@ class _EventSectionState extends State<EventSection> {
 
   void _goEduEvent() => context.pushNamed(EduEventScreen.routeName);
 
-  Widget _card(double cardW, {required String title, required String period}) {
+  Widget _card(
+    double cardW, {
+    required String title,
+    required String period,
+    required String imagePath,
+  }) {
     return SizedBox(
       width: cardW,
       child: HomeEventCard(
         title: title,
         periodText: period,
-        imagePath: Assets.images.event.path,
+        imagePath: imagePath,
         onTap: _goEduEvent,
       ),
     );
@@ -65,46 +73,15 @@ class _EventSectionState extends State<EventSection> {
     ];
   }
 
-  List<Widget> _cardsFor(double cardW, double gap) {
-    final edu1 = _card(
-      cardW,
-      title: '교육 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
-      period: '2025.06.02 ~ 2025.06.03',
-    );
-    final edu2 = _card(
-      cardW,
-      title: '교육 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
-      period: '2025.06.12 ~ 2025.06.12',
-    );
-    final event1 = _card(
-      cardW,
-      title: '행사 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
-      period: '2025.07.05 ~ 2025.07.06',
-    );
-    final event2 = _card(
-      cardW,
-      title: '행사 예시입니다. 제목이 길어질 경우 줄바꿈 처리',
-      period: '2025.07.15 ~ 2025.07.19',
-    );
-
-    switch (_filter) {
-      case HomeFilter.all:
-        return _withGap([edu1, edu2, event1, event2], gap);
-      case HomeFilter.edu:
-        return _withGap([edu1, edu2], gap);
-      case HomeFilter.event:
-        return _withGap([event1, event2], gap);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final hPad = 16.w;
-    const visibleCards = 1.8; // 약 1.8장 보이도록
+    const visibleCards = 2; // 약 1.8장 보이도록
     final gap = 16.w;
     final minW = 160.w;
     final maxW = 220.w;
 
+    final state = ref.watch(homeProvider);
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: hPad),
       child: LayoutBuilder(
@@ -120,8 +97,8 @@ class _EventSectionState extends State<EventSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               HomeSectionHeader(title: '교육·행사 정보', onTap: _goEduEvent),
-              SizedBox(height: 12.h),
-              HomeFilterChip(selected: _filter, onChanged: _setFilter),
+              // SizedBox(height: 12.h),
+              // HomeFilterChip(selected: _filter, onChanged: _setFilter),
               SizedBox(height: 16.h),
               SizedBox(
                 height: listH,
@@ -129,7 +106,21 @@ class _EventSectionState extends State<EventSection> {
                   controller: _scroll,
                   scrollDirection: Axis.horizontal,
                   padding: EdgeInsets.only(right: 16.w),
-                  children: _cardsFor(cardW, gap),
+                  children: state is HomeModel && state.eventItems.isNotEmpty
+                      ? _withGap(
+                          state.eventItems
+                              .map(
+                                (e) => _card(
+                                  cardW,
+                                  title: e.wrSubject,
+                                  period: e.wr4,
+                                  imagePath: e.wr5,
+                                ),
+                              )
+                              .toList(),
+                          gap,
+                        )
+                      : [],
                 ),
               ),
             ],

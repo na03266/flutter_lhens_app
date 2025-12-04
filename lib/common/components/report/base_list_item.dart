@@ -45,6 +45,17 @@ class BaseListItem extends StatelessWidget {
       dateText: DataUtils.datetimeParse(model.wrDatetime),
     );
   }
+  factory BaseListItem.fromManual({
+    required PostModel model,
+    bool isDetail = false,
+  }) {
+    return BaseListItem(
+      typeName: '${model.wr1 == '' ? '공통' : '[${model.wr1}]'} ',
+      title: model.wrSubject,
+      author: model.wrName,
+      dateText: DataUtils.datetimeParse(model.wrDatetime),
+    );
+  }
 
   factory BaseListItem.fromPostModelForEdu({
     required PostModel model,

@@ -61,11 +61,14 @@ class _MenuGroupWidget extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             group.title,
-            style: AppTextStyles.pb13.copyWith(color: AppColors.secondary),
+            style: AppTextStyles.pb16.copyWith(
+              color: AppColors.secondary,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 12),
           ...group.items.map(
-                (it) => GestureDetector(
+            (it) => GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
                 final router = GoRouter.of(context);

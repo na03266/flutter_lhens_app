@@ -30,7 +30,49 @@ class HomeEventCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.r),
             child: AspectRatio(
               aspectRatio: 3 / 2,
-              child: Image.asset(imagePath, fit: BoxFit.cover),
+              child: (imagePath.isEmpty)
+                  // 1. 이미지 경로가 아예 없을 때
+                  ? Container(
+                      color: Colors.grey.shade200,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.image_not_supported,
+                        size: 32.r,
+                        color: Colors.grey,
+                      ),
+                    )
+                  // 2. 네트워크 이미지 로드 시도
+                  : Image.network(
+                      imagePath,
+                      fit: BoxFit.cover,
+                      // 2-1. 로딩 중 처리
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: Colors.grey.shade100,
+                          alignment: Alignment.center,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      (loadingProgress.expectedTotalBytes ?? 1)
+                                : null,
+                          ),
+                        );
+                      },
+                      // 2-2. 에러(404, 네트워크 실패 등) 처리
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade200,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 32.r,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    ),
             ),
           ),
           SizedBox(height: 16.h),
@@ -55,9 +97,15 @@ class HomeEventCard extends StatelessWidget {
                 style: AppTextStyles.psb12.copyWith(color: AppColors.textTer),
               ),
               SizedBox(width: 4.w),
-              Text(
-                periodText,
-                style: AppTextStyles.pr12.copyWith(color: AppColors.textTer),
+              Expanded(
+                child: Text(
+                  periodText,
+                  style: AppTextStyles.pr12.copyWith(
+                    color: AppColors.textTer,
+                    letterSpacing: -0.5,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),

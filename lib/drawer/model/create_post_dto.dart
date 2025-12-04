@@ -4,7 +4,7 @@ part 'create_post_dto.g.dart';
 
 @JsonSerializable(includeIfNull: false)
 class CreatePostDto {
-  final String wrSubject;
+  final String? wrSubject;
   final String wrContent;
   final String? caName;
   final String? wrOption;
@@ -14,7 +14,7 @@ class CreatePostDto {
   final String? wr2;
 
   CreatePostDto({
-    required this.wrSubject,
+      this.wrSubject,
     required this.wrContent,
     this.caName,
     this.wrOption,

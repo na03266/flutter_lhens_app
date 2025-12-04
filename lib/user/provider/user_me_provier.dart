@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:lhens_app/user/model/change_password_dto.dart';
 
 import '../../common/const/data.dart';
 import '../../common/secure_storage/secure_storage.dart';
@@ -77,7 +78,10 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
       state = userResp;
       return userResp;
     } catch (e) {
-      state = UserModelError(message: '로그인에 실패했습니다.');
+      state = UserModelError(message:
+      e.toString()
+      // '로그인에 실패했습니다.',
+      );
       return Future.value(state);
     }
   }
@@ -89,5 +93,8 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
       storage.delete(key: REFRESH_TOKEN_KEY),
       storage.delete(key: ACCESS_TOKEN_KEY),
     ]);
+  }
+  changePassword(ChangePasswordDto dto) async {
+    await repository.changePassword(dto: dto);
   }
 }

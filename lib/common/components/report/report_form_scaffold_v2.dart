@@ -54,6 +54,7 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
     _ca1Name = widget.post?.caName;
     _ca2Name = widget.post?.wr1;
     _ca3Name = widget.post?.wr2;
+    _secret = widget.post?.wrOption.contains('secret') ?? false;
   }
 
   Future<bool> get _canSubmit async {
@@ -96,19 +97,33 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                   selected: _ca1Name,
                   getLabel: (v) => v,
                   onSelected: (v) => setState(() {
+                    if (v == '외부 공지사항' || v == '내부 공지사항') {
+                      _ca2Name = null;
+                    }
                     _ca1Name = v;
                   }),
                 ),
                 SizedBox(height: 12.h),
               ],
-              if (widget.ca2Names.isNotEmpty) ...[
+              if (widget.ca2Names.isNotEmpty && _ca1Name != null) ...[
                 Selector<String>(
                   hint: '유형2 선택',
-                  items: widget.ca2Names,
+                  items: _ca1Name != '외부 공지사항'
+                      ? widget.ca2Names
+                            .where((e) => !['공고문', '언론보도'].contains(e))
+                            .toList()
+                      : widget.ca2Names
+                            .where((e) => ['공고문', '언론보도'].contains(e))
+                            .toList(),
                   selected: _ca2Name,
                   getLabel: (v) => v,
                   onSelected: (v) => setState(() {
                     _ca2Name = v;
+                    // if (['공고문', '언론보도'].contains(v)) {
+                    //   _ca1Name = '외부 공지사항';
+                    // }else{
+                    //   _ca1Name = '내부 공지사항';
+                    // }
                   }),
                 ),
                 SizedBox(height: 12.h),
@@ -148,7 +163,28 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                   ),
                   htmlToolbarOptions: const HtmlToolbarOptions(
                     toolbarType: ToolbarType.nativeScrollable,
-                    // 굵게, 기울임, 정렬, 링크, 이미지 등 툴바 구성
+                    defaultToolbarButtons: [
+                      FontButtons(
+                        // 굵게, 기울임, 밑줄 등
+                        bold: true,
+                        italic: true,
+                        underline: true,
+                        clearAll: false,
+                        strikethrough: false,
+                        subscript: false,
+                        superscript: false,
+                      ),
+
+                      ListButtons(ul: true, ol: true, listStyles: false),
+                      InsertButtons(
+                        link: true,
+                        picture: true,
+                        audio: false,
+                        video: false,
+                        table: false,
+                        hr: false,
+                      ),
+                    ],
                   ),
                   otherOptions: const OtherOptions(height: 230),
                   callbacks: Callbacks(

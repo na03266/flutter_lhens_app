@@ -66,7 +66,7 @@ class AppButton extends StatelessWidget {
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: AppTextStyles.pb16.copyWith(color: textColor),
+          style: AppTextStyles.pb18.copyWith(color: textColor),
         ),
       ),
     );

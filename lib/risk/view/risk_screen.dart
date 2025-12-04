@@ -19,7 +19,6 @@ class RiskScreen extends ConsumerStatefulWidget {
 
   const RiskScreen({super.key, this.mineOnly = false, this.showFab = true});
 
-
   @override
   ConsumerState<RiskScreen> createState() => _RiskScreenState();
 }
@@ -32,7 +31,6 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final board = ref.watch(boardProvider);
     if (board is! BoardInfo) {
       return Scaffold(
@@ -42,18 +40,17 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
     }
 
     final item = board.items.firstWhere(
-          (element) => element.boTable == 'comm21',
+      (element) => element.boTable == 'comm21',
     );
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: ReportListScaffoldV2<PostModel>(
         tabs: item.boCategoryList.split('|'),
-        filters: [
-          ...item.bo1.split('|').length > 1 ? item.bo1.split('|') : [],
-        ],
+        filters: ['전체'],
         selectTabName: (String selectedTab) {
           setState(() {
-            caName = selectedTab.replaceAll(" ", "");
+            caName = selectedTab;
           });
           ref
               .read(riskProvider.notifier)
@@ -82,13 +79,13 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
           ref
               .read(riskProvider.notifier)
               .paginate(
-            fetchPage: page,
-            caName: caName,
-            wr1: wr1,
-            title: title,
-          );
+                fetchPage: page,
+                caName: caName,
+                wr1: wr1,
+                title: title,
+              );
         },
-        addPost: (){
+        addPost: () {
           context.goNamed(RiskFormScreen.routeNameCreate);
         },
         itemBuilder: (_, index, model) {
@@ -104,104 +101,5 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
         },
       ),
     );
-
-    // final config = ReportListConfig<RiskItem>(
-    //   tabs: const ['공개', '요청(비공개)'],
-    //   filters: const ['전체', '작성자', '유형명'],
-    //
-    //   // empty 문구
-    //   emptyMessage: (tabIndex, {required bool mineOnly}) {
-    //     if (mineOnly) {
-    //       switch (tabIndex) {
-    //         case 1:
-    //           return '등록한 공개 위험신고가 없습니다.';
-    //         case 2:
-    //           return '등록한 비공개 위험신고가 없습니다.';
-    //         default:
-    //           return '등록한 위험신고가 없습니다.';
-    //       }
-    //     } else {
-    //       switch (tabIndex) {
-    //         case 1:
-    //           return '등록된 공개 위험신고가 없습니다.';
-    //         case 2:
-    //           return '등록된 비공개 위험신고가 없습니다.';
-    //         default:
-    //           return '등록된 위험신고가 없습니다.';
-    //       }
-    //     }
-    //   },
-    //   // 내 위험신고 내역 / 위험신고 empty 아이콘
-    //   emptyIconPath: widget.mineOnly
-    //       ? Assets.icons.features.reportDoc.path
-    //       : Assets.icons.tabs.danger.path,
-    //
-    //   // FAB 및 라우팅 이름
-    //   showFab: widget.showFab,
-    //   formRouteName: RiskFormScreen.routeName,
-    //   detailRouteName: RiskDetailScreen.routeName,
-    //   myDetailRouteName: '내 위험신고 상세',
-    //
-    //   // 데이터 로드 (mock 데이터)
-    //   // load: () async => <RiskItem>[],
-    //   load: () async => generateRiskItems(
-    //     40,
-    //     secretRatio: 0.25,
-    //     authorA: RiskScreen._currentUser,
-    //     authorB: '홍길동(1002001)',
-    //   ),
-    //
-    //   // 탭 필터
-    //   tabPredicate: (e, tab) {
-    //     switch (tab) {
-    //       case 1:
-    //         return !e.secret; // 공개
-    //       case 2:
-    //         return e.secret; // 비공개
-    //       default:
-    //         return true; // 전체
-    //     }
-    //   },
-    //
-    //   // 검색 필터
-    //   searchPredicate: (e, selected, q) {
-    //     if (q.isEmpty) return true;
-    //     final title = e.title.toLowerCase();
-    //     final author = e.author.toLowerCase();
-    //     final type = e.typeName.toLowerCase();
-    //     switch (selected) {
-    //       case '작성자':
-    //         return author.contains(q);
-    //       case '유형명':
-    //         return type.contains(q);
-    //       default:
-    //         return title.contains(q) || author.contains(q) || type.contains(q);
-    //     }
-    //   },
-    //
-    //   // 리스트 아이템 표시용 DTO 매핑
-    //   mapToProps: (e) => ReportListItemProps(
-    //     status: e.status,
-    //     typeName: e.typeName,
-    //     title: e.title,
-    //     author: e.author,
-    //     dateText: e.dateText,
-    //     commentCount: e.comments,
-    //     secret: e.secret,
-    //   ),
-    //
-    //   // 내 글 필터 조건
-    //   mineOnlyPredicate: (e) => e.author == RiskScreen._currentUser,
-    //
-    //   // 상세 화면으로 데이터 전달이 필요한 경우에 사용
-    //   // 지정하면 기본 pushNamed 대신 이 콜백이 실행
-    //   //
-    //   // onItemTap: (ctx, item) => ctx.pushNamed(
-    //   //   RiskDetailScreen.routeName,
-    //   //   extra: item, // ← API 연동 후 실제 데이터 전달
-    //   // ),
-    // );
-    //
-    // return ReportListScaffold<RiskItem>(config: config, mineOnly: widget.mineOnly);
   }
 }

@@ -49,7 +49,6 @@ class RiskStateNotifier
       );
     }
   }
-
   postPost({required CreatePostDto dto}) async {
     final resp = await repository.postPost(dto: dto);
     if (resp != null) {
@@ -57,11 +56,26 @@ class RiskStateNotifier
     }
   }
 
-  patchPost({required CreatePostDto dto, required String wrId}) async {
-    final resp = await repository.patchPost(wrId: wrId, dto: dto);
-    if (resp != null) {
-      paginate(forceRefetch: true);
-    }
-    await getDetail(wrId: wrId);
+  patchPost({required int wrId, required CreatePostDto dto}) async {
+    await repository.patchPost(wrId: wrId.toString(), dto: dto);
+    await getDetail(wrId: wrId.toString());
+  }
+
+  postComment({required int wrId, required CreatePostDto dto}) async {
+    await repository.postComment(parentId: wrId.toString(), dto: dto);
+    await getDetail(wrId: wrId.toString());
+  }
+
+  postReComment({
+    required int wrId,
+    required int coId,
+    required CreatePostDto dto,
+  }) async {
+    await repository.postReComment(
+      parentId: wrId.toString(),
+      commentId: coId.toString(),
+      dto: dto,
+    );
+    await getDetail(wrId: wrId.toString());
   }
 }

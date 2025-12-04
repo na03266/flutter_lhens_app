@@ -16,7 +16,8 @@ class EduEventDetailScreen extends ConsumerStatefulWidget {
   const EduEventDetailScreen({super.key, required this.wrId});
 
   @override
-  ConsumerState<EduEventDetailScreen> createState() => _EduEventDetailScreenState();
+  ConsumerState<EduEventDetailScreen> createState() =>
+      _EduEventDetailScreenState();
 }
 
 class _EduEventDetailScreenState extends ConsumerState<EduEventDetailScreen> {
@@ -27,15 +28,12 @@ class _EduEventDetailScreenState extends ConsumerState<EduEventDetailScreen> {
   }
 
   @override
-  Widget build(BuildContext context,) {
+  Widget build(BuildContext context) {
     final state = ref.watch(eduDetailProvider(widget.wrId));
 
-    if (state == null) {
+    if (state == null || state is! PostDetailModel) {
       return Center(child: CircularProgressIndicator());
     }
-    final isDetail = state is PostDetailModel;
-    return ReportDetailScaffoldV2.fromModel(
-      isDetail ? state : null,
-    );
+    return ReportDetailScaffoldV2.fromModel(model: state);
   }
 }

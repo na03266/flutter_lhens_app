@@ -8,6 +8,8 @@ import 'package:lhens_app/drawer/model/board_info_model.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/drawer/notice/provider/notice_provider.dart';
 import 'package:lhens_app/drawer/notice/view/notice_form_screen.dart';
+import 'package:lhens_app/user/model/user_model.dart';
+import 'package:lhens_app/user/provider/user_me_provier.dart';
 
 import '../../provider/board_provider.dart';
 import 'notice_detail_screen.dart';
@@ -39,6 +41,7 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
     final item = board.items.firstWhere(
       (element) => element.boTable == 'comm08',
     );
+    final me = ref.read(userMeProvider);
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -70,9 +73,11 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
               .read(noticeProvider.notifier)
               .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
         },
-        addPost: () {
-          context.pushNamed(NoticeFormScreen.routeNameCreate);
-        },
+        addPost: me is UserModel && me.mbLevel >= 4
+            ? () {
+                context.pushNamed(NoticeFormScreen.routeNameCreate);
+              }
+            : null,
         provider: noticeProvider,
         changePage: (int page) {
           ref

@@ -51,7 +51,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen> {
     );
     if (widget.wrId != null) {
       final state = ref.watch(complaintDetailProvider(widget.wrId!));
-      if (state == null) {
+      if (state == null || state is! PostDetailModel) {
         return Center(child: CircularProgressIndicator());
       }
 
@@ -62,9 +62,11 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen> {
         ca2Names: item.bo1.isNotEmpty ? item.bo1.split('|') : [],
         ca3Names: item.bo1.isNotEmpty ? item.bo2.split('|') : [],
         submitText: '수정',
-        post: state as PostDetailModel,
+        post: state,
         onSubmit: (dto) {
-          ref.read(complaintProvider.notifier).patchPost(dto: dto);
+          ref
+              .read(complaintProvider.notifier)
+              .patchPost(dto: dto, wrId: state.wrId);
         },
       );
     }

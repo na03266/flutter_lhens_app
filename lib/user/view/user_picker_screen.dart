@@ -122,6 +122,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                         UserTreeV2(
                           departmentList: state.data,
                           onTeamExpanded: (state, id) async {
+                            // 확장시 선택 조건
                             await ref
                                 .read(departmentProvider.notifier)
                                 .getDetail(id);
@@ -134,6 +135,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                             });
                           },
                           onTeamSelected: (state, id) {
+                            // 팀 선택시 활성
                             setState(() {
                               if (state) {
                                 _selTeams.add(id);
@@ -143,6 +145,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                             });
                           },
                           onMbSelected: (state, id) {
+                            // 멤버 선택시 설정
                             setState(() {
                               if (state) {
                                 _selMbNo.add(id);
@@ -157,7 +160,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                         ),
                         SizedBox(height: 24.h),
                       ],
-
+//
                       // 완료 버튼
                       AppButton(
                         text: '선택완료',

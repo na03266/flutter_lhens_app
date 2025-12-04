@@ -67,7 +67,7 @@ class _UserTreeV2State extends State<UserTreeV2> {
                       padding: EdgeInsets.only(top: widget.gapDeptTeam.h),
                       child: _MemberRow(
                         name: m.mbName,
-                        mbInfo: '${m.mbId} ${m.mb2}',
+                        mbInfo: '${m.mbId} ${m.mb5}',
                         selected: widget.selectedMb.contains(m.mbNo),
                         onChanged: (state) =>
                             widget.onMbSelected(state, m.mbNo),
@@ -111,7 +111,7 @@ class _UserTreeV2State extends State<UserTreeV2> {
                               ),
                               child: _MemberRow(
                                 name: m.mbName,
-                                mbInfo: '${m.mbId} ${m.mb2}',
+                                mbInfo: '${m.mbId} ${m.mb5}',
                                 selected: widget.selectedMb.contains(m.mbNo),
                                 onChanged: (state) =>
                                     widget.onMbSelected(state, m.mbNo),
@@ -166,7 +166,7 @@ class _UserTreeV2State extends State<UserTreeV2> {
                                       ),
                                       child: _MemberRow(
                                         name: m.mbName,
-                                        mbInfo: '${m.mbId} ${m.mb2}',
+                                        mbInfo: '${m.mbId} ${m.mb5}',
                                         selected: widget.selectedMb.contains(
                                           m.mbNo,
                                         ),
