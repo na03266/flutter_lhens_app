@@ -326,6 +326,15 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                                 ),
                                 child: Html(
                                   data: widget.wrContent,
+                                  style: {
+                                    "img": Style(
+                                      width: Width(
+                                        270,
+                                        Unit.percent,
+                                      ),
+                                      // 또는 width: double.infinity,
+                                    ),
+                                  },
                                   onLinkTap: (url, _, __) {
                                     if (url == null) return;
                                     final uri = Uri.parse(url);

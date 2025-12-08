@@ -227,58 +227,54 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
               SizedBox(height: 12.h),
 
               // 내용
-              EditorContainer(
-                height: 248,
-                showCounter: false,
-                // HTML 기준 글자수는 저장 시 계산 권장
-                dimOnLocked: false,
-                child: HtmlEditor(
-                  controller: _htmlController,
-                  htmlEditorOptions: HtmlEditorOptions(
-                    initialText: widget.post?.wrContent ?? '',
-                  ),
-                  htmlToolbarOptions: const HtmlToolbarOptions(
-                    toolbarType: ToolbarType.nativeScrollable,
-                    defaultToolbarButtons: [
-                      FontButtons(
-                        // 굵게, 기울임, 밑줄 등
-                        bold: true,
-                        italic: true,
-                        underline: true,
-                        clearAll: false,
-                        strikethrough: false,
-                        subscript: false,
-                        superscript: false,
-                      ),
+              HtmlEditor(
+                controller: _htmlController,
+                htmlEditorOptions: HtmlEditorOptions(
+                  initialText: widget.post?.wrContent ?? '',
+                ),
+                htmlToolbarOptions: HtmlToolbarOptions(
+                  toolbarType: ToolbarType.nativeScrollable,
+                  defaultToolbarButtons: [
+                    FontButtons(
+                      // 굵게, 기울임, 밑줄 등
+                      bold: true,
+                      italic: true,
+                      underline: true,
+                      clearAll: false,
+                      strikethrough: false,
+                      subscript: false,
+                      superscript: false,
+                    ),
 
-                      ListButtons(ul: true, ol: true, listStyles: false),
-                      InsertButtons(
-                        link: true,
-                        picture: true,
-                        audio: false,
-                        video: false,
-                        table: false,
-                        hr: false,
-                      ),
-                    ],
-                  ),
-                  otherOptions: const OtherOptions(height: 230),
-                  callbacks: Callbacks(
-                    onImageUpload: (FileUpload file) async {
-                      final base64Str =
-                          file.base64; // "data:image/png;base64,AAAA..."
-                      final filename = file.name ?? 'image.png';
+                    ListButtons(ul: true, ol: true, listStyles: false),
+                    InsertButtons(
+                      link: true,
+                      picture: true,
+                      audio: false,
+                      video: false,
+                      table: false,
+                      hr: false,
+                    ),
+                  ],
+                  mediaUploadInterceptor: (file, type) async {
+                    type == InsertFileType.image;
+                    if (type != InsertFileType.image) return false;
+                    try {
+                      // bytes 가져오기 (모바일에서는 path로 읽어야 하는 경우도 있으니 둘 다 대응)
+                      Uint8List bytes;
+                      if (file.bytes != null) {
+                        bytes = file.bytes!;
+                      } else if (file.path != null) {
+                        bytes = await File(file.path!).readAsBytes();
+                      } else {
+                        debugPrint(
+                          '[editor] mediaUploadInterceptor: no bytes/path',
+                        );
+                        return true; // 기본 동작(=base64 삽입)으로 fallback
+                      }
 
-                      if (base64Str == null) return;
-
-                      // 1) "data:image/...;base64," prefix 제거
-                      final reg = RegExp(r'data:image/[^;]+;base64,');
-                      final pureBase64 = base64Str.replaceAll(reg, '');
-
-                      // 2) base64 → Uint8List 디코딩
-                      final Uint8List bytes = base64Decode(pureBase64);
-
-                      // 3) Repository 통해 서버 업로드
+                      final filename = file.name;
+                      // 서버 업로드
                       final imageUrl = await ref
                           .read(fileRepositoryProvider)
                           .uploadEditorImageFromBytes(
@@ -286,13 +282,32 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
                             filename: filename,
                           );
 
-                      // 4) 에디터에 네트워크 이미지 삽입
                       if (imageUrl != null) {
-                        _htmlController.insertNetworkImage(imageUrl);
+                        // 에디터에 네트워크 이미지 삽입
+                        final html =
+                            '<img src="$imageUrl" filename = "$filename" alt="$filename">';
+                        // 1) 에디터에 포커스
+                        _htmlController.setFocus();
+
+                        // 2) selection이 정리된 뒤에 HTML 삽입
+                        Future.microtask(() async {
+                          _htmlController.insertHtml(html);
+                          debugPrint('[editor] inserted html image: $imageUrl');
+                        });
+                        // 기본 base64 삽입은 막기
+                        debugPrint(await _htmlController.getText());
+                        return false;
+                      } else {
+                        // 업로드 실패 시에는 에디터라도 보여주고 싶으면 true로 리턴
+                        return true;
                       }
-                    },
-                  ),
+                    } catch (e, st) {
+                      // 에러 시 기본 동작 유지
+                      return true;
+                    }
+                  },
                 ),
+                otherOptions: const OtherOptions(height: 230),
               ),
               SizedBox(height: 12.h),
 
