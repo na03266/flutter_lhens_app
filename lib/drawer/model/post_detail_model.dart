@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:lhens_app/drawer/model/file_model.dart';
+import 'package:lhens_app/common/file/model/file_model.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 
 import 'post_comment_model.dart';

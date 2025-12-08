@@ -6,6 +6,7 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/drawer/model/board_info_model.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:lhens_app/drawer/notice/provider/notice_provider.dart';
+import 'package:lhens_app/drawer/notice/view/notice_detail_screen.dart';
 import 'package:lhens_app/drawer/notice/view/notice_screen.dart';
 
 import '../../provider/board_provider.dart';
@@ -62,9 +63,14 @@ class _NoticeScreenState extends ConsumerState<NoticeFormScreen> {
         submitText: '수정',
         post: state,
         onSubmit: (dto) {
+          print(dto.toJson());
           ref
               .read(noticeProvider.notifier)
               .patchPost(wrId: state.wrId, dto: dto);
+          context.goNamed(
+            NoticeDetailScreen.routeName,
+            pathParameters: {'rid': state.wrId.toString()},
+          );
         },
       );
     }

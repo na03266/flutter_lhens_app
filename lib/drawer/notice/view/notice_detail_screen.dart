@@ -39,20 +39,35 @@ class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
     return ReportDetailScaffoldV2.fromModel(
       model: state,
       onUpdate:
-          me is UserModel && (me.mbLevel > 10 || state.wrName.contains(me.mbId))
-          ? null
-          : () {
-              context.goNamed(
-                NoticeFormScreen.routeNameUpdate,
-                pathParameters: {'rid': widget.wrId},
-              );
-            },
+      me is UserModel && (me.mbLevel > 10 || state.wrName.contains(me.mbId))
+          ? () {
+        context.goNamed(
+          NoticeFormScreen.routeNameUpdate,
+          pathParameters: {'rid': widget.wrId},
+        );
+      }
+          : null,
       onDelete:
-          me is UserModel && (me.mbLevel > 10 || state.wrName.contains(me.mbId))
-          ? null
-          : () {
-              ref.read(noticeProvider.notifier).deletePost(wrId: widget.wrId);
-            },
+      me is UserModel && (me.mbLevel > 10 || state.wrName.contains(me.mbId))
+          ? () {
+        try {
+          ref.read(noticeProvider.notifier).deletePost(wrId: widget.wrId);
+        } on DioException catch (e) {
+          final data = e.response?.data;
+          String? serverMsg;
+          if (data is Map<String, dynamic>) {
+            final m = data['message'];
+            if (m is String) {
+              serverMsg = m;
+            } else if (m is List && m.isNotEmpty) {
+              serverMsg = m.first.toString();
+            }
+            _showMsg(serverMsg ?? '삭제 중 오류가 발생했습니다.');
+          }
+        }
+        _showMsg('정상적으로 삭제되었습니다.');
+      }
+          : null,
       postComment: (wrId, dto) {
         ref.read(noticeProvider.notifier).postComment(wrId: wrId, dto: dto);
       },

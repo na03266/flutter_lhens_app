@@ -13,7 +13,7 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/common/utils/data_utils.dart';
 import 'package:lhens_app/drawer/model/create_post_dto.dart';
-import 'package:lhens_app/drawer/model/file_model.dart';
+import 'package:lhens_app/common/file/model/file_model.dart';
 import 'package:lhens_app/drawer/model/post_comment_model.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:url_launcher/url_launcher.dart';

@@ -1,19 +1,26 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
+import 'package:lhens_app/common/components/attachments/attchment_section.dart';
 import 'package:lhens_app/common/components/buttons/app_button.dart';
 import 'package:lhens_app/common/components/inputs/app_checkbox.dart';
 import 'package:lhens_app/common/components/inputs/app_text_field.dart';
 import 'package:lhens_app/common/components/report/editor_container.dart';
 import 'package:lhens_app/common/components/selector/selector.dart';
+import 'package:lhens_app/common/file/model/file_model.dart';
+import 'package:lhens_app/common/file/model/temp_file_model.dart';
+import 'package:lhens_app/common/file/repository/file_repository.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/drawer/model/create_post_dto.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
 
-class ReportFormScaffoldV2 extends StatefulWidget {
+class ReportFormScaffoldV2 extends ConsumerStatefulWidget {
   final List<String> ca1Names;
   final List<String> ca2Names;
   final List<String> ca3Names;
@@ -34,10 +41,11 @@ class ReportFormScaffoldV2 extends StatefulWidget {
   });
 
   @override
-  State<ReportFormScaffoldV2> createState() => _ReportFormScaffoldV2State();
+  ConsumerState<ReportFormScaffoldV2> createState() =>
+      _ReportFormScaffoldV2State();
 }
 
-class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
+class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
   final _title = TextEditingController();
   final HtmlEditorController _htmlController = HtmlEditorController(); // ★ 추가
 
@@ -47,6 +55,11 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
   String? _ca2Name;
   String? _ca3Name;
 
+  List<FileModel> _oldFiles = [];
+  Set<int> _keepFileIds = {}; // 유지할 기존 파일의 bfNo
+
+  List<TempFileModel> _newFiles = [];
+
   @override
   void initState() {
     super.initState();
@@ -55,12 +68,66 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
     _ca2Name = widget.post?.wr1;
     _ca3Name = widget.post?.wr2;
     _secret = widget.post?.wrOption.contains('secret') ?? false;
+    // 기존 첨부파일이 있다면 초기화
+    // TODO: widget.post에서 기존 첨부파일 정보 가져오기
+    if (widget.post?.files != null) {
+      _oldFiles = widget.post!.files;
+      // 초기에는 모든 기존 파일을 유지
+      _keepFileIds = _oldFiles.map((f) => f.bfNo).toSet();
+    }
   }
 
   Future<bool> get _canSubmit async {
     final t = _title.text.trim();
     final c = await _htmlController.getText();
     return t.isNotEmpty && c.isNotEmpty;
+  }
+
+  // 파일 선택 및 업로드
+  Future<void> _pickAndUploadFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.any,
+    );
+
+    if (result == null || result.files.isEmpty) return;
+
+    for (final platformFile in result.files) {
+      // path가 없으면 (웹 환경 등) 스킵
+      if (platformFile.path == null) continue;
+
+      try {
+        // PlatformFile -> File 변환
+        final file = File(platformFile.path!);
+
+        // 서버에 업로드
+        final uploadedFile = await ref
+            .read(fileRepositoryProvider)
+            .uploadFile(file: file);
+
+        setState(() {
+          _newFiles.add(uploadedFile);
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('파일 업로드 실패.')));
+      }
+    }
+  }
+
+  // 기존 파일 제거 (keepFileIds에서 제외)
+  void _removeOldFile(int bfNo) {
+    setState(() {
+      _keepFileIds.remove(bfNo);
+    });
+  }
+
+  // 새 파일 제거
+  void _removeNewFile(String savedName) {
+    setState(() {
+      _newFiles.removeWhere((f) => f.savedName == savedName);
+    });
   }
 
   _submit() async {
@@ -73,13 +140,27 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
           caName: _ca1Name,
           wr1: _ca2Name,
           wr2: _ca3Name,
+          files: widget.submitText == '등록' && _newFiles.isNotEmpty
+              ? _newFiles
+              : null,
+          keepFiles: widget.submitText == '수정' && _keepFileIds.isNotEmpty
+              ? _keepFileIds.toList()
+              : null,
+          newFiles: widget.submitText == '수정' && _newFiles.isNotEmpty
+              ? _newFiles
+              : null,
         ),
+        // _keepFileIds.toList(), // 유지할 기존 파일 ID 목록
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final displayOldFiles = _oldFiles
+        .where((f) => _keepFileIds.contains(f.bfNo))
+        .toList();
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: GestureDetector(
@@ -119,11 +200,6 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                   getLabel: (v) => v,
                   onSelected: (v) => setState(() {
                     _ca2Name = v;
-                    // if (['공고문', '언론보도'].contains(v)) {
-                    //   _ca1Name = '외부 공지사항';
-                    // }else{
-                    //   _ca1Name = '내부 공지사항';
-                    // }
                   }),
                 ),
                 SizedBox(height: 12.h),
@@ -188,30 +264,29 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                   ),
                   otherOptions: const OtherOptions(height: 230),
                   callbacks: Callbacks(
-                    onImageUpload: (file) async {
+                    onImageUpload: (FileUpload file) async {
                       final base64Str =
-                          file.base64; // 예: "data:image/png;base64,AAAA..."
-                      final filename = file.name;
+                          file.base64; // "data:image/png;base64,AAAA..."
+                      final filename = file.name ?? 'image.png';
 
-                      if (base64Str == null || filename == null) return;
+                      if (base64Str == null) return;
 
-                      // 1) "data:image/png;base64," 부분 제거
+                      // 1) "data:image/...;base64," prefix 제거
                       final reg = RegExp(r'data:image/[^;]+;base64,');
                       final pureBase64 = base64Str.replaceAll(reg, '');
 
                       // 2) base64 → Uint8List 디코딩
                       final Uint8List bytes = base64Decode(pureBase64);
 
-                      if (bytes == null || filename == null) return;
+                      // 3) Repository 통해 서버 업로드
+                      final imageUrl = await ref
+                          .read(fileRepositoryProvider)
+                          .uploadEditorImageFromBytes(
+                            bytes: bytes,
+                            filename: filename,
+                          );
 
-                      // 2. 서버로 업로드 (예: NestJS /upload/editor-image)
-                      final imageUrl = null;
-                      // await _uploadEditorImage(
-                      //   bytes,
-                      //   filename,
-                      // );
-
-                      // 3. 에디터에 네트워크 이미지로 삽입
+                      // 4) 에디터에 네트워크 이미지 삽입
                       if (imageUrl != null) {
                         _htmlController.insertNetworkImage(imageUrl);
                       }
@@ -232,6 +307,16 @@ class _ReportFormScaffoldV2State extends State<ReportFormScaffoldV2> {
                     style: AppCheckboxStyle.secondary,
                   ),
                 ],
+              ),
+
+              // 파일 첨부 섹션
+              AttachmentSection(
+                oldFiles: displayOldFiles,
+                newFiles: _newFiles,
+                onAdd: _pickAndUploadFile,
+                onRemoveOld: (bfNo) => _removeOldFile(bfNo),
+                onRemoveNew: (savedName) => _removeNewFile(savedName),
+                spacing: 8,
               ),
               SizedBox(height: 8.h),
 
