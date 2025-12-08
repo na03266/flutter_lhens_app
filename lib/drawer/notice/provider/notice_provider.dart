@@ -83,6 +83,9 @@ class NoticeStateNotifier
 
   deletePost({required String wrId}) async {
     await repository.delete(wrId: wrId);
-    paginate(forceRefetch: true);
+    await paginate(forceRefetch: true);
+  }
+  deleteReply({required String wrId}) async {
+    await repository.delete(wrId: wrId);
   }
 }

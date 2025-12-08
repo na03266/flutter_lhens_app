@@ -321,7 +321,8 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                               ),
                               child: LayoutBuilder(
                                 builder: (context, constraints) {
-                                  final contentWidth = constraints.maxWidth; // ← 여기까지가 "현재 남은 폭"
+                                  final contentWidth =
+                                      constraints.maxWidth; // ← 여기까지가 "현재 남은 폭"
 
                                   return MediaQuery(
                                     data: MediaQuery.of(context).copyWith(
@@ -332,11 +333,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                                       data: widget.wrContent,
                                       style: {
                                         "img": Style(
-                                          width: Width(
-                                            contentWidth,
-                                            Unit.px,
-                                          ),
-                                          // 또는 width: double.infinity,
+                                          width: Width(contentWidth * 0.72),
                                         ),
                                       },
                                       onLinkTap: (url, _, __) {
@@ -349,7 +346,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                                       },
                                     ),
                                   );
-                                }
+                                },
                               ),
                             ),
                             SizedBox(height: 16.h),

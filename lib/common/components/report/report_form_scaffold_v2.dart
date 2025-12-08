@@ -292,18 +292,15 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
                         // 2) selection이 정리된 뒤에 HTML 삽입
                         Future.microtask(() async {
                           _htmlController.insertHtml(html);
-                          debugPrint('[editor] inserted html image: $imageUrl');
                         });
-                        // 기본 base64 삽입은 막기
-                        debugPrint(await _htmlController.getText());
                         return false;
                       } else {
                         // 업로드 실패 시에는 에디터라도 보여주고 싶으면 true로 리턴
                         return true;
                       }
-                    } catch (e, st) {
+                    } catch (e) {
                       // 에러 시 기본 동작 유지
-                      return true;
+                      return false;
                     }
                   },
                 ),

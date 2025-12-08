@@ -63,10 +63,10 @@ class _NoticeScreenState extends ConsumerState<NoticeFormScreen> {
         submitText: '수정',
         post: state,
         onSubmit: (dto) {
-          print(dto.toJson());
           ref
               .read(noticeProvider.notifier)
               .patchPost(wrId: state.wrId, dto: dto);
+
           context.goNamed(
             NoticeDetailScreen.routeName,
             pathParameters: {'rid': state.wrId.toString()},
