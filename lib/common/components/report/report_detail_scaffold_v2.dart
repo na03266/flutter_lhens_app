@@ -319,31 +319,37 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                                 horizontal: 6.w,
                                 vertical: 4.h,
                               ),
-                              child: MediaQuery(
-                                data: MediaQuery.of(context).copyWith(
-                                  // 전체 텍스트 스케일 조정 (1.0 = 기본, 1.2 = 20% 확대)
-                                  textScaler: TextScaler.linear(_scale),
-                                ),
-                                child: Html(
-                                  data: widget.wrContent,
-                                  style: {
-                                    "img": Style(
-                                      width: Width(
-                                        270,
-                                        Unit.percent,
-                                      ),
-                                      // 또는 width: double.infinity,
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final contentWidth = constraints.maxWidth; // ← 여기까지가 "현재 남은 폭"
+
+                                  return MediaQuery(
+                                    data: MediaQuery.of(context).copyWith(
+                                      // 전체 텍스트 스케일 조정 (1.0 = 기본, 1.2 = 20% 확대)
+                                      textScaler: TextScaler.linear(_scale),
                                     ),
-                                  },
-                                  onLinkTap: (url, _, __) {
-                                    if (url == null) return;
-                                    final uri = Uri.parse(url);
-                                    launchUrl(
-                                      uri,
-                                      mode: LaunchMode.externalApplication,
-                                    );
-                                  },
-                                ),
+                                    child: Html(
+                                      data: widget.wrContent,
+                                      style: {
+                                        "img": Style(
+                                          width: Width(
+                                            contentWidth,
+                                            Unit.px,
+                                          ),
+                                          // 또는 width: double.infinity,
+                                        ),
+                                      },
+                                      onLinkTap: (url, _, __) {
+                                        if (url == null) return;
+                                        final uri = Uri.parse(url);
+                                        launchUrl(
+                                          uri,
+                                          mode: LaunchMode.externalApplication,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }
                               ),
                             ),
                             SizedBox(height: 16.h),
