@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -11,12 +10,12 @@ import 'package:lhens_app/common/components/attachments/attchment_section.dart';
 import 'package:lhens_app/common/components/buttons/app_button.dart';
 import 'package:lhens_app/common/components/inputs/app_checkbox.dart';
 import 'package:lhens_app/common/components/inputs/app_text_field.dart';
-import 'package:lhens_app/common/components/report/editor_container.dart';
 import 'package:lhens_app/common/components/selector/selector.dart';
 import 'package:lhens_app/common/file/model/file_model.dart';
 import 'package:lhens_app/common/file/model/temp_file_model.dart';
 import 'package:lhens_app/common/file/repository/file_repository.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/drawer/model/create_post_dto.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
 
@@ -27,6 +26,7 @@ class ReportFormScaffoldV2 extends ConsumerStatefulWidget {
   final PostDetailModel? post;
   final String submitText;
   final bool canEditSecret;
+  final bool isEduEvent;
   final Function(CreatePostDto) onSubmit;
 
   const ReportFormScaffoldV2({
@@ -36,6 +36,7 @@ class ReportFormScaffoldV2 extends ConsumerStatefulWidget {
     this.ca3Names = const [],
     this.post,
     required this.submitText,
+    this.isEduEvent = false,
     this.canEditSecret = false,
     required this.onSubmit,
   });
@@ -47,6 +48,7 @@ class ReportFormScaffoldV2 extends ConsumerStatefulWidget {
 
 class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
   final _title = TextEditingController();
+  final _wr4 = TextEditingController();
   final HtmlEditorController _htmlController = HtmlEditorController(); // ★ 추가
 
   bool _secret = false;
@@ -60,6 +62,8 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
 
   List<TempFileModel> _newFiles = [];
 
+  String? _thumbnailUrl;
+
   @override
   void initState() {
     super.initState();
@@ -69,12 +73,48 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
     _ca3Name = widget.post?.wr2;
     _secret = widget.post?.wrOption.contains('secret') ?? false;
     // 기존 첨부파일이 있다면 초기화
-    // TODO: widget.post에서 기존 첨부파일 정보 가져오기
+    _thumbnailUrl = widget.post?.wr5;
     if (widget.post?.files != null) {
       _oldFiles = widget.post!.files;
       // 초기에는 모든 기존 파일을 유지
       _keepFileIds = _oldFiles.map((f) => f.bfNo).toSet();
     }
+  }
+
+  // 썸네일 선택 및 업로드 (wr5 전용)
+  Future<void> _pickThumbnail() async {
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.image,
+    );
+
+    if (result == null || result.files.isEmpty) return;
+
+    final platformFile = result.files.first;
+    if (platformFile.path == null) return;
+
+    try {
+      final file = File(platformFile.path!);
+
+      final responseUrl = await ref
+          .read(fileRepositoryProvider)
+          .uploadThumbnail(file: file); // TempFileModel 반환이라고 가정
+
+      // ★ 업로드 결과에서 URL만 wr5용으로 사용
+      setState(() {
+        _thumbnailUrl = responseUrl; // 필드 이름은 TempFileModel에 맞게 수정
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('썸네일 업로드 실패.')));
+    }
+  }
+
+  void _removeThumbnail() {
+    setState(() {
+      _thumbnailUrl = null;
+    });
   }
 
   Future<bool> get _canSubmit async {
@@ -140,6 +180,10 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
           caName: _ca1Name,
           wr1: _ca2Name,
           wr2: _ca3Name,
+          // todo 조직도
+          wr3: "전체",
+          wr4: widget.isEduEvent ? _wr4.text.trim() : null,
+          wr5: _thumbnailUrl,
           files: widget.submitText == '등록' && _newFiles.isNotEmpty
               ? _newFiles
               : null,
@@ -153,6 +197,9 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
         // _keepFileIds.toList(), // 유지할 기존 파일 ID 목록
       );
     }
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('필수 항목을 입력해주세요')));
   }
 
   @override
@@ -225,6 +272,16 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
                 dimOnLocked: false,
               ),
               SizedBox(height: 12.h),
+              // 기간
+              if (widget.isEduEvent) ...[
+                AppTextField(
+                  hint: '0000.00.00 ~ 0000.00.00',
+                  controller: _wr4,
+                  textInputAction: TextInputAction.next,
+                  dimOnLocked: false,
+                ),
+                SizedBox(height: 12.h),
+              ],
 
               // 내용
               HtmlEditor(
@@ -321,7 +378,55 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
                 ],
               ),
 
-              // 파일 첨부 섹션
+              // 썸네일
+              // 썸네일
+              if (widget.isEduEvent) ...[
+                Text('썸네일 이미지', style: AppTextStyles.psb16),
+                SizedBox(height: 8.h),
+                GestureDetector(
+                  onTap: _pickThumbnail, // ★ 썸네일 선택
+                  child: _thumbnailUrl != null
+                      ? Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8.r),
+                              child: Image.network(
+                                _thumbnailUrl!,
+                                height: 140.h,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.close,
+                                  color: Colors.white,
+                                ),
+                                onPressed: _removeThumbnail, // ★ 썸네일 삭제
+                              ),
+                            ),
+                          ],
+                        )
+                      : Container(
+                          height: 140.h,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.r),
+                            border: Border.all(color: AppColors.border),
+                            color: AppColors.subtle,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '썸네일 이미지를 선택하세요',
+                            style: AppTextStyles.pr14,
+                          ),
+                        ),
+                ),
+                SizedBox(height: 8.h),
+              ],
+
               AttachmentSection(
                 oldFiles: displayOldFiles,
                 newFiles: _newFiles,

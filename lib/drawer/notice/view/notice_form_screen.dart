@@ -66,7 +66,6 @@ class _NoticeScreenState extends ConsumerState<NoticeFormScreen> {
           ref
               .read(noticeProvider.notifier)
               .patchPost(wrId: state.wrId, dto: dto);
-
           context.goNamed(
             NoticeDetailScreen.routeName,
             pathParameters: {'rid': state.wrId.toString()},

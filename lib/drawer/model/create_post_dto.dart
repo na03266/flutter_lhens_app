@@ -13,6 +13,9 @@ class CreatePostDto {
   final String? wrLink2;
   final String? wr1;
   final String? wr2;
+  final String? wr3;
+  final String? wr4;
+  final String? wr5;
   final List<TempFileModel>? files;
   final List<int>? keepFiles;
   final List<TempFileModel>? newFiles;
@@ -26,6 +29,9 @@ class CreatePostDto {
     this.wrLink2,
     this.wr1,
     this.wr2,
+    this.wr3,
+    this.wr4,
+    this.wr5,
     this.files,
     this.keepFiles,
     this.newFiles,
@@ -40,6 +46,9 @@ class CreatePostDto {
     String? wrLink2,
     String? wr1,
     String? wr2,
+    String? wr3,
+    String? wr4,
+    String? wr5,
     List<TempFileModel>? files,
     List<int>? keepFiles,
     List<TempFileModel>? newFiles,
@@ -53,6 +62,7 @@ class CreatePostDto {
       wrLink2: wrLink2 ?? this.wrLink2,
       wr1: wr1 ?? this.wr1,
       wr2: wr2 ?? this.wr2,
+      wr5: wr5 ?? this.wr5,
       files: files ?? this.files,
       keepFiles: keepFiles ?? this.keepFiles,
       newFiles: newFiles ?? this.newFiles,

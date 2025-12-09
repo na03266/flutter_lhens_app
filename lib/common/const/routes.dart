@@ -30,6 +30,8 @@ import 'package:lhens_app/common/layout/default_layout.dart';
 import 'package:lhens_app/home/view/home_screen.dart';
 import 'package:lhens_app/common/view/splash_screen.dart';
 
+import '../../drawer/edu_event/view/edu_event_form_screen.dart';
+
 List<RouteBase> get routes => [
   // 네비게이션 없는 화면
   GoRoute(
@@ -137,6 +139,19 @@ List<RouteBase> get routes => [
                 const NoTransitionPage(child: EduEventScreen()),
             routes: [
               GoRoute(
+                path: 'update/:rid',
+                name: EduEventFormScreen.routeNameUpdate,
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: EduEventFormScreen(wrId: state.pathParameters['rid']!),
+                ),
+              ),
+              GoRoute(
+                path: 'create',
+                name: EduEventFormScreen.routeNameCreate,
+                pageBuilder: (context, state) =>
+                    NoTransitionPage(child: EduEventFormScreen()),
+              ),
+              GoRoute(
                 path: ':rid',
                 name: EduEventDetailScreen.routeName,
                 pageBuilder: (context, state) => NoTransitionPage(
@@ -145,6 +160,7 @@ List<RouteBase> get routes => [
                   ),
                 ),
               ),
+
             ],
           ),
           GoRoute(

@@ -3,25 +3,27 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/report/report_form_scaffold_v2.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
+import 'package:lhens_app/drawer/edu_event/provider/edu_provider.dart';
 import 'package:lhens_app/drawer/model/board_info_model.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
-import 'package:lhens_app/drawer/provider/board_provider.dart';
-import 'package:lhens_app/risk/provider/risk_provider.dart';
-import 'package:lhens_app/risk/view/risk_detail_screen.dart';
 
-class RiskFormScreen extends ConsumerStatefulWidget {
-  static String get routeNameCreate => '위험신고 등록';
+import '../../provider/board_provider.dart';
+import 'edu_event_detail_screen.dart';
+import 'edu_event_screen.dart';
 
-  static String get routeNameUpdate => '위험신고 수정';
+class EduEventFormScreen extends ConsumerStatefulWidget {
+  static String get routeNameCreate => '교육행사 생성';
+
+  static String get routeNameUpdate => '교육행사 수정';
   final String? wrId;
 
-  const RiskFormScreen({super.key, this.wrId});
+  const EduEventFormScreen({super.key, this.wrId});
 
   @override
-  ConsumerState<RiskFormScreen> createState() => _RiskFormScreenState();
+  ConsumerState<EduEventFormScreen> createState() => _EduEventScreenState();
 }
 
-class _RiskFormScreenState extends ConsumerState<RiskFormScreen> {
+class _EduEventScreenState extends ConsumerState<EduEventFormScreen> {
   String ca1Name = '';
   String ca2Name = '';
   String ca3Name = '';
@@ -30,7 +32,7 @@ class _RiskFormScreenState extends ConsumerState<RiskFormScreen> {
   void initState() {
     super.initState();
     if (widget.wrId != null) {
-      ref.read(riskProvider.notifier).getDetail(wrId: widget.wrId!);
+      ref.read(eduProvider.notifier).getDetail(wrId: widget.wrId!);
     }
   }
 
@@ -45,29 +47,29 @@ class _RiskFormScreenState extends ConsumerState<RiskFormScreen> {
     }
 
     final item = board.items.firstWhere(
-      (element) => element.boTable == 'comm21',
+          (element) => element.boTable == 'comm22',
     );
     if (widget.wrId != null) {
-      final state = ref.watch(riskDetailProvider(widget.wrId!));
-
+      final state = ref.watch(eduDetailProvider(widget.wrId!));
       if (state == null || state is! PostDetailModel) {
         return Center(child: CircularProgressIndicator());
       }
+
       return ReportFormScaffoldV2(
         ca1Names: item.boCategoryList.isNotEmpty
             ? item.boCategoryList.split('|')
             : [],
-        ca3Names: item.bo2.split('|'),
+        ca2Names: item.bo1.isNotEmpty ? item.bo1.split('|') : [],
         submitText: '수정',
+        isEduEvent: true,
         post: state,
-        onSubmit: (dto) async {
-          final fixed = dto.copyWith(
-            wr2: '접수',
-            wrOption: dto.caName == '요청(비공개)' ? 'html1,secret' : dto.wrOption,
-          );
-          ref.read(riskProvider.notifier).patchPost(wrId: state.wrId, dto: fixed);
+        onSubmit: (dto) {
+          ref
+              .read(eduProvider.notifier)
+              .patchPost(wrId: state.wrId, dto: dto);
+
           context.goNamed(
-            RiskDetailScreen.routeName,
+            EduEventDetailScreen.routeName,
             pathParameters: {'rid': state.wrId.toString()},
           );
         },
@@ -80,13 +82,10 @@ class _RiskFormScreenState extends ConsumerState<RiskFormScreen> {
           : [],
       ca2Names: item.bo1.isNotEmpty ? item.bo1.split('|') : [],
       submitText: '등록',
+      isEduEvent: true,
       onSubmit: (dto) {
-        final fixed = dto.copyWith(
-          wr2: '접수',
-          wrOption: dto.caName == '요청(비공개)' ? 'html1,secret' : dto.wrOption,
-        );
-        ref.read(riskProvider.notifier).postPost(dto: fixed);
-        context.pop();
+        ref.read(eduProvider.notifier).postPost(dto: dto);
+        context.goNamed(EduEventScreen.routeName);
       },
     );
   }

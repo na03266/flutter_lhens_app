@@ -7,6 +7,7 @@ import 'package:lhens_app/common/components/comments/comments_section_v2.dart';
 import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
 import 'package:lhens_app/common/components/inputs/inline_action_field.dart';
 import 'package:lhens_app/common/components/report/report_detail_header.dart';
+import 'package:lhens_app/common/components/report/status_segmented.dart';
 import 'package:lhens_app/common/components/report/text_sizer.dart';
 import 'package:lhens_app/common/components/sheets/action_sheet.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
@@ -33,6 +34,8 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
   final String wrName;
   final String wrDatetime;
   final String wrHit;
+  final String? wr1;
+  final String? wr2;
   final String? wr3;
   final String? wr4;
   final List<PostCommentModel> comments;
@@ -41,6 +44,7 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
   final bool Function(PostCommentModel c)? canCommentDeleteOf;
   final void Function(PostCommentModel c)? onCommentDelete;
   final Function(int, CreatePostDto c)? onCommentUpdate;
+  final Function(int wrId, String status)? onProgressUpdate;
 
   const ReportDetailScaffoldV2({
     super.key,
@@ -55,6 +59,8 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     this.wrName = '',
     this.wrDatetime = '',
     this.wrHit = '',
+    this.wr1,
+    this.wr2,
     this.wr3,
     this.wr4,
     this.comments = const [],
@@ -63,6 +69,7 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     this.canCommentDeleteOf,
     this.onCommentDelete,
     this.onCommentUpdate,
+    this.onProgressUpdate,
   });
 
   @override
@@ -78,6 +85,7 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     bool Function(PostCommentModel c)? canCommentDeleteOf,
     void Function(PostCommentModel c)? onCommentDelete,
     void Function(int, CreatePostDto c)? onCommentUpdate,
+    void Function(int wrId, String status)? onProgressUpdate,
   }) {
     return ReportDetailScaffoldV2(
       onUpdate: onUpdate,
@@ -93,11 +101,14 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
       wrHit: model.wrHit.toString(),
       comments: model.comments,
       files: model.files,
+      wr1: model.wr1,
+      wr2: model.wr2,
       wr3: model.wr3,
       wr4: model.wr4,
       canCommentDeleteOf: canCommentDeleteOf,
       onCommentDelete: onCommentDelete,
       onCommentUpdate: onCommentUpdate,
+      onProgressUpdate: onProgressUpdate,
     );
   }
 }
@@ -209,6 +220,32 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SizedBox(height: 24.h),
+
+                      if (widget.onProgressUpdate != null) ...[
+                        IgnorePointer(
+                          ignoring: false,
+                          child: StatusSegmented(
+                            value: switch (widget.wr2) {
+                              '처리중' => ReportStatus.processing,
+                              '완료' => ReportStatus.done,
+                              _ => ReportStatus.received,
+                            },
+                            onChanged: (s) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              final progressStatus = switch (s) {
+                                ReportStatus.processing => '처리중',
+                                ReportStatus.done => '완료',
+                                _ => '접수',
+                              };
+                              widget.onProgressUpdate!(
+                                widget.wrId,
+                                progressStatus,
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
+                      ],
 
                       ReportDetailHeader(
                         typeName: widget.caName,

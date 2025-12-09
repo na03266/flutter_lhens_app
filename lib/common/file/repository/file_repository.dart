@@ -39,6 +39,37 @@ class FileRepository {
     return TempFileModel.fromJson(response.data);
   }
 
+  Future<String?> uploadThumbnail({required File file}) async {
+    final formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(
+        file.path,
+        filename: file.path.split('/').last,
+      ),
+    });
+
+    final response = await _dio.post(
+      '$ip/common/thumbnail',
+      data: formData,
+
+      options: Options(
+        headers: {'accessToken': 'true'},  // 토큰 헤더 추가
+        sendTimeout: const Duration(seconds: 120),
+        receiveTimeout: const Duration(seconds: 120),
+      ),
+    );
+
+    final data = response.data;
+
+    if (data is Map<String, dynamic>) {
+      return data['url'] as String?;
+    }
+    // 혹시 문자열로만 돌려줄 경우까지 대비
+    if (data is String) {
+      return data;
+    }
+    return null;
+  }
+
   // 2) 신규: 에디터 이미지 업로드 (bytes 기반)
   Future<String?> uploadEditorImageFromBytes({
     required Uint8List bytes,
@@ -70,7 +101,6 @@ class FileRepository {
     if (data is String) {
       return data;
     }
-
     return null;
   }
 }

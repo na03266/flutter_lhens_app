@@ -39,7 +39,7 @@ class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
     return ReportDetailScaffoldV2.fromModel(
       model: state,
       onUpdate:
-          me is UserModel && (me.mbLevel > 10 || state.wrName.contains(me.mbId))
+          me is UserModel && (me.mbLevel == 10 || state.wrName.contains(me.mbId))
           ? () {
               context.goNamed(
                 NoticeFormScreen.routeNameUpdate,
@@ -48,7 +48,7 @@ class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
             }
           : null,
       onDelete:
-          me is UserModel && (me.mbLevel > 10 || state.wrName.contains(me.mbId))
+          me is UserModel && (me.mbLevel == 10 || state.wrName.contains(me.mbId))
           ? () {
               try {
                 ref.read(noticeProvider.notifier).deletePost(wrId: widget.wrId);

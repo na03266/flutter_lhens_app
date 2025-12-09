@@ -59,4 +59,8 @@ abstract class RiskRepository
     @Body() required CreatePostDto dto,
     @Query('wrId') required String wrId,
   });
+
+  @DELETE('')
+  @Headers({'accessToken': 'true'})
+  Future<String?> delete({@Query('wrId') required String wrId});
 }
