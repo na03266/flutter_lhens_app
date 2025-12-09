@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
 import 'package:lhens_app/common/components/report/report_detail_scaffold_v2.dart';
 import 'package:lhens_app/drawer/model/create_post_dto.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
@@ -82,14 +83,52 @@ class _RiskDetailScreenState extends ConsumerState<RiskDetailScreen> {
             .read(riskProvider.notifier)
             .postReComment(wrId: wrId, dto: dto, coId: coId);
       },
+      canCommentDeleteOf: (item) {
+        if (me is UserModel) {
+          return item.wrName.contains(me.mbId);
+        }
+        return false;
+      },
+      onCommentDelete: (item) async {
+        final ok = await ConfirmDialog.show(
+          context,
+          title: '삭제',
+          message: '삭제시 복구할수 없습니다.\n삭제 하시겠습니까?',
+          destructive: true,
+        );
+        if (!mounted) return;
+        if (ok == true) {
+          try {
+            await ref
+                .read(riskProvider.notifier)
+                .deleteReply(wrId: item.wrId.toString());
+          } on DioException catch (e) {
+            final data = e.response?.data;
+            String? serverMsg;
+            if (data is Map<String, dynamic>) {
+              final m = data['message'];
+              if (m is String) {
+                serverMsg = m;
+              } else if (m is List && m.isNotEmpty) {
+                serverMsg = m.first.toString();
+              }
+              _showMsg(serverMsg ?? '삭제 중 오류가 발생했습니다.');
+            }
+          }
+          await ref.read(riskProvider.notifier).getDetail(wrId: widget.wrId);
+        }
+      },
+      onCommentUpdate: (id, item) async {
+        await ref.read(riskProvider.notifier).patchPost(wrId: id, dto: item);
+      },
       onProgressUpdate: (wrId, wr2) {
         if (me is UserModel && me.mbLevel >= 4) {
           ref
               .read(riskProvider.notifier)
               .patchPost(
-                wrId: wrId,
-                dto: CreatePostDto(wrContent: state.wrContent, wr2: wr2),
-              );
+            wrId: wrId,
+            dto: CreatePostDto(wrContent: state.wrContent, wr2: wr2),
+          );
         }
         return;
       },

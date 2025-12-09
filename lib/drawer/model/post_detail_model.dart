@@ -29,6 +29,8 @@ class PostDetailModel extends PostModel {
     required this.wrHit,
     required this.comments,
     required this.files,
+    required super.wrLink1,
+    required super.wrLink2,
   });
 
   factory PostDetailModel.fromJson(Map<String, dynamic> json) =>

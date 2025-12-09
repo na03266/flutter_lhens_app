@@ -9,6 +9,8 @@ class PostModel {
   final String wrName;
   final String wrDatetime;
   final List<String> wrOption;
+  final String wrLink1; // 링크 1
+  final String wrLink2; // 링크 2
   final String caName; // 1차 분류
   final String wr1; // 2차 분류
   final String wr2; // 접수/처리중/완료
@@ -21,6 +23,8 @@ class PostModel {
     required this.wrSubject,
     required this.wrName,
     required this.wrDatetime,
+    required this.wrLink1,
+    required this.wrLink2,
     required this.caName,
     required this.wrOption,
     required this.wr1,

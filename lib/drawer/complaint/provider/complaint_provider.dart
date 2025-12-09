@@ -77,4 +77,11 @@ class ComplaintStateNotifier
     );
     await getDetail(wrId: wrId.toString());
   }
+  deletePost({required String wrId}) async {
+    await repository.delete(wrId: wrId);
+    await paginate(forceRefetch: true);
+  }
+  deleteReply({required String wrId}) async {
+    await repository.delete(wrId: wrId);
+  }
 }

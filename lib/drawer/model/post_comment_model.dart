@@ -27,6 +27,8 @@ class PostCommentModel extends PostModel {
     required this.wrHit,
     required this.wrCommentReply,
     required this.wrComment,
+    required super.wrLink1,
+    required super.wrLink2,
   });
 
   factory PostCommentModel.fromJson(Map<String, dynamic> json) =>

@@ -34,6 +34,8 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
   final String wrName;
   final String wrDatetime;
   final String wrHit;
+  final String? wrLink1;
+  final String? wrLink2;
   final String? wr1;
   final String? wr2;
   final String? wr3;
@@ -60,6 +62,8 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     this.wrDatetime = '',
     this.wrHit = '',
     this.wr1,
+    this.wrLink1,
+    this.wrLink2,
     this.wr2,
     this.wr3,
     this.wr4,
@@ -102,6 +106,8 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
       comments: model.comments,
       files: model.files,
       wr1: model.wr1,
+      wrLink1: model.wrLink1,
+      wrLink2: model.wrLink2,
       wr2: model.wr2,
       wr3: model.wr3,
       wr4: model.wr4,
@@ -160,6 +166,30 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
       );
       widget.onDelete?.call();
       if (ok == true && mounted) Navigator.pop(context);
+    }
+  }
+  Future<void> _openExternalLink(String url) async {
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) return;
+
+    Uri? uri = Uri.tryParse(trimmed);
+    if (uri == null) {
+      debugPrint('잘못된 URL: $trimmed');
+      return;
+    }
+
+    // http/https 스킴이 없으면 https 기본 추가
+    if (!uri.hasScheme) {
+      uri = Uri.parse('https://$trimmed');
+    }
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+    } else {
+      debugPrint('외부 브라우저로 열 수 없음: $uri');
     }
   }
 
@@ -384,7 +414,65 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                               ),
                             ),
                             SizedBox(height: 16.h),
+                            // ⬇⬇⬇ 문자열 URL 하이퍼링크 영역 추가
+                            if (widget.wrLink1 != null && widget.wrLink1!.trim().isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 8.h),
+                                child: InkWell(
+                                  onTap: () => _openExternalLink(widget.wrLink1!),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.link,
+                                        size: 16.w,
+                                        color: AppColors.primary,
+                                      ),
+                                      SizedBox(width: 4.w),
+                                      Flexible(
+                                        child: Text(
+                                          widget.wrLink1!,
+                                          style: AppTextStyles.pr14.copyWith(
+                                            color: AppColors.primary,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
 
+                            if (widget.wrLink2 != null && widget.wrLink2!.trim().isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 8.h),
+                                child: InkWell(
+                                  onTap: () => _openExternalLink(widget.wrLink2!),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.link,
+                                        size: 16.w,
+                                        color: AppColors.primary,
+                                      ),
+                                      SizedBox(width: 4.w),
+                                      Flexible(
+                                        child: Text(
+                                          widget.wrLink2!,
+                                          style: AppTextStyles.pr14.copyWith(
+                                            color: AppColors.primary,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            // ⬆⬆⬆ 여기까지가 문자열 하이퍼링크
                             for (final f in widget.files) ...[
                               AttachmentFileRow(
                                 filename: f.fileName,
