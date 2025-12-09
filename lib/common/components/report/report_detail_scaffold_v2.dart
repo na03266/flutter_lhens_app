@@ -222,27 +222,24 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                       SizedBox(height: 24.h),
 
                       if (widget.onProgressUpdate != null) ...[
-                        IgnorePointer(
-                          ignoring: false,
-                          child: StatusSegmented(
-                            value: switch (widget.wr2) {
-                              '처리중' => ReportStatus.processing,
-                              '완료' => ReportStatus.done,
-                              _ => ReportStatus.received,
-                            },
-                            onChanged: (s) {
-                              FocusManager.instance.primaryFocus?.unfocus();
-                              final progressStatus = switch (s) {
-                                ReportStatus.processing => '처리중',
-                                ReportStatus.done => '완료',
-                                _ => '접수',
-                              };
-                              widget.onProgressUpdate!(
-                                widget.wrId,
-                                progressStatus,
-                              );
-                            },
-                          ),
+                        StatusSegmented(
+                          value: switch (widget.wr2) {
+                            '처리중' => ReportStatus.processing,
+                            '완료' => ReportStatus.done,
+                            _ => ReportStatus.received,
+                          },
+                          onChanged: (s) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            final progressStatus = switch (s) {
+                              ReportStatus.processing => '처리중',
+                              ReportStatus.done => '완료',
+                              _ => '접수',
+                            };
+                            widget.onProgressUpdate!(
+                              widget.wrId,
+                              progressStatus,
+                            );
+                          },
                         ),
                         SizedBox(height: 12.h),
                       ],

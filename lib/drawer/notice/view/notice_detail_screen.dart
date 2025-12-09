@@ -71,7 +71,6 @@ class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
       postComment: (wrId, dto) {
         ref.read(noticeProvider.notifier).postComment(wrId: wrId, dto: dto);
       },
-
       postReply: (wrId, coId, dto) {
         ref
             .read(noticeProvider.notifier)

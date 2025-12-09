@@ -2,11 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
 import 'package:lhens_app/common/components/report/report_detail_scaffold_v2.dart';
 import 'package:lhens_app/drawer/model/create_post_dto.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
-import 'package:lhens_app/mock/comment/mock_comment_models.dart';
 import 'package:lhens_app/risk/provider/risk_provider.dart';
 import 'package:lhens_app/risk/view/risk_form_screen.dart';
 import 'package:lhens_app/user/model/user_model.dart';
@@ -31,26 +29,6 @@ class _RiskDetailScreenState extends ConsumerState<RiskDetailScreen> {
     ref.read(riskProvider.notifier).getDetail(wrId: widget.wrId);
   }
 
-  void _handleDelete(CommentModel c) async {
-    final ok = await ConfirmDialog.show(
-      context,
-      title: '댓글 삭제',
-      message: '이 댓글을 삭제하시겠습니까?',
-      confirmText: '삭제',
-      destructive: true,
-    );
-    if (ok != true) return;
-
-    setState(() => deletingIds.add(c.id));
-    await Future.delayed(const Duration(seconds: 1)); // mock
-    setState(() => deletingIds.remove(c.id));
-
-    if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('삭제되었습니다.')));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,12 +83,15 @@ class _RiskDetailScreenState extends ConsumerState<RiskDetailScreen> {
             .postReComment(wrId: wrId, dto: dto, coId: coId);
       },
       onProgressUpdate: (wrId, wr2) {
-        ref
-            .read(riskProvider.notifier)
-            .patchPost(
-              wrId: wrId,
-              dto: CreatePostDto(wrContent: state.wrContent, wr2: wr2),
-            );
+        if (me is UserModel && me.mbLevel >= 4) {
+          ref
+              .read(riskProvider.notifier)
+              .patchPost(
+                wrId: wrId,
+                dto: CreatePostDto(wrContent: state.wrContent, wr2: wr2),
+              );
+        }
+        return;
       },
     );
   }

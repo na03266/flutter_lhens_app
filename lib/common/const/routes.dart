@@ -8,6 +8,7 @@ import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_auth_screen.dart';
 import 'package:lhens_app/drawer/notice/view/notice_detail_screen.dart';
 import 'package:lhens_app/manual/view/manual_detail_screen.dart';
+import 'package:lhens_app/manual/view/manual_form_screen.dart';
 import 'package:lhens_app/manual/view/manual_screen.dart';
 import 'package:lhens_app/risk/view/risk_form_screen.dart';
 import 'package:lhens_app/risk/view/risk_detail_screen.dart';
@@ -357,6 +358,19 @@ List<RouteBase> get routes => [
         pageBuilder: (context, state) =>
             const NoTransitionPage(child: ManualScreen()),
         routes: [
+          GoRoute(
+            path: 'update/:rid',
+            name: ManualFormScreen.routeNameUpdate,
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: ManualFormScreen(wrId: state.pathParameters['rid']!),
+            ),
+          ),
+          GoRoute(
+            path: 'create',
+            name: ManualFormScreen.routeNameCreate,
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: ManualFormScreen()),
+          ),
           GoRoute(
             path: ':rid',
             name: ManualDetailScreen.routeName,
