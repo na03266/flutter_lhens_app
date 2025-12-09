@@ -61,9 +61,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final asyncItems = ref.watch(chatItemsProvider); // 추후 전환
     final state = ref.watch(chatRoomProvider);
-    print(state is CursorPagination ? state.data : '');
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: Padding(

@@ -18,7 +18,7 @@ final chatGatewayClientProvider = Provider<ChatGatewayClient?>((ref) {
 });
 
 class ChatGatewayClient {
-  final String baseUrl; // 예: https://api.example.com
+  final String baseUrl; // 예: http://110.10.147.37/app
   final String jwt;
   late final IO.Socket _socket;
 
@@ -30,13 +30,13 @@ class ChatGatewayClient {
 
   void connect() {
     // 네임스페이스는 /chat, Socket.IO path는 기본 /socket.io
-    final url = '$baseUrl/chat';
+    final url = '$baseUrl/chat';  // http://110.10.147.37/app/chat
 
     final builder = IO.OptionBuilder()
         .setTransports(['websocket'])
         .enableAutoConnect()
         .enableReconnection()
-        .setPath('/socket.io');
+        .setPath('/app/socket.io');
 
     // 모바일/데스크톱 네이티브: 헤더 사용
     // 웹(Flutter Web): 헤더가 안 먹히므로 auth로 전달

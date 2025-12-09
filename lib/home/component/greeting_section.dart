@@ -109,11 +109,22 @@ class GreetingCard extends StatelessWidget {
                   style: AppTextStyles.jm16,
                 ),
                 SizedBox(height: gap),
+                //직위 제거 소속만 남길 것
                 LabelValueLine.double(
                   label1: '소속',
                   value1: condition ? mb.mbDepart : '',
-                  label2: '직위',
-                  value2: condition ? mb.mb5 : '',
+                  label2: '',
+                  value2:  '',
+                  labelStyle: labelTextStyle,
+                  valueStyle: valueTextStyle,
+                ),
+                SizedBox(height: 4.h),
+                // 직위만 2번쨰 줄로 변경
+                LabelValueLine.double(
+                  label1: '직위',
+                  value1: condition ? mb.mb2 : '',
+                  label2: '',
+                  value2: "",
                   labelStyle: labelTextStyle,
                   valueStyle: valueTextStyle,
                 ),

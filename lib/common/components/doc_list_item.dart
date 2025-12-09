@@ -67,8 +67,15 @@ class DocListItem extends StatelessWidget {
                 children: [
                   _icon(
                     onTap: onPreview,
-                    icon: Assets.icons.document.svg(width: 20.w, height: 20.w),
-                    bgColor: AppColors.surface,
+                    icon: Assets.icons.document.svg(
+                      width: 20.w,
+                      height: 20.w,
+                      colorFilter: ColorFilter.mode(
+                        AppColors.primaryText,
+                        BlendMode.srcATop,
+                      ),
+                    ),
+                    bgColor: AppColors.primarySoft,
                   ),
                   // SizedBox(width: 8.w),
                   // _icon(

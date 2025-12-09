@@ -40,6 +40,18 @@ class NoticeSection extends ConsumerWidget {
               date: DataUtils.datetimeParse(state.noticeItems[1].wrDatetime),
               onTap: goNotice,
             ),
+          if (state is HomeModel && state.noticeItems.isNotEmpty)
+            NoticeTile(
+              title: state.noticeItems[2].wrSubject,
+              date: DataUtils.datetimeParse(state.noticeItems[2].wrDatetime),
+              onTap: goNotice,
+            ),
+          if (state is HomeModel && state.noticeItems.isNotEmpty)
+            NoticeTile(
+              title: state.noticeItems[3].wrSubject,
+              date: DataUtils.datetimeParse(state.noticeItems[3].wrDatetime),
+              onTap: goNotice,
+            ),
         ],
       ),
     );
