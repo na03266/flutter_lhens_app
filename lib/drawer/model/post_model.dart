@@ -8,6 +8,7 @@ class PostModel {
   final String wrSubject;
   final String wrName;
   final String wrDatetime;
+  final int wrComment;
   final List<String> wrOption;
   final String wrLink1; // 링크 1
   final String wrLink2; // 링크 2
@@ -23,6 +24,7 @@ class PostModel {
     required this.wrSubject,
     required this.wrName,
     required this.wrDatetime,
+    required this.wrComment,
     required this.wrLink1,
     required this.wrLink2,
     required this.caName,

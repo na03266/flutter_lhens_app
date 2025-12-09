@@ -8,7 +8,6 @@ part 'post_comment_model.g.dart';
 class PostCommentModel extends PostModel {
   final String wrContent;
   final int wrHit;
-  final int wrComment;
   final String wrCommentReply;
 
   PostCommentModel({
@@ -18,6 +17,7 @@ class PostCommentModel extends PostModel {
     required super.wrDatetime,
     required super.caName,
     required super.wrOption,
+    required super.wrComment,
     required super.wr1,
     required super.wr2,
     required super.wr3,
@@ -26,7 +26,6 @@ class PostCommentModel extends PostModel {
     required this.wrContent,
     required this.wrHit,
     required this.wrCommentReply,
-    required this.wrComment,
     required super.wrLink1,
     required super.wrLink2,
   });

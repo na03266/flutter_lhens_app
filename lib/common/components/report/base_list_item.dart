@@ -43,8 +43,10 @@ class BaseListItem extends StatelessWidget {
       title: model.wrSubject,
       author: model.wrName,
       dateText: DataUtils.datetimeParse(model.wrDatetime),
+      commentCount: model.wrComment,
     );
   }
+
   factory BaseListItem.fromManual({
     required PostModel model,
     bool isDetail = false,
@@ -54,6 +56,7 @@ class BaseListItem extends StatelessWidget {
       title: model.wrSubject,
       author: model.wrName,
       dateText: DataUtils.datetimeParse(model.wrDatetime),
+      commentCount: model.wrComment,
     );
   }
 
@@ -67,6 +70,7 @@ class BaseListItem extends StatelessWidget {
       title: model.wrSubject,
       author: model.wr3,
       dateText: model.wr4,
+      commentCount: model.wrComment,
     );
   }
 
@@ -85,6 +89,7 @@ class BaseListItem extends StatelessWidget {
       title: model.wrSubject,
       author: model.wrName,
       dateText: DataUtils.datetimeParse(model.wrDatetime),
+      commentCount: model.wrComment,
     );
   }
 
@@ -136,6 +141,7 @@ class BaseListItem extends StatelessWidget {
 
                 // 작성자 · 날짜 · (댓글)
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

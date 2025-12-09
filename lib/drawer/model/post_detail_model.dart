@@ -18,6 +18,7 @@ class PostDetailModel extends PostModel {
     required super.wrSubject,
     required super.wrName,
     required super.wrDatetime,
+    required super.wrComment,
     required super.caName,
     required super.wrOption,
     required super.wr1,

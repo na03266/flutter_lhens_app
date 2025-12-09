@@ -196,10 +196,11 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
         ),
         // _keepFileIds.toList(), // 유지할 기존 파일 ID 목록
       );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('필수 항목을 입력해주세요')));
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('필수 항목을 입력해주세요')));
   }
 
   @override
@@ -225,7 +226,7 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
                   selected: _ca1Name,
                   getLabel: (v) => v,
                   onSelected: (v) => setState(() {
-                    if (v == '외부 공지사항' || v == '내부 공지사항') {
+                    if (v == '외부공지사항' || v == '내부공지사항') {
                       _ca2Name = null;
                     }
                     _ca1Name = v;
@@ -236,7 +237,7 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
               if (widget.ca2Names.isNotEmpty && _ca1Name != null) ...[
                 Selector<String>(
                   hint: '유형2 선택',
-                  items: _ca1Name != '외부 공지사항'
+                  items: _ca1Name != '외부공지사항'
                       ? widget.ca2Names
                             .where((e) => !['공고문', '언론보도'].contains(e))
                             .toList()
