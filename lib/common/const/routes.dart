@@ -21,8 +21,8 @@ import 'package:lhens_app/drawer/edu_event/view/edu_event_screen.dart';
 import 'package:lhens_app/drawer/edu_event/view/edu_event_detail_screen.dart';
 import 'package:lhens_app/alarm/view/alarm_screen.dart';
 import 'package:lhens_app/drawer/notice/view/notice_screen.dart';
-import 'package:lhens_app/chat/view/chat_screen.dart';
-import 'package:lhens_app/chat/view/chat_detail_screen.dart';
+import 'package:lhens_app/chat/view/chat_lobby_screen.dart';
+import 'package:lhens_app/chat/view/chat_room_screen.dart';
 import 'package:lhens_app/home/my_page/change_info/view/change_info_screen.dart';
 import 'package:lhens_app/home/my_page/view/my_page_screen.dart';
 import 'package:lhens_app/risk/view/risk_screen.dart';
@@ -161,7 +161,6 @@ List<RouteBase> get routes => [
                   ),
                 ),
               ),
-
             ],
           ),
           GoRoute(
@@ -244,9 +243,9 @@ List<RouteBase> get routes => [
       ),
       GoRoute(
         path: '/chat',
-        name: ChatScreen.routeName,
+        name: ChatLobbyScreen.routeName,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: ChatScreen()),
+            const NoTransitionPage(child: ChatLobbyScreen()),
         routes: [
           GoRoute(
             path: 'info',
@@ -266,10 +265,11 @@ List<RouteBase> get routes => [
                 const NoTransitionPage(child: UserPickerScreen()),
           ),
           GoRoute(
-            path: 'detail',
-            name: ChatDetailScreen.routeName,
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: ChatDetailScreen()),
+            path: 'detail/:rid',
+            name: ChatRoomScreen.routeName,
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: ChatRoomScreen(id: state.pathParameters['rid']!),
+            ),
           ),
         ],
       ),
@@ -345,10 +345,9 @@ List<RouteBase> get routes => [
           GoRoute(
             path: ':rid',
             name: SurveyDetailScreen.routeName,
-            pageBuilder: (context, state) =>
-                 NoTransitionPage(child: SurveyDetailScreen(
-                   poId: state.pathParameters['rid']!,
-                 )),
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: SurveyDetailScreen(poId: state.pathParameters['rid']!),
+            ),
           ),
         ],
       ),

@@ -1,11 +1,9 @@
-import 'dart:ffi';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../common/model/cursor_pagination_model.dart';
 import '../../common/provider/pagination_providar.dart';
+import '../dto/create_chat_room_dto.dart';
 import '../model/chat_room_model.dart';
-import '../model/create_chat_room_dto.dart';
 import '../repository/chat_room_repository.dart';
 
 final chatRoomDetailProvider = Provider.family<ChatRoom?, String>((ref, id) {
@@ -15,7 +13,7 @@ final chatRoomDetailProvider = Provider.family<ChatRoom?, String>((ref, id) {
     return null;
   }
 
-  return state.data.firstWhere((element) => element.id == id);
+  return state.data.firstWhere((element) => element.roomId == int.parse(id));
 });
 
 final chatRoomProvider =
@@ -36,33 +34,27 @@ class ChatRoomStateNotifier
     if (resp != null) paginate(forceRefetch: true);
   }
 
-  // getDetail({
-  //   required String id,
-  // }) async {
-  //   if (state is! CursorPagination) {
-  //     await paginate();
-  //   }
-  //   if (state is! CursorPagination) {
-  //     return;
-  //   }
-  //
-  //   final pState = state as CursorPagination;
-  //
-  //   final resp = await repository.getChatRoomDetail(id: id);
-  //   if (pState.data.where((e) => e.id == id).isEmpty) {
-  //     state = pState.copyWith(
-  //       data: <ChatRoom>[
-  //         ...pState.data,
-  //         resp,
-  //       ],
-  //     );
-  //   } else {
-  //     state = pState.copyWith(
-  //         data: pState.data
-  //             .map<ChatRoom>(
-  //               (e) => e.id == id ? resp : e,
-  //         )
-  //             .toList());
-  //   }
-  // }
+  getDetail({required String id}) async {
+    if (state is! CursorPagination) {
+      await paginate();
+    }
+    if (state is! CursorPagination) {
+      return;
+    }
+
+    final pState = state as CursorPagination;
+
+    final parsedRoomId = int.parse(id);
+
+    final resp = await repository.getChatRoomDetail(id: id);
+    if (pState.data.where((e) => e.roomId == parsedRoomId).isEmpty) {
+      state = pState.copyWith(data: <ChatRoom>[...pState.data, resp]);
+    } else {
+      state = pState.copyWith(
+        data: pState.data
+            .map<ChatRoom>((e) => e.roomId == parsedRoomId ? resp : e)
+            .toList(),
+      );
+    }
+  }
 }

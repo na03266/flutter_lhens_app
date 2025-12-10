@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lhens_app/chat/view/chat_screen.dart';
+import 'package:lhens_app/chat/model/chat_room_detail_model.dart';
+import 'package:lhens_app/chat/provider/chat_room_provider.dart';
+import 'package:lhens_app/chat/view/chat_lobby_screen.dart';
 
 import 'package:lhens_app/common/components/buttons/app_button.dart';
 import 'package:lhens_app/common/components/count_inline.dart';
@@ -13,8 +16,9 @@ import 'package:lhens_app/chat/view/chat_name_screen.dart';
 import 'package:lhens_app/user/model/user_pick_result.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
-class ChatSettingsDrawer extends StatelessWidget {
+class ChatSettingsDrawer extends ConsumerStatefulWidget {
   final BuildContext pageContext;
+  final String roomId;
   final String groupName;
   final int participantCount; // 서버 전체 참여자 수 (표시 목록과 다를 수 있음)
   final List<String> participants;
@@ -24,6 +28,7 @@ class ChatSettingsDrawer extends StatelessWidget {
   const ChatSettingsDrawer({
     super.key,
     required this.pageContext,
+    required this.roomId,
     this.groupName = 'LH E&S 기획팀',
     this.participantCount = 13,
     this.participants = const [
@@ -46,10 +51,24 @@ class ChatSettingsDrawer extends StatelessWidget {
   });
 
   @override
+  ConsumerState<ChatSettingsDrawer> createState() => _ChatSettingsDrawerState();
+}
+
+class _ChatSettingsDrawerState extends ConsumerState<ChatSettingsDrawer> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(chatRoomProvider.notifier).getDetail(id: widget.roomId);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final router = GoRouter.of(pageContext);
-
+    final router = GoRouter.of(widget.pageContext);
+    final state = ref.watch(chatRoomDetailProvider(widget.roomId));
+    if (state == null || state is! ChatRoomDetail) {
+      return Center(child: CircularProgressIndicator());
+    }
     return Drawer(
       backgroundColor: AppColors.white,
       shape: const ContinuousRectangleBorder(),
@@ -59,15 +78,15 @@ class ChatSettingsDrawer extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _HeaderRow(
-              title: groupName,
+              title: state.name,
               onEdit: () async {
-                Navigator.of(pageContext).pop();
+                Navigator.of(widget.pageContext).pop();
                 await router.pushNamed(
                   ChatNameScreen.routeName,
-                  extra: {'initialName': groupName},
+                  extra: {'initialName': state.name},
                 );
               },
-              onClose: () => Navigator.of(pageContext).pop(),
+              onClose: () => Navigator.of(widget.pageContext).pop(),
             ),
             Expanded(
               child: ListView(
@@ -90,7 +109,7 @@ class ChatSettingsDrawer extends StatelessWidget {
                       children: [
                         CountInline(
                           label: '참여자',
-                          count: participantCount,
+                          count: state.memberCount,
                           suffix: '명',
                           labelColor: AppColors.text,
                           countColor: AppColors.secondary,
@@ -101,17 +120,19 @@ class ChatSettingsDrawer extends StatelessWidget {
                           type: AppButtonType.outlined,
                           height: 48.h,
                           onTap:
-                              onInvite ??
+                              widget.onInvite ??
                               () async {
-                                Navigator.of(pageContext).pop();
-                                final res = await GoRouter.of(pageContext)
-                                    .pushNamed<UserPickResult>(
+                                Navigator.of(widget.pageContext).pop();
+                                final res =
+                                    await GoRouter.of(
+                                      widget.pageContext,
+                                    ).pushNamed<UserPickResult>(
                                       '커뮤니케이션-사용자선택',
                                       extra: {'mode': 'chatInvite'},
                                     );
                                 if (res != null && res.members.isNotEmpty) {
                                   ScaffoldMessenger.of(
-                                    pageContext,
+                                    widget.pageContext,
                                   ).showSnackBar(
                                     const SnackBar(
                                       content: Text('초대했습니다.'),
@@ -125,13 +146,11 @@ class ChatSettingsDrawer extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 2.h),
-                  ...participants.asMap().entries.map((entry) {
-                    final i = entry.key;
+                  ...state.members.map((e) {
                     return _ParticipantTile(
-                      nameAndDept: entry.value,
-                      isFirst: i == 0,
+                      nameAndDept: '${e.name} ${e.mb2} | ${e.department}',
                     );
-                  }).toList(),
+                  }),
                   const Divider(
                     height: 1,
                     thickness: 1,
@@ -148,19 +167,19 @@ class ChatSettingsDrawer extends StatelessWidget {
                       ),
                       onTap: () async {
                         final ok = await ConfirmDialog.show(
-                          pageContext,
+                          widget.pageContext,
                           title: '채팅방 나가기',
                           message: '이 채팅방에서 나가시겠습니까?',
                           destructive: true,
                           confirmText: '나가기',
                         );
-                        if (!pageContext.mounted) return;
+                        if (!widget.pageContext.mounted) return;
                         if (ok == true) {
-                          final r = GoRouter.of(pageContext);
-                          Navigator.of(pageContext).maybePop();
-                          onLeave?.call();
-                          r.goNamed(ChatScreen.routeName);
-                          ScaffoldMessenger.of(pageContext).showSnackBar(
+                          final r = GoRouter.of(widget.pageContext);
+                          Navigator.of(widget.pageContext).maybePop();
+                          widget.onLeave?.call();
+                          r.goNamed(ChatLobbyScreen.routeName);
+                          ScaffoldMessenger.of(widget.pageContext).showSnackBar(
                             const SnackBar(
                               content: Text('채팅방에서 나갔습니다.'),
                               duration: Duration(seconds: 1),

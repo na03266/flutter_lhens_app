@@ -55,6 +55,7 @@ flutter:
     - assets/icons/features/
     - assets/illustrations/
     - assets/images/
+    - assets/chat/
     - assets/logos/
 
   fonts:
