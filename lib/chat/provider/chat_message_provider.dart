@@ -237,4 +237,16 @@ class ChatMessageStateNotifier extends StateNotifier<CursorPaginationBase> {
           .toList(),
     );
   }
+
+  void deleteMessage(String id) {
+    if (state is! CursorPagination<MessageModel>) return;
+    final p = state as CursorPagination<MessageModel>;
+
+    final newList = p.data.where((m) => m.id != id).toList();
+
+    state = p.copyWith(
+      data: newList,
+      meta: p.meta.copyWith(count: p.meta.count - 1),
+    );
+  }
 }

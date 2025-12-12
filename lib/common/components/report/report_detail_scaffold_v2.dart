@@ -168,6 +168,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
       if (ok == true && mounted) Navigator.pop(context);
     }
   }
+
   Future<void> _openExternalLink(String url) async {
     final trimmed = url.trim();
     if (trimmed.isEmpty) return;
@@ -184,10 +185,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
     }
 
     if (await canLaunchUrl(uri)) {
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       debugPrint('외부 브라우저로 열 수 없음: $uri');
     }
@@ -252,24 +250,31 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                       SizedBox(height: 24.h),
 
                       if (widget.onProgressUpdate != null) ...[
-                        StatusSegmented(
-                          value: switch (widget.wr2) {
-                            '처리중' => ReportStatus.processing,
-                            '완료' => ReportStatus.done,
-                            _ => ReportStatus.received,
-                          },
-                          onChanged: (s) {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            final progressStatus = switch (s) {
-                              ReportStatus.processing => '처리중',
-                              ReportStatus.done => '완료',
-                              _ => '접수',
-                            };
-                            widget.onProgressUpdate!(
-                              widget.wrId,
-                              progressStatus,
-                            );
-                          },
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: 16.w,
+                            right: 16.w,
+                            bottom: 8.h,
+                          ),
+                          child: StatusSegmented(
+                            value: switch (widget.wr2) {
+                              '처리중' => ReportStatus.processing,
+                              '완료' => ReportStatus.done,
+                              _ => ReportStatus.received,
+                            },
+                            onChanged: (s) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              final progressStatus = switch (s) {
+                                ReportStatus.processing => '처리중',
+                                ReportStatus.done => '완료',
+                                _ => '접수',
+                              };
+                              widget.onProgressUpdate!(
+                                widget.wrId,
+                                progressStatus,
+                              );
+                            },
+                          ),
                         ),
                         SizedBox(height: 12.h),
                       ],
@@ -415,11 +420,13 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                             ),
                             SizedBox(height: 16.h),
                             // ⬇⬇⬇ 문자열 URL 하이퍼링크 영역 추가
-                            if (widget.wrLink1 != null && widget.wrLink1!.trim().isNotEmpty)
+                            if (widget.wrLink1 != null &&
+                                widget.wrLink1!.trim().isNotEmpty)
                               Padding(
                                 padding: EdgeInsets.only(bottom: 8.h),
                                 child: InkWell(
-                                  onTap: () => _openExternalLink(widget.wrLink1!),
+                                  onTap: () =>
+                                      _openExternalLink(widget.wrLink1!),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -434,7 +441,8 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                                           widget.wrLink1!,
                                           style: AppTextStyles.pr14.copyWith(
                                             color: AppColors.primary,
-                                            decoration: TextDecoration.underline,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -444,11 +452,13 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                                 ),
                               ),
 
-                            if (widget.wrLink2 != null && widget.wrLink2!.trim().isNotEmpty)
+                            if (widget.wrLink2 != null &&
+                                widget.wrLink2!.trim().isNotEmpty)
                               Padding(
                                 padding: EdgeInsets.only(bottom: 8.h),
                                 child: InkWell(
-                                  onTap: () => _openExternalLink(widget.wrLink2!),
+                                  onTap: () =>
+                                      _openExternalLink(widget.wrLink2!),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -463,7 +473,8 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                                           widget.wrLink2!,
                                           style: AppTextStyles.pr14.copyWith(
                                             color: AppColors.primary,
-                                            decoration: TextDecoration.underline,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                         ),

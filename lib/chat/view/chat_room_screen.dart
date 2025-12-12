@@ -58,6 +58,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatRoomScreen> {
           const Stream.empty().listen((_) {});
     });
   }
+
   void listener() {
     if (controller.offset > controller.position.maxScrollExtent - 50) {
       ref
@@ -92,15 +93,12 @@ class _ChatDetailScreenState extends ConsumerState<ChatRoomScreen> {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
             decoration: BoxDecoration(
-              color: AppColors.border,          // 필요에 따라 색 조정
+              color: AppColors.border, // 필요에 따라 색 조정
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: 11.sp,
-                color: AppColors.textTer,
-              ),
+              style: TextStyle(fontSize: 11.sp, color: AppColors.textTer),
             ),
           ),
         ),
@@ -209,7 +207,9 @@ class _ChatDetailScreenState extends ConsumerState<ChatRoomScreen> {
           onDelete: () async {
             final ok = await _confirmDelete();
             if (!ok) return;
-            // TODO: 서버 삭제 후 paginate(forceRefetch: true)
+            ref
+                .read(chatMessageProvider(widget.id).notifier)
+                .deleteMessage(m.id);
           },
         ),
       );

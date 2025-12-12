@@ -42,7 +42,7 @@ abstract class ChatMessageRepository {
     @Body() required Map<String, dynamic> dto,
   });
 
-  @GET('/{id}')
+  @DELETE('/{id}')
   @Headers({'accessToken': 'true'})
-  Future<MessageModel> getChatMessageDetail({@Path('id') required String id});
+  Future<String> deleteMessage({@Path('id') required String id});
 }
