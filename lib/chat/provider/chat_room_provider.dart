@@ -29,11 +29,6 @@ class ChatRoomStateNotifier
     extends PaginationProvider<ChatRoom, ChatRoomRepository> {
   ChatRoomStateNotifier({required super.repository});
 
-  createChatRoom({required CreateChatRoomDto dto}) async {
-    final resp = await repository.createChatRoom(dto: dto);
-    if (resp != null) paginate(forceRefetch: true);
-  }
-
   getDetail({required String id}) async {
     if (state is! CursorPagination) {
       await paginate();
@@ -56,5 +51,15 @@ class ChatRoomStateNotifier
             .toList(),
       );
     }
+  }
+
+  createChatRoom({required CreateChatRoomDto dto}) async {
+    final resp = await repository.createChatRoom(dto: dto);
+    if (resp != null) paginate(forceRefetch: true);
+  }
+
+  patchChatRoom({required String id, required CreateChatRoomDto dto}) async {
+    await repository.patchChatRoom(id: id, dto: dto);
+    getDetail(id: id);
   }
 }

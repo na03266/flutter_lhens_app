@@ -65,15 +65,12 @@ class ChatListItem extends StatelessWidget {
                               color: AppColors.primary,
                               borderRadius: BorderRadius.circular(50.r),
                             ),
-                            child: SizedBox(
-                              width: 8.w,
-                              child: Text(
-                                '$unreadCount',
-                                textAlign: TextAlign.center,
-                                style: AppTextStyles.pb12.copyWith(
-                                  color: AppColors.white,
-                                  height: 0.83,
-                                ),
+                            child: Text(
+                              '$unreadCount',
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.pb12.copyWith(
+                                color: AppColors.white,
+                                height: 0.83,
                               ),
                             ),
                           ),

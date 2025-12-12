@@ -33,26 +33,55 @@ class ChatLobbyScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
   final List<String> _categories = const ['전체'];
   String _category = '전체';
+  final ScrollController controller = ScrollController();
 
   bool _scrolled = false;
 
   @override
   void initState() {
     super.initState();
+    controller.addListener(listener);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.read(chatGatewayClientProvider);
     });
   }
 
+  void listener() {
+    if (controller.offset > controller.position.maxScrollExtent - 300) {
+      ref.read(chatRoomProvider.notifier).paginate(fetchMore: true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(chatRoomProvider);
-    if (state is! CursorPagination) {
-      return Scaffold(
+    // 1) 첫 로딩
+    if (state is CursorPaginationLoading) {
+      return const Scaffold(
         backgroundColor: AppColors.white,
         body: Center(child: CircularProgressIndicator()),
       );
     }
+
+    // 2) 에러
+    if (state is CursorPaginationError) {
+      return Scaffold(
+        backgroundColor: AppColors.white,
+        body: Center(child: Text(state.message)),
+      );
+    }
+
+    // 3) 데이터 상태 (일반 + fetchMore 중)
+    if (state is! CursorPagination<ChatRoom>) {
+      // 방어 로직
+      return const Scaffold(
+        backgroundColor: AppColors.white,
+        body: SizedBox.shrink(),
+      );
+    }
+    // fetchMore 중인지 여부
+    final isFetchingMore = state is CursorPaginationFetchingMore<ChatRoom>;
+    final rooms = state.data;
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: Padding(
@@ -80,7 +109,7 @@ class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
 
             // 스크롤 영역
             Expanded(
-              child: state.data.isNotEmpty
+              child: rooms.isNotEmpty
                   ? NotificationListener<ScrollNotification>(
                       onNotification: (n) {
                         if (n is ScrollUpdateNotification) {
@@ -95,36 +124,67 @@ class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
                         onRefresh: () async {
                           ref
                               .read(chatRoomProvider.notifier)
-                              .paginate(fetchOrder: ['roomId_DESC']);
+                              .paginate(
+                                fetchOrder: ['roomId_DESC'],
+                                forceRefetch: true,
+                              );
                         },
                         child: ListView.separated(
+                          controller: controller,
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: EdgeInsets.zero,
-                          itemCount: state.data.length + 1,
-                          // 헤더 + 아이템
-                          separatorBuilder: (_, i) => i == 0
-                              ? const SizedBox.shrink()
-                              : SizedBox(height: 10.h),
+                          // 헤더(1) + 방 목록 + (로딩 한 줄)
+                          itemCount:
+                              rooms.length + 1 + (isFetchingMore ? 1 : 0),
+                          separatorBuilder: (_, i) {
+                            // 헤더 위에는 간격 없음
+                            if (i == 0) return const SizedBox.shrink();
+                            return SizedBox(height: 10.h);
+                          },
                           itemBuilder: (_, i) {
+                            // 0: 헤더
                             if (i == 0) {
                               return Padding(
                                 padding: EdgeInsets.fromLTRB(2.w, 0, 2.w, 8.h),
                                 child: CountInline(
                                   label: '전체',
-                                  count: state.data.length,
+                                  count: rooms.length,
                                   showSuffix: false,
                                 ),
                               );
                             }
-                            final e = state.data[i - 1] as ChatRoom;
+
+                            // 맨 마지막 아이템이 로딩 줄인지 체크
+                            final isLoaderIndex =
+                                isFetchingMore &&
+                                i == rooms.length + 1; // 헤더 + rooms 뒤
+
+                            if (isLoaderIndex) {
+                              return Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16.h),
+                                child: const Center(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            // 그 외는 실제 채팅방 아이템
+                            final room = rooms[i - 1]; // 헤더 한 칸 보정
 
                             return ChatListItem(
-                              title: e.name,
-                              participants: e.memberCount,
-                              unreadCount: e.newMessageCount,
-                              onTap: () =>  GoRouter.of(
-                                context,
-                              ).pushNamed(ChatRoomScreen.routeName, pathParameters: {'rid': e.roomId.toString()}),
+                              title: room.name,
+                              participants: room.memberCount,
+                              unreadCount: room.newMessageCount,
+                              onTap: () => GoRouter.of(context).pushNamed(
+                                ChatRoomScreen.routeName,
+                                pathParameters: {'rid': room.roomId.toString()},
+                              ),
                             );
                           },
                         ),

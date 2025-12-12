@@ -21,3 +21,21 @@ Map<String, dynamic> _$CursorPaginationParamsToJson(
   'take': instance.take,
   'order': instance.order,
 };
+
+CursorPaginationParamsForMessage _$CursorPaginationParamsForMessageFromJson(
+  Map<String, dynamic> json,
+) => CursorPaginationParamsForMessage(
+  roomId: json['roomId'] as String?,
+  take: (json['take'] as num?)?.toInt(),
+  cursor: json['cursor'] as String?,
+  order: (json['order'] as List<dynamic>?)?.map((e) => e as String).toList(),
+);
+
+Map<String, dynamic> _$CursorPaginationParamsForMessageToJson(
+  CursorPaginationParamsForMessage instance,
+) => <String, dynamic>{
+  'cursor': instance.cursor,
+  'take': instance.take,
+  'order': instance.order,
+  'roomId': instance.roomId,
+};

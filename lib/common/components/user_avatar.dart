@@ -7,29 +7,34 @@ class UserAvatar extends StatelessWidget {
   final double size;
   final double iconSize;
   final Color? bg;
+  final AssetGenImage? icon;
 
   const UserAvatar({
     super.key,
     this.size = 36,
-    this.iconSize = 20,
+    this.iconSize = 70,
     this.bg,
+    this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size.w,
-      height: size.w,
-      decoration: BoxDecoration(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12.r),
+      child: Container(
+        width: size.w,
+        height: size.w,
         color: bg ?? AppColors.border,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Center(
-        child: Assets.icons.user.svg(
-          width: iconSize.w,
-          height: iconSize.w,
+        child: icon != null
+            ? icon!.image(
+          fit: BoxFit.fitHeight,          // 가득 채우기
+          width: double.infinity,
+          height: double.infinity,
+        )
+            : Assets.icons.user.svg(
+          width: size.w * 0.7,
+          height: size.w * 0.7,
         ),
       ),
     );
-  }
-}
+  }}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lhens_app/chat/dto/create_chat_room_dto.dart';
 import 'package:lhens_app/chat/model/chat_room_detail_model.dart';
 import 'package:lhens_app/chat/provider/chat_room_provider.dart';
 import 'package:lhens_app/chat/view/chat_lobby_screen.dart';
@@ -65,10 +66,14 @@ class _ChatSettingsDrawerState extends ConsumerState<ChatSettingsDrawer> {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
     final router = GoRouter.of(widget.pageContext);
+    // ❗ ref.read는 여기에서만 한 번
+    final chatRoomNotifier = ref.read(chatRoomProvider.notifier);
+
     final state = ref.watch(chatRoomDetailProvider(widget.roomId));
     if (state == null || state is! ChatRoomDetail) {
       return Center(child: CircularProgressIndicator());
     }
+
     return Drawer(
       backgroundColor: AppColors.white,
       shape: const ContinuousRectangleBorder(),
@@ -80,10 +85,23 @@ class _ChatSettingsDrawerState extends ConsumerState<ChatSettingsDrawer> {
             _HeaderRow(
               title: state.name,
               onEdit: () async {
+                // 1) Drawer 먼저 닫고
                 Navigator.of(widget.pageContext).pop();
-                await router.pushNamed(
+
+                // 2) 이름 입력 화면으로 이동
+                final roomName = await router.pushNamed<String>(
                   ChatNameScreen.routeName,
                   extra: {'initialName': state.name},
+                );
+
+                // 3) 여기서는 ref 대신, 위에서 뽑아둔 chatRoomNotifier 사용
+                if (roomName == null || roomName.trim().isEmpty) {
+                  return;
+                }
+
+                await chatRoomNotifier.patchChatRoom(
+                  id: widget.roomId,
+                  dto: CreateChatRoomDto(name: roomName),
                 );
               },
               onClose: () => Navigator.of(widget.pageContext).pop(),
@@ -122,18 +140,30 @@ class _ChatSettingsDrawerState extends ConsumerState<ChatSettingsDrawer> {
                           onTap:
                               widget.onInvite ??
                               () async {
+                                // Drawer 닫기
                                 Navigator.of(widget.pageContext).pop();
-                                final res =
-                                    await GoRouter.of(
-                                      widget.pageContext,
-                                    ).pushNamed<UserPickResult>(
-                                      '커뮤니케이션-사용자선택',
-                                      extra: {'mode': 'chatInvite'},
-                                    );
+
+                                // 사용자 선택 화면으로 이동
+                                final res = await GoRouter.of(
+                                  widget.pageContext,
+                                ).pushNamed<UserPickResult>(
+                                  '커뮤니케이션-사용자선택',
+                                  extra: {'mode': 'chatInvite'},
+                                );
+
+                                // 여기서도 ref X, chatRoomNotifier O
                                 if (res != null && res.members.isNotEmpty) {
-                                  ScaffoldMessenger.of(
-                                    widget.pageContext,
-                                  ).showSnackBar(
+                                  await chatRoomNotifier.patchChatRoom(
+                                    id: widget.roomId,
+                                    dto: CreateChatRoomDto(
+                                      name: state.name,
+                                      teamNos: res.departments,
+                                      memberNos: res.members,
+                                    ),
+                                  );
+
+                                  ScaffoldMessenger.of(widget.pageContext)
+                                      .showSnackBar(
                                     const SnackBar(
                                       content: Text('초대했습니다.'),
                                       duration: Duration(seconds: 1),
@@ -147,6 +177,13 @@ class _ChatSettingsDrawerState extends ConsumerState<ChatSettingsDrawer> {
                   ),
                   SizedBox(height: 2.h),
                   ...state.members.map((e) {
+                    final isFirst = state.members.first == e;
+                    if (isFirst) {
+                      return _ParticipantTile(
+                        nameAndDept: '${e.name} ${e.mb2} | ${e.department}',
+                        isFirst: true,
+                      );
+                    }
                     return _ParticipantTile(
                       nameAndDept: '${e.name} ${e.mb2} | ${e.department}',
                     );

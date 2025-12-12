@@ -8,7 +8,6 @@ import 'package:lhens_app/common/dio/dio.dart';
 import 'package:lhens_app/common/model/cursor_pagination_model.dart';
 import 'package:lhens_app/common/model/cursor_pagination_params.dart';
 import 'package:lhens_app/common/repository/base_pagination_repository.dart';
-import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'chat_room_repository.g.dart';
@@ -34,6 +33,13 @@ abstract class ChatRoomRepository
   @POST('room')
   @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
   Future<String?> createChatRoom({@Body() required CreateChatRoomDto dto});
+
+  @PATCH('room/{id}')
+  @Headers({'accessToken': 'true', 'Content-Type': 'application/json'})
+  Future<String> patchChatRoom({
+    @Path('id') required String id,
+    @Body() required CreateChatRoomDto dto,
+  });
 
   @GET('room/{id}')
   @Headers({'accessToken': 'true'})

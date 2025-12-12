@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'create_chat_room_dto.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false,)
 class CreateChatRoomDto {
   final List<int>? memberNos;
   final List<int>? teamNos;
