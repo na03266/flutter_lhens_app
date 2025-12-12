@@ -34,6 +34,7 @@ class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
   final List<String> _categories = const ['전체'];
   String _category = '전체';
   final ScrollController controller = ScrollController();
+  final TextEditingController _textEditingController = TextEditingController();
 
   bool _scrolled = false;
 
@@ -100,9 +101,16 @@ class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
                 selected: _category,
                 getLabel: (v) => v,
                 onSelected: (v) => setState(() => _category = v),
-                controller: TextEditingController(),
+                controller: _textEditingController,
                 // 검색 미사용
-                onSubmitted: (_) {},
+                onSubmitted: (_) {
+                  ref
+                      .read(chatRoomProvider.notifier)
+                      .paginate(
+                        forceRefetch: true,
+                        name: _textEditingController.text.trim(),
+                      );
+                },
               ),
             ),
             SizedBox(height: 14.h),
@@ -125,7 +133,7 @@ class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
                           ref
                               .read(chatRoomProvider.notifier)
                               .paginate(
-                                fetchOrder: ['roomId_DESC'],
+                                fetchOrder: ['updatedAt_DESC'],
                                 forceRefetch: true,
                               );
                         },
