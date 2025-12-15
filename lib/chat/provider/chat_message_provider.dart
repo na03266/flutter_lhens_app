@@ -209,6 +209,8 @@ class ChatMessageStateNotifier extends StateNotifier<CursorPaginationBase> {
     required String text,
     required String tempId,
     required UserModel me,
+    MessageType? type,
+    String? filePath,
   }) {
     final now = DateTime.now().toIso8601String();
 
@@ -217,8 +219,8 @@ class ChatMessageStateNotifier extends StateNotifier<CursorPaginationBase> {
       author: me,
       content: text,
       createdAt: now,
-      filePath: '',
-      type: MessageType.TEXT,
+      filePath: filePath ?? '',
+      type: type ?? MessageType.TEXT,
       tempId: tempId,
     );
 
@@ -238,7 +240,8 @@ class ChatMessageStateNotifier extends StateNotifier<CursorPaginationBase> {
     );
   }
 
-  void deleteMessage(String id) {
+  Future<void> deleteMessage(String id) async {
+    await repository.deleteMessage(id: id);
     if (state is! CursorPagination<MessageModel>) return;
     final p = state as CursorPagination<MessageModel>;
 

@@ -44,4 +44,8 @@ abstract class ChatRoomRepository
   @GET('room/{id}')
   @Headers({'accessToken': 'true'})
   Future<ChatRoomDetail> getChatRoomDetail({@Path('id') required String id});
+
+  @DELETE('room/{id}')
+  @Headers({'accessToken': 'true'})
+  Future<String> exitChatRoom({@Path('id') required String id});
 }

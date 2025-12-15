@@ -137,40 +137,38 @@ class _ChatSettingsDrawerState extends ConsumerState<ChatSettingsDrawer> {
                           text: '초대하기',
                           type: AppButtonType.outlined,
                           height: 48.h,
-                          onTap:
-                              widget.onInvite ??
-                              () async {
-                                // Drawer 닫기
-                                Navigator.of(widget.pageContext).pop();
+                          onTap: () async {
+                            // Drawer 닫기
+                            Navigator.of(widget.pageContext).pop();
 
-                                // 사용자 선택 화면으로 이동
-                                final res = await GoRouter.of(
-                                  widget.pageContext,
-                                ).pushNamed<UserPickResult>(
+                            // 사용자 선택 화면으로 이동
+                            final res = await GoRouter.of(widget.pageContext)
+                                .pushNamed<UserPickResult>(
                                   '커뮤니케이션-사용자선택',
                                   extra: {'mode': 'chatInvite'},
                                 );
 
-                                // 여기서도 ref X, chatRoomNotifier O
-                                if (res != null && res.members.isNotEmpty) {
-                                  await chatRoomNotifier.patchChatRoom(
-                                    id: widget.roomId,
-                                    dto: CreateChatRoomDto(
-                                      name: state.name,
-                                      teamNos: res.departments,
-                                      memberNos: res.members,
-                                    ),
-                                  );
+                            // 여기서도 ref X, chatRoomNotifier O
+                            if (res != null && res.members.isNotEmpty) {
+                              await chatRoomNotifier.patchChatRoom(
+                                id: widget.roomId,
+                                dto: CreateChatRoomDto(
+                                  name: state.name,
+                                  teamNos: res.departments,
+                                  memberNos: res.members,
+                                ),
+                              );
 
-                                  ScaffoldMessenger.of(widget.pageContext)
-                                      .showSnackBar(
-                                    const SnackBar(
-                                      content: Text('초대했습니다.'),
-                                      duration: Duration(seconds: 1),
-                                    ),
-                                  );
-                                }
-                              },
+                              ScaffoldMessenger.of(
+                                widget.pageContext,
+                              ).showSnackBar(
+                                const SnackBar(
+                                  content: Text('초대했습니다.'),
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -213,6 +211,9 @@ class _ChatSettingsDrawerState extends ConsumerState<ChatSettingsDrawer> {
                         if (!widget.pageContext.mounted) return;
                         if (ok == true) {
                           final r = GoRouter.of(widget.pageContext);
+                          ref
+                              .read(chatRoomProvider.notifier)
+                              .exitChatRoom(id: widget.roomId);
                           Navigator.of(widget.pageContext).maybePop();
                           widget.onLeave?.call();
                           r.goNamed(ChatLobbyScreen.routeName);

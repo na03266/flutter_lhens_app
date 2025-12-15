@@ -62,4 +62,9 @@ class ChatRoomStateNotifier
     await repository.patchChatRoom(id: id, dto: dto);
     getDetail(id: id);
   }
+
+  exitChatRoom({required String id}) async {
+    await repository.exitChatRoom(id: id);
+    await paginate(forceRefetch: true);
+  }
 }

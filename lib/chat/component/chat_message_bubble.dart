@@ -1,13 +1,10 @@
 // lib/chat/component/chat_message_bubble.dart
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lhens_app/chat/component/chat_attachment_file.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/common/utils/text_break.dart';
-import 'package:lhens_app/gen/assets.gen.dart';
-import 'package:lhens_app/chat/component/chat_attachment_file.dart';
 
 enum ChatMessageType { text, image, file }
 
@@ -85,21 +82,72 @@ class ChatMessageBubble extends StatelessWidget {
         break;
 
       case ChatMessageType.image:
+        final String? imgUrl = imageUrl;
+
         content = LayoutBuilder(
-          builder: (context, c) {
+          builder: (context, constraints) {
+            // 기존 너비/비율 계산 로직
             final double capW = 294.w;
-            final double maxW = c.maxWidth.isFinite ? c.maxWidth : capW;
+            final double maxW = constraints.maxWidth.isFinite
+                ? constraints.maxWidth
+                : capW;
             final double bubbleW = maxW < capW ? maxW : capW;
             const double fallbackRatio = 152 / 182;
             final double bubbleH = bubbleW * fallbackRatio;
 
+            // 1. URL 자체가 없을 때 에러 방어
+            if (imgUrl == null || imgUrl.isEmpty) {
+              return Container(
+                width: bubbleW,
+                height: bubbleH,
+                alignment: Alignment.center,
+                color: Colors.grey[200],
+                child: const Icon(
+                  Icons.broken_image_outlined,
+                ),
+              );
+            }
+
             return ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
-              child: Image.asset(
-                Assets.images.chat.path,
+              child: Image.network(
+                imgUrl,
                 width: bubbleW,
                 height: bubbleH,
                 fit: BoxFit.cover,
+
+                // 2. 네트워크/디코딩 에러 처리
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: bubbleW,
+                    height: bubbleH,
+                    alignment: Alignment.center,
+                    color: Colors.grey[200],
+                    child: const Icon(
+                      Icons.broken_image_outlined,
+                    ),
+                  );
+                },
+
+                // 3. 로딩 중 처리
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
+
+                  final expected = loadingProgress.expectedTotalBytes;
+                  final loaded = loadingProgress.cumulativeBytesLoaded;
+
+                  return SizedBox(
+                    width: bubbleW,
+                    height: bubbleH,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: expected != null ? loaded / expected : null,
+                      ),
+                    ),
+                  );
+                },
               ),
             );
           },

@@ -30,7 +30,7 @@ class FileRepository {
       data: formData,
 
       options: Options(
-        headers: {'accessToken': 'true'},  // 토큰 헤더 추가
+        headers: {'accessToken': 'true'}, // 토큰 헤더 추가
         sendTimeout: const Duration(seconds: 120),
         receiveTimeout: const Duration(seconds: 120),
       ),
@@ -52,7 +52,7 @@ class FileRepository {
       data: formData,
 
       options: Options(
-        headers: {'accessToken': 'true'},  // 토큰 헤더 추가
+        headers: {'accessToken': 'true'}, // 토큰 헤더 추가
         sendTimeout: const Duration(seconds: 120),
         receiveTimeout: const Duration(seconds: 120),
       ),
@@ -76,14 +76,11 @@ class FileRepository {
     required String filename,
   }) async {
     final formData = FormData.fromMap({
-      'file': MultipartFile.fromBytes(
-        bytes,
-        filename: filename,
-      ),
+      'file': MultipartFile.fromBytes(bytes, filename: filename),
     });
 
     final response = await _dio.post(
-      '$ip/common/editor',   // Nest @Post('editor') 와 매칭
+      '$ip/common/editor', // Nest @Post('editor') 와 매칭
       data: formData,
       options: Options(
         headers: {'accessToken': 'true'},
@@ -92,6 +89,37 @@ class FileRepository {
       ),
     );
 
+    // Nest에서 { url: '...' }로 반환한다고 가정
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      return data['url'] as String?;
+    }
+    // 혹시 문자열로만 돌려줄 경우까지 대비
+    if (data is String) {
+      return data;
+    }
+    return null;
+  }
+
+  // 2) 신규: 채팅 파일 업로드
+  Future<String?> uploadChatFile({required File file}) async {
+    final formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(
+        file.path,
+        filename: file.path.split('/').last,
+      ),
+    });
+
+    final response = await _dio.post(
+      '$ip/common/chat',
+      data: formData,
+
+      options: Options(
+        headers: {'accessToken': 'true'}, // 토큰 헤더 추가
+        sendTimeout: const Duration(seconds: 120),
+        receiveTimeout: const Duration(seconds: 120),
+      ),
+    );
     // Nest에서 { url: '...' }로 반환한다고 가정
     final data = response.data;
     if (data is Map<String, dynamic>) {

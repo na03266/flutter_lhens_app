@@ -27,6 +27,8 @@ class MessageModel {
   @JsonKey(fromJson: _messageTypeFromJson, toJson: _messageTypeToJson)
   final MessageType type;
   final String? tempId;
+  final int? unreadMembers;
+
 
   MessageModel({
     required this.id,
@@ -36,6 +38,7 @@ class MessageModel {
     this.filePath = '',
     required this.type,
     this.tempId,
+    this.unreadMembers,
   });
 
   MessageModel copyWith({
@@ -46,6 +49,7 @@ class MessageModel {
     bool? isMine,
     String? filePath,
     MessageType? type,
+    int? unreadMembers,
   }) {
     return MessageModel(
       id: id ?? this.id,
@@ -54,6 +58,7 @@ class MessageModel {
       createdAt: createdAt ?? this.createdAt,
       filePath: filePath ?? this.filePath,
       type: type ?? this.type,
+      unreadMembers: unreadMembers ?? this.unreadMembers,
     );
   }
 
