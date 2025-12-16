@@ -102,52 +102,51 @@ class ChatMessageBubble extends StatelessWidget {
                 height: bubbleH,
                 alignment: Alignment.center,
                 color: Colors.grey[200],
-                child: const Icon(
-                  Icons.broken_image_outlined,
-                ),
+                child: const Icon(Icons.broken_image_outlined),
               );
             }
 
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
-                imgUrl,
-                width: bubbleW,
-                height: bubbleH,
-                fit: BoxFit.cover,
+            return GestureDetector(
+              onTap: onFileDownload,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.r),
+                child: Image.network(
+                  imgUrl,
+                  width: bubbleW,
+                  height: bubbleH,
+                  fit: BoxFit.cover,
 
-                // 2. 네트워크/디코딩 에러 처리
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: bubbleW,
-                    height: bubbleH,
-                    alignment: Alignment.center,
-                    color: Colors.grey[200],
-                    child: const Icon(
-                      Icons.broken_image_outlined,
-                    ),
-                  );
-                },
+                  // 2. 네트워크/디코딩 에러 처리
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: bubbleW,
+                      height: bubbleH,
+                      alignment: Alignment.center,
+                      color: Colors.grey[200],
+                      child: const Icon(Icons.broken_image_outlined),
+                    );
+                  },
 
-                // 3. 로딩 중 처리
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  }
+                  // 3. 로딩 중 처리
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    }
 
-                  final expected = loadingProgress.expectedTotalBytes;
-                  final loaded = loadingProgress.cumulativeBytesLoaded;
+                    final expected = loadingProgress.expectedTotalBytes;
+                    final loaded = loadingProgress.cumulativeBytesLoaded;
 
-                  return SizedBox(
-                    width: bubbleW,
-                    height: bubbleH,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: expected != null ? loaded / expected : null,
+                    return SizedBox(
+                      width: bubbleW,
+                      height: bubbleH,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: expected != null ? loaded / expected : null,
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             );
           },

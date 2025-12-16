@@ -1,13 +1,17 @@
 // common/components/app_bottom_nav.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lhens_app/chat/model/chat_room_model.dart';
+import 'package:lhens_app/chat/provider/chat_room_provider.dart';
 import 'package:lhens_app/common/components/feedback/press_scale.dart';
+import 'package:lhens_app/common/model/cursor_pagination_model.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_shadows.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 
-class AppBottomNav extends StatelessWidget {
+class AppBottomNav extends ConsumerWidget {
   final VoidCallback onTapLeft1,
       onTapLeft2,
       onTapRight1,
@@ -29,10 +33,11 @@ class AppBottomNav extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final inset = MediaQuery.of(context).padding.bottom;
     final bottomGap = (inset > 0 ? inset : minBottomGap).h;
     final barHeight = topGap.h + contentHeight.h + bottomGap;
+    final chatting = ref.watch(chatRoomProvider);
 
     return SizedBox(
       height: barHeight,
@@ -58,9 +63,17 @@ class AppBottomNav extends StatelessWidget {
               child: Row(
                 children: [
                   _item('위험신고', Assets.icons.tabs.danger, onTapLeft1),
-                  _item('커뮤니케이션', Assets.icons.tabs.chat, onTapLeft2),
+                  _item(
+                    '커뮤니케이션',
+                    Assets.icons.tabs.chat,
+                    onTapLeft2,
+                    showNew:
+                        chatting is CursorPagination<ChatRoom> &&
+                        chatting.data.any((e) => e.newMessageCount != 0),
+                  ),
+
                   SizedBox(width: fabDiameter.w), // FAB 자리만 비워둠
-                  _item('알림', Assets.icons.bell, onTapRight2),
+                  _item('알림', Assets.icons.bell, onTapRight2, showNew: true),
                   _item('업무매뉴얼', Assets.icons.tabs.manual, onTapRight1),
                 ],
               ),
@@ -102,7 +115,12 @@ class AppBottomNav extends StatelessWidget {
     );
   }
 
-  Widget _item(String label, SvgGenImage icon, VoidCallback onTap) {
+  Widget _item(
+    String label,
+    SvgGenImage icon,
+    VoidCallback onTap, {
+    bool showNew = false,
+  }) {
     final iconSize = 22.w;
     return Expanded(
       child: InkWell(
@@ -114,10 +132,45 @@ class AppBottomNav extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              icon.svg(
-                width: iconSize,
-                height: iconSize,
-                colorFilter: ColorFilter.mode(AppColors.text, BlendMode.srcIn),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: icon.svg(
+                      width: iconSize,
+                      height: iconSize,
+                      colorFilter: ColorFilter.mode(
+                        AppColors.text,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+
+                  if (showNew)
+                    Positioned(
+                      right: 15.w,
+                      top: -4.w,
+                      child: Container(
+                        width: 16.w,
+                        height: 16.w,
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'N',
+                          style: TextStyle(
+                            fontSize: 10.sp,
+                            height: 1,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               SizedBox(height: 6.h),
               // 높이 부족 오버플로우 방지

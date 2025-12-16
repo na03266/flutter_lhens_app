@@ -280,6 +280,8 @@ class _ChatDetailScreenState extends ConsumerState<ChatRoomScreen> {
           side: side,
           time: time,
           readCount: readCount == 0 ? null : readCount,
+          onFileDownload: () =>
+              _onFileDownload(fileUrl: m.filePath, fileName: m.content),
         );
       } else {
         bubble = ChatMessageBubble(

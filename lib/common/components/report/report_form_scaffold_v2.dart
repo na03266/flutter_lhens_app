@@ -367,17 +367,18 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
               SizedBox(height: 12.h),
 
               // 비공개
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  AppCheckbox(
-                    label: '비공개',
-                    value: _secret,
-                    onChanged: (v) => setState(() => _secret = v),
-                    style: AppCheckboxStyle.secondary,
-                  ),
-                ],
-              ),
+              if (!widget.ca1Names.contains('공개'))
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    AppCheckbox(
+                      label: '비공개',
+                      value: _secret,
+                      onChanged: (v) => setState(() => _secret = v),
+                      style: AppCheckboxStyle.secondary,
+                    ),
+                  ],
+                ),
 
               // 썸네일
               // 썸네일

@@ -56,7 +56,7 @@ class ChatMessageGroup extends StatelessWidget {
             children: [
               if (user != null)
                 Text(
-                  user?.mbName ?? '',
+                  '(${user?.mb5}) ${user?.mbName}',
                   style: AppTextStyles.pm14.copyWith(color: AppColors.text),
                 ),
               if (user != null) SizedBox(height: 12.h),
