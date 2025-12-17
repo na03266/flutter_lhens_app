@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
 import 'package:lhens_app/common/components/report/report_detail_scaffold_v2.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
+import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/drawer/notice/provider/notice_provider.dart';
 import 'package:lhens_app/drawer/notice/view/notice_form_screen.dart';
 import 'package:lhens_app/user/model/user_model.dart';
@@ -21,6 +22,8 @@ class NoticeDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
+  int refreshCount = 0;
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +35,10 @@ class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
     final state = ref.watch(noticeDetailProvider(widget.wrId));
 
     if (state == null || state is! PostDetailModel) {
+      if (state is PostModel) {
+        ref.read(noticeProvider.notifier).getDetail(wrId: widget.wrId);
+      }
+
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final me = ref.watch(userMeProvider);
@@ -39,7 +46,8 @@ class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
     return ReportDetailScaffoldV2.fromModel(
       model: state,
       onUpdate:
-          me is UserModel && (me.mbLevel == 10 || state.wrName.contains(me.mbId))
+          me is UserModel &&
+              (me.mbLevel == 10 || state.wrName.contains(me.mbId))
           ? () {
               context.goNamed(
                 NoticeFormScreen.routeNameUpdate,
@@ -48,7 +56,8 @@ class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
             }
           : null,
       onDelete:
-          me is UserModel && (me.mbLevel == 10 || state.wrName.contains(me.mbId))
+          me is UserModel &&
+              (me.mbLevel == 10 || state.wrName.contains(me.mbId))
           ? () {
               try {
                 ref.read(noticeProvider.notifier).deletePost(wrId: widget.wrId);
@@ -68,52 +77,52 @@ class _NoticeDetailScreenState extends ConsumerState<NoticeDetailScreen> {
               _showMsg('정상적으로 삭제되었습니다.');
             }
           : null,
-      postComment: (wrId, dto) {
-        ref.read(noticeProvider.notifier).postComment(wrId: wrId, dto: dto);
-      },
-      postReply: (wrId, coId, dto) {
-        ref
-            .read(noticeProvider.notifier)
-            .postReComment(wrId: wrId, dto: dto, coId: coId);
-      },
-      canCommentDeleteOf: (item) {
-        if (me is UserModel) {
-          return item.wrName.contains(me.mbId);
-        }
-        return false;
-      },
-      onCommentDelete: (item) async {
-        final ok = await ConfirmDialog.show(
-          context,
-          title: '삭제',
-          message: '삭제시 복구할수 없습니다.\n삭제 하시겠습니까?',
-          destructive: true,
-        );
-        if (!mounted) return;
-        if (ok == true) {
-          try {
-            await ref
-                .read(noticeProvider.notifier)
-                .deleteReply(wrId: item.wrId.toString());
-          } on DioException catch (e) {
-            final data = e.response?.data;
-            String? serverMsg;
-            if (data is Map<String, dynamic>) {
-              final m = data['message'];
-              if (m is String) {
-                serverMsg = m;
-              } else if (m is List && m.isNotEmpty) {
-                serverMsg = m.first.toString();
-              }
-              _showMsg(serverMsg ?? '삭제 중 오류가 발생했습니다.');
-            }
-          }
-          await ref.read(noticeProvider.notifier).getDetail(wrId: widget.wrId);
-        }
-      },
-      onCommentUpdate: (id, item) async {
-        await ref.read(noticeProvider.notifier).patchPost(wrId: id, dto: item);
-      },
+      // postComment: (wrId, dto) {
+      //   ref.read(noticeProvider.notifier).postComment(wrId: wrId, dto: dto);
+      // },
+      // postReply: (wrId, coId, dto) {
+      //   ref
+      //       .read(noticeProvider.notifier)
+      //       .postReComment(wrId: wrId, dto: dto, coId: coId);
+      // },
+      // canCommentDeleteOf: (item) {
+      //   if (me is UserModel) {
+      //     return item.wrName.contains(me.mbId);
+      //   }
+      //   return false;
+      // },
+      // onCommentDelete: (item) async {
+      //   final ok = await ConfirmDialog.show(
+      //     context,
+      //     title: '삭제',
+      //     message: '삭제시 복구할수 없습니다.\n삭제 하시겠습니까?',
+      //     destructive: true,
+      //   );
+      //   if (!mounted) return;
+      //   if (ok == true) {
+      //     try {
+      //       await ref
+      //           .read(noticeProvider.notifier)
+      //           .deleteReply(wrId: item.wrId.toString());
+      //     } on DioException catch (e) {
+      //       final data = e.response?.data;
+      //       String? serverMsg;
+      //       if (data is Map<String, dynamic>) {
+      //         final m = data['message'];
+      //         if (m is String) {
+      //           serverMsg = m;
+      //         } else if (m is List && m.isNotEmpty) {
+      //           serverMsg = m.first.toString();
+      //         }
+      //         _showMsg(serverMsg ?? '삭제 중 오류가 발생했습니다.');
+      //       }
+      //     }
+      //     await ref.read(noticeProvider.notifier).getDetail(wrId: widget.wrId);
+      //   }
+      // },
+      // onCommentUpdate: (id, item) async {
+      //   await ref.read(noticeProvider.notifier).patchPost(wrId: id, dto: item);
+      // },
     );
   }
 

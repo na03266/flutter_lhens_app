@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/chat/component/chat_input_bar.dart';
@@ -194,6 +195,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatRoomScreen> {
     // 현재까지 쌓인 그룹을 하나 완성해서 groups에 넣는 함수
     void flushCurrentGroup() {
       if (currentBubbles.isEmpty) return;
+
       groups.add(
         ChatMessageGroup(
           side: currentSide ?? ChatMessageSide.left,
@@ -292,14 +294,19 @@ class _ChatDetailScreenState extends ConsumerState<ChatRoomScreen> {
           readCount: readCount == 0 ? null : readCount,
         );
       }
+      final isMine = (me.mbNo == m.author?.mbNo);
 
       currentBubbles.add(
         _wrapDeletable(
           child: bubble,
+          canDelete: isMine, // ✅ 다른 사람 메시지는 삭제 메뉴 자체가 안 뜸
           onDelete: () async {
             await ref
                 .read(chatMessageProvider(widget.id).notifier)
                 .deleteMessage(m.id);
+          },
+          onCopy: () async {
+            await _copyMessage(m);
           },
         ),
       );
@@ -438,23 +445,13 @@ class _ChatDetailScreenState extends ConsumerState<ChatRoomScreen> {
     super.dispose();
   }
 
-  Future<bool> _confirmDelete() async {
-    final key = await showActionSheet(
-      context,
-      actions: [ActionItem('delete', '메시지 삭제', destructive: true)],
-      cancelText: '취소',
-    );
+  Future<String?> _showMessageActionSheet({required bool canDelete}) async {
+    final actions = <ActionItem>[
+      ActionItem('copy', '메시지 복사'),
+      if (canDelete) ActionItem('delete', '메시지 삭제', destructive: true),
+    ];
 
-    if (!mounted || key != 'delete') return false;
-
-    final ok = await ConfirmDialog.show(
-      context,
-      title: '삭제',
-      message: '이 메시지를\n모두에게서 삭제하시겠습니까?',
-      destructive: true,
-    );
-    if (!mounted) return false;
-    return ok == true;
+    return showActionSheet(context, actions: actions, cancelText: '취소');
   }
 
   Future<bool> _confirmCancelSend() async {
@@ -465,6 +462,35 @@ class _ChatDetailScreenState extends ConsumerState<ChatRoomScreen> {
       destructive: true,
     );
     return ok == true;
+  }
+
+  String _copyTextOf(MessageModel m) {
+    // 텍스트는 그대로
+    if (m.type == MessageType.TEXT) return m.content;
+
+    // 이미지/파일은 "파일명 + URL" 형태가 실무에서 유용합니다.
+    if (m.type == MessageType.IMAGE || m.type == MessageType.FILE) {
+      final name = (m.content).trim(); // 파일명으로 쓰고 계심
+      final url = (m.filePath ?? '').trim();
+      if (url.isEmpty) return name;
+      if (name.isEmpty) return url;
+      return '$name\n$url';
+    }
+
+    // 시스템 메시지 등
+    return m.content;
+  }
+
+  Future<void> _copyMessage(MessageModel m) async {
+    final text = _copyTextOf(m).trim();
+    if (text.isEmpty) return;
+
+    await Clipboard.setData(ClipboardData(text: text));
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('복사되었습니다.'), duration: Duration(seconds: 1)),
+    );
   }
 
   Future<void> _onFileDownload({
@@ -509,14 +535,31 @@ class _ChatDetailScreenState extends ConsumerState<ChatRoomScreen> {
 
   Widget _wrapDeletable({
     required Widget child,
+    required bool canDelete,
     required Future<void> Function() onDelete,
+    required Future<void> Function() onCopy,
   }) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onLongPress: () async {
-        final go = await _confirmDelete();
-        if (!mounted || !go) return;
-        await onDelete();
+        final key = await _showMessageActionSheet(canDelete: canDelete);
+        if (!mounted || key == null) return;
+
+        if (key == 'copy') {
+          await onCopy();
+          return;
+        }
+
+        if (key == 'delete') {
+          final ok = await ConfirmDialog.show(
+            context,
+            title: '삭제',
+            message: '이 메시지를\n모두에게서 삭제하시겠습니까?',
+            destructive: true,
+          );
+          if (!mounted || ok != true) return;
+          await onDelete();
+        }
       },
       child: child,
     );

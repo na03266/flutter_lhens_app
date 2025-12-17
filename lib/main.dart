@@ -23,6 +23,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+
     debugPrint('✅ onMessage: ${message.messageId}');
     debugPrint('title=${message.notification?.title}');
     debugPrint('body=${message.notification?.body}');

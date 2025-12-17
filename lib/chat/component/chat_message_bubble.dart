@@ -102,7 +102,9 @@ class ChatMessageBubble extends StatelessWidget {
                 height: bubbleH,
                 alignment: Alignment.center,
                 color: Colors.grey[200],
-                child: const Icon(Icons.broken_image_outlined),
+                child: const Icon(
+                  Icons.broken_image_outlined,
+                ),
               );
             }
 
@@ -123,7 +125,9 @@ class ChatMessageBubble extends StatelessWidget {
                       height: bubbleH,
                       alignment: Alignment.center,
                       color: Colors.grey[200],
-                      child: const Icon(Icons.broken_image_outlined),
+                      child: const Icon(
+                        Icons.broken_image_outlined,
+                      ),
                     );
                   },
 

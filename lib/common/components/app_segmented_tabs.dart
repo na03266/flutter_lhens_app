@@ -40,9 +40,8 @@ class AppSegmentedTabs extends StatelessWidget {
       final selected = index == i;
       final base = selected ? AppTextStyles.psb15 : AppTextStyles.pm15;
 
-      final isWholeTab = i == 0;
-      final badgeVisible = showBadge && (badgeCount ?? 0) > 0 && isWholeTab;
-      final badgeActive = isWholeTab && index == 0;
+      final badgeVisible = showBadge && (badgeCount ?? 0) > 0 && index == i;
+      final badgeActive = index == i;
       final badgeBg = AppColors.secondary.withValues(
         alpha: badgeActive ? 1.0 : 0.35,
       );
@@ -106,8 +105,8 @@ class AppSegmentedTabs extends StatelessWidget {
             child: Row(
               children: [
                 tab('전체', 0, showBadge: badgeCount != null),
-                tab(rightTabs[0], 1),
-                tab(rightTabs[1], 2),
+                tab(rightTabs[0], 1, showBadge: badgeCount != null),
+                tab(rightTabs[1], 2, showBadge: badgeCount != null),
               ],
             ),
           ),

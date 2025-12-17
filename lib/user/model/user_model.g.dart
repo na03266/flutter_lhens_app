@@ -11,6 +11,9 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   mbId: json['mbId'] as String,
   mbName: json['mbName'] as String,
   mbNick: json['mbNick'] as String,
+  deptSite: json['deptSite'] == null
+      ? null
+      : DeptModel.fromJson(json['deptSite'] as Map<String, dynamic>),
   jobDuty: json['jobDuty'] as String? ?? '',
   mb2: json['mb2'] as String? ?? '',
   mb3: json['mb3'] as String? ?? '',
@@ -33,7 +36,22 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'mb5': instance.mb5,
   'mbHp': instance.mbHp,
   'mbEmail': instance.mbEmail,
+  'deptSite': instance.deptSite,
   'mbDepart': instance.mbDepart,
   'registerNum': instance.registerNum,
   'mbLevel': instance.mbLevel,
+};
+
+DeptModel _$DeptModelFromJson(Map<String, dynamic> json) => DeptModel(
+  id: (json['id'] as num).toInt(),
+  name: json['name'] as String,
+  parent: json['parent'] == null
+      ? null
+      : DeptModel.fromJson(json['parent'] as Map<String, dynamic>),
+);
+
+Map<String, dynamic> _$DeptModelToJson(DeptModel instance) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+  'parent': instance.parent,
 };

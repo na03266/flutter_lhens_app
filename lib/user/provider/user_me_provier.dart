@@ -55,7 +55,19 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
     state = userResp;
 
     await ref.read(pushRepositoryProvider).registerToken(platform: 'android');
-    await ref.read(pushRepositoryProvider).subscribeTopic(topic: 'notice-all');
+    await ref.read(pushRepositoryProvider).subscribeTopic(topic: 'all'); // 공통
+    await ref
+        .read(pushRepositoryProvider)
+        .subscribeTopic(
+          topic: ['행정', '경영지원', '안전관리'].contains(userResp.mb5)
+              ? 'office'
+              : 'tech',
+        ); // 직무
+    if (userResp.deptSite != null) {
+      await ref
+          .read(pushRepositoryProvider)
+          .subscribeTopic(topic: userResp.deptSite!.id.toString()); // 부서
+    }
   }
 
   Future<UserModelBase> login({

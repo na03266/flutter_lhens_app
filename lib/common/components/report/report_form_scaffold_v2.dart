@@ -234,7 +234,8 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
                 ),
                 SizedBox(height: 12.h),
               ],
-              if (widget.ca2Names.isNotEmpty && _ca1Name != null) ...[
+              if (widget.ca2Names.contains('공통') ||
+                  widget.ca2Names.isNotEmpty && _ca1Name != null) ...[
                 Selector<String>(
                   hint: '유형2 선택',
                   items: _ca1Name != '외부공지사항'
@@ -367,7 +368,8 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
               SizedBox(height: 12.h),
 
               // 비공개
-              if (!widget.ca1Names.contains('공개'))
+              if (!widget.ca1Names.contains('공개') &&
+                  !widget.ca2Names.contains('공통'))
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
