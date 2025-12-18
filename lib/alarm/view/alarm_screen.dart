@@ -159,7 +159,7 @@ class _AlarmScreenState extends ConsumerState<AlarmScreen> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 40.h),
                       children: [
-                        SizedBox(height: 120.h),
+                        SizedBox(height: 240.h),
                         EmptyState(
                           iconPath: Assets.icons.bell.path,
                           message: _emptyMessage,

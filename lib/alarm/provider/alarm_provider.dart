@@ -5,7 +5,7 @@ import 'package:lhens_app/alarm/repository/alarm_repository.dart';
 final alarmProvider =
     StateNotifierProvider<AlarmStateNotifier, AlarmModelBase?>((ref) {
       final repository = ref.watch(alarmRepositoryProvider);
-      return AlarmStateNotifier(ref: ref, repository: repository);
+      return AlarmStateNotifier( repository: repository);
     });
 
 class AlarmStateNotifier extends StateNotifier<AlarmModelBase?> {
