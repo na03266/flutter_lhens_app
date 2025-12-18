@@ -9,11 +9,9 @@ final alarmProvider =
     });
 
 class AlarmStateNotifier extends StateNotifier<AlarmModelBase?> {
-  final Ref ref;
   final AlarmRepository repository;
 
-  AlarmStateNotifier({required this.ref, required this.repository})
-    : super(AlarmModelLoading()) {
+  AlarmStateNotifier({required this.repository}) : super(AlarmModelLoading()) {
     getItems();
   }
 

@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lhens_app/alarm/model/alarm_model.dart';
+import 'package:lhens_app/alarm/provider/alarm_provider.dart';
 import 'package:lhens_app/chat/model/chat_room_model.dart';
 import 'package:lhens_app/chat/provider/chat_room_provider.dart';
 import 'package:lhens_app/common/components/feedback/press_scale.dart';
@@ -38,6 +40,7 @@ class AppBottomNav extends ConsumerWidget {
     final bottomGap = (inset > 0 ? inset : minBottomGap).h;
     final barHeight = topGap.h + contentHeight.h + bottomGap;
     final chatting = ref.watch(chatRoomProvider);
+    final alarm = ref.watch(alarmProvider);
 
     return SizedBox(
       height: barHeight,
@@ -73,7 +76,14 @@ class AppBottomNav extends ConsumerWidget {
                   ),
 
                   SizedBox(width: fabDiameter.w), // FAB 자리만 비워둠
-                  _item('알림', Assets.icons.bell, onTapRight2, showNew: true),
+                  _item(
+                    '알림',
+                    Assets.icons.bell,
+                    onTapRight2,
+                    showNew:
+                        alarm is AlarmModel &&
+                        alarm.data.any((e) => e.isRead != false),
+                  ),
                   _item('업무매뉴얼', Assets.icons.tabs.manual, onTapRight1),
                 ],
               ),
