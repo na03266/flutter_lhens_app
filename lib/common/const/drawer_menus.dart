@@ -1,7 +1,7 @@
 import 'package:lhens_app/drawer/complaint/view/complaint_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/drawer/notice/view/notice_screen.dart';
-import 'package:lhens_app/chat/view/chat_screen.dart';
+import 'package:lhens_app/chat/view/chat_lobby_screen.dart';
 import 'package:lhens_app/manual/view/manual_screen.dart';
 import 'package:lhens_app/risk/view/risk_screen.dart';
 import 'package:lhens_app/drawer/survey/view/survey_screen.dart';
@@ -28,7 +28,7 @@ final drawerMenuGroups = <DrawerMenuGroup>[
     DrawerMenuItem('위험신고', RiskScreen.routeName),
   ]),
   DrawerMenuGroup('소통', [
-    DrawerMenuItem('커뮤니케이션', ChatScreen.routeName),
+    DrawerMenuItem('커뮤니케이션', ChatLobbyScreen.routeName),
     DrawerMenuItem('공지사항', NoticeScreen.routeName),
   ]),
   DrawerMenuGroup('업무·자료', [

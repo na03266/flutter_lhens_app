@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:lhens_app/push/repository/push_repository.dart';
 import 'package:lhens_app/user/model/change_password_dto.dart';
 
 import '../../common/const/data.dart';
@@ -17,7 +18,7 @@ final userMeProvider =
       final repository = ref.watch(userMeRepositoryProvider);
       final storage = ref.watch(secureStorageProvider);
       return UserMeStateNotifier(
-        ref:ref,
+        ref: ref,
         authRepository: authRepository,
         repository: repository,
         storage: storage,
@@ -50,8 +51,23 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
       return;
     }
 
-    final resp = await repository.getMe();
-    state = resp;
+    final userResp = await repository.getMe();
+    state = userResp;
+
+    await ref.read(pushRepositoryProvider).registerToken(platform: 'android');
+    await ref.read(pushRepositoryProvider).subscribeTopic(topic: 'all'); // 공통
+    await ref
+        .read(pushRepositoryProvider)
+        .subscribeTopic(
+          topic: ['행정', '경영지원', '안전관리'].contains(userResp.mb5)
+              ? 'office'
+              : 'tech',
+        ); // 직무
+    if (userResp.deptSite != null) {
+      await ref
+          .read(pushRepositoryProvider)
+          .subscribeTopic(topic: userResp.deptSite!.id.toString()); // 부서
+    }
   }
 
   Future<UserModelBase> login({
@@ -72,15 +88,14 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
 
       // 2) 전역 Auth 토큰 프로바이더에 반영(소켓/요청에 쓰임)
 
-
       final userResp = await repository.getMe();
 
       state = userResp;
       return userResp;
     } catch (e) {
-      state = UserModelError(message:
-      e.toString()
-      // '로그인에 실패했습니다.',
+      state = UserModelError(
+        message: e.toString(),
+        // '로그인에 실패했습니다.',
       );
       return Future.value(state);
     }
@@ -94,6 +109,7 @@ class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
       storage.delete(key: ACCESS_TOKEN_KEY),
     ]);
   }
+
   changePassword(ChangePasswordDto dto) async {
     await repository.changePassword(dto: dto);
   }

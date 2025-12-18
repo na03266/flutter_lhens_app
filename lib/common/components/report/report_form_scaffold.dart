@@ -217,22 +217,22 @@ class _ReportFormScaffoldState extends State<ReportFormScaffold> {
               SizedBox(height: 8.h),
 
               // 첨부
-              IgnorePointer(
-                ignoring: _locked,
-                child: Opacity(
-                  opacity: _locked ? 0.7 : 1,
-                  child: AttachmentSection(
-                    files: _files,
-                    onAdd: () => setState(() {
-                      _files.add('첨부_${_files.length + 1}.pdf');
-                    }),
-                    onRemove: (name) => setState(() {
-                      _files.remove(name);
-                    }),
-                    spacing: 8,
-                  ),
-                ),
-              ),
+              // IgnorePointer(
+              //   ignoring: _locked,
+              //   child: Opacity(
+              //     opacity: _locked ? 0.7 : 1,
+              //     child: AttachmentSection(
+              //       files: _files,
+              //       onAdd: () => setState(() {
+              //         _files.add('첨부_${_files.length + 1}.pdf');
+              //       }),
+              //       onRemove: (name) => setState(() {
+              //         _files.remove(name);
+              //       }),
+              //       spacing: 8,
+              //     ),
+              //   ),
+              // ),
 
               if (cfg.showTargets) ...[
                 SizedBox(height: 24.h),

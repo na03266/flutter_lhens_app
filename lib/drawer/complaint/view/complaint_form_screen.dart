@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lhens_app/common/components/report/report_form_config.dart';
-import 'package:lhens_app/common/components/report/report_form_scaffold.dart';
 import 'package:lhens_app/common/components/report/report_form_scaffold_v2.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/drawer/complaint/provider/complaint_provider.dart';
 import 'package:lhens_app/drawer/model/board_info_model.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:lhens_app/drawer/provider/board_provider.dart';
+
+import 'complaint_detail_screen.dart';
+import 'complaint_screen.dart';
 
 class ComplaintFormScreen extends ConsumerStatefulWidget {
   static String get routeNameCreate => '민원제안 생성';
@@ -60,13 +61,16 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen> {
             ? item.boCategoryList.split('|')
             : [],
         ca2Names: item.bo1.isNotEmpty ? item.bo1.split('|') : [],
-        ca3Names: item.bo1.isNotEmpty ? item.bo2.split('|') : [],
         submitText: '수정',
         post: state,
         onSubmit: (dto) {
           ref
               .read(complaintProvider.notifier)
               .patchPost(dto: dto, wrId: state.wrId);
+          context.goNamed(
+            ComplaintDetailScreen.routeName,
+            pathParameters: {'rid': state.wrId.toString()},
+          );
         },
       );
     }
@@ -83,7 +87,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen> {
           wrOption: dto.caName == '요청(비공개)' ? 'secret' : dto.wrOption,
         );
         ref.read(complaintProvider.notifier).postPost(dto: fixed);
-        context.pop();
+        context.goNamed(ComplaintScreen.routeName);
       },
     );
   }

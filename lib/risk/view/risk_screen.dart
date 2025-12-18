@@ -73,7 +73,9 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
               .read(riskProvider.notifier)
               .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
         },
-
+        addPost: () {
+          context.goNamed(RiskFormScreen.routeNameCreate);
+        },
         provider: riskProvider,
         changePage: (int page) {
           ref
@@ -84,9 +86,6 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
                 wr1: wr1,
                 title: title,
               );
-        },
-        addPost: () {
-          context.goNamed(RiskFormScreen.routeNameCreate);
         },
         itemBuilder: (_, index, model) {
           return GestureDetector(

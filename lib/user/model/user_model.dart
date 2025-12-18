@@ -24,6 +24,7 @@ class UserModel extends UserModelBase {
   final String mb5; // 직무
   final String mbHp;
   final String mbEmail;
+  final DeptModel? deptSite;
   final String mbDepart; // 소속
   final String registerNum;
   final int mbLevel;
@@ -33,6 +34,7 @@ class UserModel extends UserModelBase {
     required this.mbId,
     required this.mbName,
     required this.mbNick,
+    this.deptSite,
     this.jobDuty = '',
     this.mb2 = '',
     this.mb3 = '',
@@ -46,4 +48,20 @@ class UserModel extends UserModelBase {
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
+}
+
+@JsonSerializable()
+class DeptModel {
+  final int id;
+  final String name;
+  final DeptModel? parent ;
+
+  DeptModel({
+    required this.id,
+    required this.name,
+    this.parent,
+  });
+
+  factory DeptModel.fromJson(Map<String, dynamic> json) =>
+      _$DeptModelFromJson(json);
 }

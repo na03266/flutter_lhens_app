@@ -7,13 +7,14 @@ import 'package:lhens_app/common/components/comments/comments_section_v2.dart';
 import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
 import 'package:lhens_app/common/components/inputs/inline_action_field.dart';
 import 'package:lhens_app/common/components/report/report_detail_header.dart';
+import 'package:lhens_app/common/components/report/status_segmented.dart';
 import 'package:lhens_app/common/components/report/text_sizer.dart';
 import 'package:lhens_app/common/components/sheets/action_sheet.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/common/utils/data_utils.dart';
 import 'package:lhens_app/drawer/model/create_post_dto.dart';
-import 'package:lhens_app/drawer/model/file_model.dart';
+import 'package:lhens_app/common/file/model/file_model.dart';
 import 'package:lhens_app/drawer/model/post_comment_model.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -24,6 +25,7 @@ import '../label_value_line.dart';
 class ReportDetailScaffoldV2 extends StatefulWidget {
   final Function()? onUpdate;
   final Function()? onDelete;
+  final Function()? onPass;
   final Function(int, CreatePostDto)? postComment;
   final Function(int, int, CreatePostDto)? postReply;
   final int wrId;
@@ -33,6 +35,10 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
   final String wrName;
   final String wrDatetime;
   final String wrHit;
+  final String? wrLink1;
+  final String? wrLink2;
+  final String? wr1;
+  final String? wr2;
   final String? wr3;
   final String? wr4;
   final List<PostCommentModel> comments;
@@ -41,11 +47,13 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
   final bool Function(PostCommentModel c)? canCommentDeleteOf;
   final void Function(PostCommentModel c)? onCommentDelete;
   final Function(int, CreatePostDto c)? onCommentUpdate;
+  final Function(int wrId, String status)? onProgressUpdate;
 
   const ReportDetailScaffoldV2({
     super.key,
     this.onUpdate,
     this.onDelete,
+    this.onPass,
     this.postComment,
     this.postReply,
     required this.wrId,
@@ -55,6 +63,10 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     this.wrName = '',
     this.wrDatetime = '',
     this.wrHit = '',
+    this.wr1,
+    this.wrLink1,
+    this.wrLink2,
+    this.wr2,
     this.wr3,
     this.wr4,
     this.comments = const [],
@@ -63,6 +75,7 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     this.canCommentDeleteOf,
     this.onCommentDelete,
     this.onCommentUpdate,
+    this.onProgressUpdate,
   });
 
   @override
@@ -72,16 +85,19 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     required PostDetailModel model,
     Function()? onUpdate,
     Function()? onDelete,
+    Function()? onPass,
     Function(int, CreatePostDto)? postComment,
     Function(int, CreatePostDto)? updateComment,
     Function(int, int, CreatePostDto)? postReply,
     bool Function(PostCommentModel c)? canCommentDeleteOf,
     void Function(PostCommentModel c)? onCommentDelete,
     void Function(int, CreatePostDto c)? onCommentUpdate,
+    void Function(int wrId, String status)? onProgressUpdate,
   }) {
     return ReportDetailScaffoldV2(
       onUpdate: onUpdate,
       onDelete: onDelete,
+      onPass: onPass,
       postComment: postComment,
       postReply: postReply,
       wrId: model.wrId,
@@ -93,11 +109,16 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
       wrHit: model.wrHit.toString(),
       comments: model.comments,
       files: model.files,
+      wr1: model.wr1,
+      wrLink1: model.wrLink1,
+      wrLink2: model.wrLink2,
+      wr2: model.wr2,
       wr3: model.wr3,
       wr4: model.wr4,
       canCommentDeleteOf: canCommentDeleteOf,
       onCommentDelete: onCommentDelete,
       onCommentUpdate: onCommentUpdate,
+      onProgressUpdate: onProgressUpdate,
     );
   }
 }
@@ -126,6 +147,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
     final sel = await showActionSheet(
       context,
       actions: [
+        if (widget.onPass != null) ActionItem('pass', '상위부서 이관'),
         if (widget.onUpdate != null) ActionItem('edit', '수정'),
         if (widget.onDelete != null)
           ActionItem('delete', '삭제', destructive: true),
@@ -134,6 +156,10 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
     if (!mounted || sel == null) return;
 
     if (sel == 'edit') {
+      widget.onUpdate!();
+      return;
+    }
+    if (sel == 'pass') {
       widget.onUpdate!();
       return;
     }
@@ -149,6 +175,28 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
       );
       widget.onDelete?.call();
       if (ok == true && mounted) Navigator.pop(context);
+    }
+  }
+
+  Future<void> _openExternalLink(String url) async {
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) return;
+
+    Uri? uri = Uri.tryParse(trimmed);
+    if (uri == null) {
+      debugPrint('잘못된 URL: $trimmed');
+      return;
+    }
+
+    // http/https 스킴이 없으면 https 기본 추가
+    if (!uri.hasScheme) {
+      uri = Uri.parse('https://$trimmed');
+    }
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      debugPrint('외부 브라우저로 열 수 없음: $uri');
     }
   }
 
@@ -209,6 +257,36 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SizedBox(height: 24.h),
+
+                      if (widget.onProgressUpdate != null) ...[
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: 16.w,
+                            right: 16.w,
+                            bottom: 8.h,
+                          ),
+                          child: StatusSegmented(
+                            value: switch (widget.wr2) {
+                              '처리중' => ReportStatus.processing,
+                              '완료' => ReportStatus.done,
+                              _ => ReportStatus.received,
+                            },
+                            onChanged: (s) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              final progressStatus = switch (s) {
+                                ReportStatus.processing => '처리중',
+                                ReportStatus.done => '완료',
+                                _ => '접수',
+                              };
+                              widget.onProgressUpdate!(
+                                widget.wrId,
+                                progressStatus,
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
+                      ],
 
                       ReportDetailHeader(
                         typeName: widget.caName,
@@ -319,26 +397,102 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                                 horizontal: 6.w,
                                 vertical: 4.h,
                               ),
-                              child: MediaQuery(
-                                data: MediaQuery.of(context).copyWith(
-                                  // 전체 텍스트 스케일 조정 (1.0 = 기본, 1.2 = 20% 확대)
-                                  textScaler: TextScaler.linear(_scale),
-                                ),
-                                child: Html(
-                                  data: widget.wrContent,
-                                  onLinkTap: (url, _, __) {
-                                    if (url == null) return;
-                                    final uri = Uri.parse(url);
-                                    launchUrl(
-                                      uri,
-                                      mode: LaunchMode.externalApplication,
-                                    );
-                                  },
-                                ),
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final contentWidth =
+                                      constraints.maxWidth; // ← 여기까지가 "현재 남은 폭"
+
+                                  return MediaQuery(
+                                    data: MediaQuery.of(context).copyWith(
+                                      // 전체 텍스트 스케일 조정 (1.0 = 기본, 1.2 = 20% 확대)
+                                      textScaler: TextScaler.linear(_scale),
+                                    ),
+                                    child: Html(
+                                      data: widget.wrContent,
+                                      style: {
+                                        "img": Style(
+                                          width: Width(contentWidth * 0.72),
+                                        ),
+                                      },
+                                      onLinkTap: (url, _, __) {
+                                        if (url == null) return;
+                                        final uri = Uri.parse(url);
+                                        launchUrl(
+                                          uri,
+                                          mode: LaunchMode.externalApplication,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                             SizedBox(height: 16.h),
+                            // ⬇⬇⬇ 문자열 URL 하이퍼링크 영역 추가
+                            if (widget.wrLink1 != null &&
+                                widget.wrLink1!.trim().isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 8.h),
+                                child: InkWell(
+                                  onTap: () =>
+                                      _openExternalLink(widget.wrLink1!),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.link,
+                                        size: 16.w,
+                                        color: AppColors.primary,
+                                      ),
+                                      SizedBox(width: 4.w),
+                                      Flexible(
+                                        child: Text(
+                                          widget.wrLink1!,
+                                          style: AppTextStyles.pr14.copyWith(
+                                            color: AppColors.primary,
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
 
+                            if (widget.wrLink2 != null &&
+                                widget.wrLink2!.trim().isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 8.h),
+                                child: InkWell(
+                                  onTap: () =>
+                                      _openExternalLink(widget.wrLink2!),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.link,
+                                        size: 16.w,
+                                        color: AppColors.primary,
+                                      ),
+                                      SizedBox(width: 4.w),
+                                      Flexible(
+                                        child: Text(
+                                          widget.wrLink2!,
+                                          style: AppTextStyles.pr14.copyWith(
+                                            color: AppColors.primary,
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            // ⬆⬆⬆ 여기까지가 문자열 하이퍼링크
                             for (final f in widget.files) ...[
                               AttachmentFileRow(
                                 filename: f.fileName,

@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:lhens_app/drawer/model/file_model.dart';
+import 'package:lhens_app/common/file/model/file_model.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 
 import 'post_comment_model.dart';
@@ -18,6 +18,7 @@ class PostDetailModel extends PostModel {
     required super.wrSubject,
     required super.wrName,
     required super.wrDatetime,
+    required super.wrComment,
     required super.caName,
     required super.wrOption,
     required super.wr1,
@@ -29,6 +30,8 @@ class PostDetailModel extends PostModel {
     required this.wrHit,
     required this.comments,
     required this.files,
+    required super.wrLink1,
+    required super.wrLink2,
   });
 
   factory PostDetailModel.fromJson(Map<String, dynamic> json) =>

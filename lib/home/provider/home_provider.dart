@@ -31,7 +31,7 @@ class HomeStateNotifier extends StateNotifier<HomeModelBase> {
 
   Future<void> initialize() async {
     final noticeResp = await noticeRepository.paginate(
-      paginationParams: PagePaginationParams(take: 2, page: 1),
+      paginationParams: PagePaginationParams(take: 4, page: 1),
     );
     final eduResp = await eduRepository.paginate(
       paginationParams: PagePaginationParams(take: 10, page: 1),

@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lhens_app/common/components/doc_list_item.dart';
-import 'package:lhens_app/common/components/empty_state.dart';
 import 'package:lhens_app/common/components/report/base_list_item.dart';
 import 'package:lhens_app/common/components/report/report_list_scaffold_v2.dart';
-import 'package:lhens_app/common/components/search/filter_search_bar.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
-import 'package:lhens_app/common/theme/app_shadows.dart';
 import 'package:lhens_app/drawer/model/board_info_model.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/drawer/provider/board_provider.dart';
-import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/manual/provider/manual_provider.dart';
 import 'package:lhens_app/manual/view/manual_detail_screen.dart';
+import 'package:lhens_app/user/model/user_model.dart';
+import 'package:lhens_app/user/provider/user_me_provier.dart';
+
+import 'manual_form_screen.dart';
 
 class ManualScreen extends ConsumerStatefulWidget {
   static String get routeName => '업무매뉴얼';
@@ -32,12 +30,6 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
   String title = '';
 
   final TextEditingController _query = TextEditingController();
-
-
-  final List<({String cat, String title})> _all = List.generate(
-    10,
-    (_) => (cat: '매뉴얼 카테고리', title: '업무매뉴얼 제목명'),
-  );
 
   @override
   void dispose() {
@@ -58,6 +50,9 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
     final item = board.items.firstWhere(
       (element) => element.boTable == 'comm10_1',
     );
+
+    final me = ref.read(userMeProvider);
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: ReportListScaffoldV2<PostModel>(
@@ -91,7 +86,11 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
               .read(manualProvider.notifier)
               .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
         },
-
+        addPost: me is UserModel && me.mbLevel >= 4
+            ? () {
+                context.pushNamed(ManualFormScreen.routeNameCreate);
+              }
+            : null,
         provider: manualProvider,
         changePage: (int page) {
           ref
@@ -103,7 +102,6 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
                 title: title,
               );
         },
-
         itemBuilder: (_, index, model) {
           return GestureDetector(
             onTap: () {
@@ -119,6 +117,5 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
         },
       ),
     );
-
   }
 }

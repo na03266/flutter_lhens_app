@@ -16,6 +16,7 @@ import 'package:lhens_app/drawer/provider/board_provider.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
 import 'package:lhens_app/mock/complaint/mock_complaint_models.dart';
 import 'package:lhens_app/mock/complaint/mock_complaint_data.dart';
+import 'package:lhens_app/user/provider/user_me_provier.dart';
 
 import '../../../common/components/report/base_list_item.dart';
 
@@ -30,8 +31,6 @@ class ComplaintScreen extends ConsumerStatefulWidget {
     this.showFab = true,
   });
 
-  static const String _currentUser = '조예빈(1001599)';
-
   @override
   ConsumerState<ComplaintScreen> createState() => _ComplaintScreenState();
 }
@@ -43,7 +42,6 @@ class _ComplaintScreenState extends ConsumerState<ComplaintScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     ref
         .read(complaintProvider.notifier)
@@ -59,9 +57,13 @@ class _ComplaintScreenState extends ConsumerState<ComplaintScreen> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
+
     final item = board.items.firstWhere(
       (element) => element.boTable == 'comm20',
     );
+
+    final me = ref.read(userMeProvider);
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: ReportListScaffoldV2<PostModel>(
@@ -75,11 +77,15 @@ class _ComplaintScreenState extends ConsumerState<ComplaintScreen> {
               .read(complaintProvider.notifier)
               .paginate(fetchPage: 1, caName: selectedTab, forceRefetch: true);
         },
-        selectFilterName: (String selectedFilter) {
-          setState(() {
-            wr1 = selectedFilter;
-          });
-        },
+          selectFilterName: (String selectedFilter) {
+            setState(() {
+              if (selectedFilter == '전체') {
+                wr1 = '';
+              } else {
+                wr1 = selectedFilter;
+              }
+            });
+          },
         onSearched: (String input) {
           setState(() {
             title = input;

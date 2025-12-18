@@ -18,22 +18,20 @@ class HomeNavCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double cardHeight = 110.h;
-    final double iconSize = 45.w;
+    final double cardHeight = 80.h;
+    final double iconSize = 35.sp;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         height: cardHeight,
-        padding: EdgeInsets.fromLTRB(16.w, 18.w, 8.w, 8.w),
+        padding: EdgeInsets.fromLTRB(16.w, 12.w, 8.w, 8.w),
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: AppShadows.card,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
             Text(
               title,

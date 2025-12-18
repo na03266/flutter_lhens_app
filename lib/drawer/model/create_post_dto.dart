@@ -1,8 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:lhens_app/common/file/model/temp_file_model.dart';
 
 part 'create_post_dto.g.dart';
 
-@JsonSerializable(includeIfNull: false)
+@JsonSerializable(includeIfNull: false,explicitToJson: true)
 class CreatePostDto {
   final String? wrSubject;
   final String wrContent;
@@ -12,6 +13,14 @@ class CreatePostDto {
   final String? wrLink2;
   final String? wr1;
   final String? wr2;
+  final String? wr3;
+  final String? wr4;
+  final String? wr5;
+  final String? wr6;
+  final String? wr7;
+  final List<TempFileModel>? files;
+  final List<int>? keepFiles;
+  final List<TempFileModel>? newFiles;
 
   CreatePostDto({
       this.wrSubject,
@@ -22,6 +31,14 @@ class CreatePostDto {
     this.wrLink2,
     this.wr1,
     this.wr2,
+    this.wr3,
+    this.wr4,
+    this.wr5,
+    this.wr6,
+    this.wr7,
+    this.files,
+    this.keepFiles,
+    this.newFiles,
   });
 
   CreatePostDto copyWith({
@@ -33,6 +50,14 @@ class CreatePostDto {
     String? wrLink2,
     String? wr1,
     String? wr2,
+    String? wr3,
+    String? wr4,
+    String? wr5,
+    String? wr6,
+    String? wr7,
+    List<TempFileModel>? files,
+    List<int>? keepFiles,
+    List<TempFileModel>? newFiles,
   }) {
     return CreatePostDto(
       wrSubject: wrSubject ?? this.wrSubject,
@@ -43,6 +68,12 @@ class CreatePostDto {
       wrLink2: wrLink2 ?? this.wrLink2,
       wr1: wr1 ?? this.wr1,
       wr2: wr2 ?? this.wr2,
+      wr5: wr5 ?? this.wr5,
+      wr6: wr6 ?? this.wr6,
+      wr7: wr7 ?? this.wr7,
+      files: files ?? this.files,
+      keepFiles: keepFiles ?? this.keepFiles,
+      newFiles: newFiles ?? this.newFiles,
     );
   }
 

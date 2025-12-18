@@ -3,14 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/common/components/attachments/attachment_item.dart';
 import 'package:lhens_app/common/components/attachments/attach_button.dart';
+import 'package:lhens_app/common/file/model/file_model.dart';
+import 'package:lhens_app/common/file/model/temp_file_model.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 
 class AttachmentSection extends StatelessWidget {
-  final List<String> files; // 파일명 리스트
-  final VoidCallback? onAdd; // 첨부 버튼 탭
-  final ValueChanged<String>? onRemove; // 파일 제거 콜백
-  final double? spacing; // 버튼-리스트 간 간격
+  /// 기존 파일 (서버에서 받은 파일)
+  final List<FileModel> oldFiles;
+
+  /// 새로 추가된 파일
+  final List<TempFileModel> newFiles;
+
+  /// 첨부 버튼 탭
+  final VoidCallback? onAdd;
+
+  /// 기존 파일 제거 콜백 (bfNo로 식별)
+  final ValueChanged<int>? onRemoveOld;
+
+  /// 새 파일 제거 콜백 (savedName으로 식별)
+  final ValueChanged<String>? onRemoveNew;
+
+  /// 버튼-리스트 간 간격
+  final double? spacing;
 
   /// 읽기 전용(복사/미리보기만, 추가/삭제 불가)
   final bool readOnly;
@@ -20,9 +35,11 @@ class AttachmentSection extends StatelessWidget {
 
   const AttachmentSection({
     super.key,
-    required this.files,
+    this.oldFiles = const [],
+    this.newFiles = const [],
     this.onAdd,
-    this.onRemove,
+    this.onRemoveOld,
+    this.onRemoveNew,
     this.spacing,
     this.readOnly = false,
     this.enabled = true,
@@ -32,6 +49,8 @@ class AttachmentSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final canMutate = enabled && !readOnly;
     final opacityFor = enabled ? (readOnly ? 0.6 : 1.0) : 0.6;
+
+    final hasFiles = oldFiles.isNotEmpty || newFiles.isNotEmpty;
 
     return Opacity(
       opacity: opacityFor,
@@ -57,7 +76,7 @@ class AttachmentSection extends StatelessWidget {
             SizedBox(height: (spacing ?? 8).h),
 
             // 파일 리스트 / empty
-            if (files.isEmpty)
+            if (!hasFiles)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -83,13 +102,21 @@ class AttachmentSection extends StatelessWidget {
             else
               Column(
                 children: [
-                  for (final name in files)
-                    // 항목별 삭제 버튼은 readOnly면 숨김, enabled=false면 어차피 터치 차단
+                  // 기존 파일 목록
+                  for (final file in oldFiles)
                     AttachmentItem(
-                      filename: name,
-                      onRemove: canMutate && onRemove != null
-                          ? () => onRemove!(name)
-                          : null, // ← null이면 삭제 아이콘 감춤(아래 주석 참고)
+                      filename: file.fileName,
+                      onRemove: canMutate && onRemoveOld != null
+                          ? () => onRemoveOld!(file.bfNo)
+                          : null,
+                    ),
+                  // 새 파일 목록
+                  for (final file in newFiles)
+                    AttachmentItem(
+                      filename: file.originalName,
+                      onRemove: canMutate && onRemoveNew != null
+                          ? () => onRemoveNew!(file.savedName)
+                          : null,
                     ),
                 ],
               ),

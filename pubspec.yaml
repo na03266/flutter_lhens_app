@@ -34,6 +34,10 @@ dependencies:
   path_provider: ^2.1.5
   open_filex: ^4.7.0
   flutter_native_splash: ^2.4.7
+  file_picker: ^10.3.7
+  firebase_core: ^4.2.1
+  firebase_messaging: ^16.0.4
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +58,7 @@ flutter:
     - assets/icons/features/
     - assets/illustrations/
     - assets/images/
+    - assets/chat/
     - assets/logos/
 
   fonts:
@@ -95,3 +100,12 @@ flutter_native_splash:
   ios: true
   android_12:
     background_image: assets/images/splash_v2.png
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logos/LH_E&S_Signature_C.png"
+  # 안드로이드 8+ 적응형 아이콘까지 깔끔하게 하려면 아래도 권장
+  adaptive_icon_foreground: "assets/logos/LH_E&S_Signature_C.png"
+  adaptive_icon_background: "#FFFFFF"

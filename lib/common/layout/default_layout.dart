@@ -11,7 +11,7 @@ import 'package:lhens_app/home/component/home_app_bar.dart';
 import '../../drawer/view/custom_drawer.dart';
 import '../../home/view/home_screen.dart';
 import '../../risk/view/risk_screen.dart';
-import '../../chat/view/chat_screen.dart';
+import '../../chat/view/chat_lobby_screen.dart';
 import '../../manual/view/manual_screen.dart';
 import '../../chat/component/chat_settings_drawer.dart';
 
@@ -48,7 +48,7 @@ class DefaultLayout extends ConsumerWidget {
                       : AppBarBottomBorder.thin,
                 ),
           endDrawer: _isChatDetail(path)
-              ? ChatSettingsDrawer(pageContext: context)
+              ? ChatSettingsDrawer(pageContext: context, roomId: path.split('/').last,)
               : const CustomDrawer(),
           endDrawerEnableOpenDragGesture: false,
           body: child,
@@ -116,7 +116,7 @@ class DefaultLayout extends ConsumerWidget {
     return AppBarRightType.menu;
   }
 
-  bool _isChatDetail(String path) => path == '/chat/detail';
+  bool _isChatDetail(String path) => path.contains('/chat/detail');
 
   // 하단 보더
   bool _shouldHideAppBarBottom(String path) {
@@ -140,7 +140,7 @@ class DefaultLayout extends ConsumerWidget {
         context.goNamed(RiskScreen.routeName);
         break;
       case 1:
-        context.goNamed(ChatScreen.routeName);
+        context.goNamed(ChatLobbyScreen.routeName);
         break;
       case 3:
         context.goNamed(ManualScreen.routeName);

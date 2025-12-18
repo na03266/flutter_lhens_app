@@ -6,6 +6,7 @@ import 'package:lhens_app/common/components/report/report_list_scaffold_v2.dart'
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/drawer/edu_event/provider/edu_provider.dart';
 import 'package:lhens_app/drawer/edu_event/view/edu_event_detail_screen.dart';
+import 'package:lhens_app/drawer/edu_event/view/edu_event_form_screen.dart';
 import 'package:lhens_app/drawer/model/board_info_model.dart';
 import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/drawer/provider/board_provider.dart';
@@ -76,7 +77,7 @@ class _EduEventScreenState extends ConsumerState<EduEventScreen> {
         },
         addPost: me is UserModel && me.mbLevel >= 4
             ? () {
-                // context.pushNamed(NoticeFormScreen.routeNameCreate);
+                context.pushNamed(EduEventFormScreen.routeNameCreate);
               }
             : null,
         provider: eduProvider,

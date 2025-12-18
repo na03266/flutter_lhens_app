@@ -10,12 +10,14 @@ class _PaginationInfo {
   final List<String> fetchOrder;
   final bool fetchMore;
   final bool forceRefetch;
+  final String? name;
 
   _PaginationInfo({
     this.fetchCount = 20,
     this.fetchMore = false,
     this.fetchOrder = const ['id_DESC'],
     this.forceRefetch = false,
+    this.name,
   });
 }
 
@@ -41,8 +43,9 @@ class PaginationProvider<T, U extends IBaseCursorPaginationRepository<T>>
     // 추가로 데이터 더 가져오기
     // true = 더 가져오기
     // false = 새로고침
+    String? name,
     bool fetchMore = false,
-    List<String> fetchOrder = const ['roomId_DESC'],
+    List<String> fetchOrder = const ['updatedAt_DESC'],
     // 강제로 다시 로딩하기
     // true - CursorPaginationLoading()
     bool forceRefetch = false,
@@ -53,6 +56,7 @@ class PaginationProvider<T, U extends IBaseCursorPaginationRepository<T>>
         fetchMore: fetchMore,
         fetchOrder: fetchOrder,
         forceRefetch: forceRefetch,
+        name: name,
       ),
     );
   }
@@ -92,6 +96,7 @@ class PaginationProvider<T, U extends IBaseCursorPaginationRepository<T>>
 
       // PaginationParams 생성
       CursorPaginationParams paginationParams = CursorPaginationParams(
+        name: info.name,
         take: fetchCount,
         order: fetchOrder,
       );

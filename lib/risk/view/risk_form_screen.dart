@@ -53,18 +53,19 @@ class _RiskFormScreenState extends ConsumerState<RiskFormScreen> {
       if (state == null || state is! PostDetailModel) {
         return Center(child: CircularProgressIndicator());
       }
-
       return ReportFormScaffoldV2(
         ca1Names: item.boCategoryList.isNotEmpty
             ? item.boCategoryList.split('|')
             : [],
-        ca3Names: item.bo1.isNotEmpty ? item.bo2.split('|') : [],
+        ca3Names: item.bo2.split('|'),
         submitText: '수정',
         post: state,
         onSubmit: (dto) async {
-          await ref
-              .read(riskProvider.notifier)
-              .patchPost(wrId: state.wrId, dto: dto);
+          final fixed = dto.copyWith(
+            wr2: '접수',
+            wrOption: dto.caName == '요청(비공개)' ? 'html1,secret' : dto.wrOption,
+          );
+          ref.read(riskProvider.notifier).patchPost(wrId: state.wrId, dto: fixed);
           context.goNamed(
             RiskDetailScreen.routeName,
             pathParameters: {'rid': state.wrId.toString()},

@@ -58,8 +58,11 @@ class _ReportListScaffoldState<T>
   @override
   void initState() {
     super.initState();
-    if (widget.filters.length > 0) {
+    if (widget.filters.isNotEmpty) {
       _selectedFilter = widget.filters[0];
+    }
+    if(widget.mineOnly){
+      ref.read(widget.provider.notifier).paginate(mineOnly: 1);
     }
   }
 

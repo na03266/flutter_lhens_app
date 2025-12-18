@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
+import 'package:lhens_app/common/utils/data_utils.dart';
 
 class AlarmListItem extends StatelessWidget {
   final String category;
@@ -56,7 +57,7 @@ class AlarmListItem extends StatelessWidget {
             SizedBox(height: 8.h),
             // 날짜
             Text(
-              date,
+              DataUtils.datetimeParse(date),
               style: AppTextStyles.pr14.copyWith(
                 color: muted ? AppColors.placeholder : AppColors.textTer,
               ),

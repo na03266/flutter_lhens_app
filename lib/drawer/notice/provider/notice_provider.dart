@@ -11,7 +11,6 @@ final noticeDetailProvider = Provider.family<PostModel?, String>((ref, id) {
   if (state is! PagePagination) {
     return null;
   }
-
   return state.data.firstWhere((element) => element.wrId == int.parse(id));
 });
 
@@ -82,6 +81,11 @@ class NoticeStateNotifier
   }
 
   deletePost({required String wrId}) async {
+    await repository.delete(wrId: wrId);
+    await paginate(forceRefetch: true);
+  }
+
+  deleteReply({required String wrId}) async {
     await repository.delete(wrId: wrId);
   }
 }

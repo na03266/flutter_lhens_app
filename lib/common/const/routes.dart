@@ -8,6 +8,7 @@ import 'package:lhens_app/drawer/salary/view/salary_screen.dart';
 import 'package:lhens_app/drawer/salary/view/salary_auth_screen.dart';
 import 'package:lhens_app/drawer/notice/view/notice_detail_screen.dart';
 import 'package:lhens_app/manual/view/manual_detail_screen.dart';
+import 'package:lhens_app/manual/view/manual_form_screen.dart';
 import 'package:lhens_app/manual/view/manual_screen.dart';
 import 'package:lhens_app/risk/view/risk_form_screen.dart';
 import 'package:lhens_app/risk/view/risk_detail_screen.dart';
@@ -20,8 +21,8 @@ import 'package:lhens_app/drawer/edu_event/view/edu_event_screen.dart';
 import 'package:lhens_app/drawer/edu_event/view/edu_event_detail_screen.dart';
 import 'package:lhens_app/alarm/view/alarm_screen.dart';
 import 'package:lhens_app/drawer/notice/view/notice_screen.dart';
-import 'package:lhens_app/chat/view/chat_screen.dart';
-import 'package:lhens_app/chat/view/chat_detail_screen.dart';
+import 'package:lhens_app/chat/view/chat_lobby_screen.dart';
+import 'package:lhens_app/chat/view/chat_room_screen.dart';
 import 'package:lhens_app/home/my_page/change_info/view/change_info_screen.dart';
 import 'package:lhens_app/home/my_page/view/my_page_screen.dart';
 import 'package:lhens_app/risk/view/risk_screen.dart';
@@ -29,6 +30,8 @@ import 'package:lhens_app/user/view/login_screen.dart';
 import 'package:lhens_app/common/layout/default_layout.dart';
 import 'package:lhens_app/home/view/home_screen.dart';
 import 'package:lhens_app/common/view/splash_screen.dart';
+
+import '../../drawer/edu_event/view/edu_event_form_screen.dart';
 
 List<RouteBase> get routes => [
   // 네비게이션 없는 화면
@@ -137,6 +140,19 @@ List<RouteBase> get routes => [
                 const NoTransitionPage(child: EduEventScreen()),
             routes: [
               GoRoute(
+                path: 'update/:rid',
+                name: EduEventFormScreen.routeNameUpdate,
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: EduEventFormScreen(wrId: state.pathParameters['rid']!),
+                ),
+              ),
+              GoRoute(
+                path: 'create',
+                name: EduEventFormScreen.routeNameCreate,
+                pageBuilder: (context, state) =>
+                    NoTransitionPage(child: EduEventFormScreen()),
+              ),
+              GoRoute(
                 path: ':rid',
                 name: EduEventDetailScreen.routeName,
                 pageBuilder: (context, state) => NoTransitionPage(
@@ -227,9 +243,9 @@ List<RouteBase> get routes => [
       ),
       GoRoute(
         path: '/chat',
-        name: ChatScreen.routeName,
+        name: ChatLobbyScreen.routeName,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: ChatScreen()),
+            const NoTransitionPage(child: ChatLobbyScreen()),
         routes: [
           GoRoute(
             path: 'info',
@@ -249,10 +265,11 @@ List<RouteBase> get routes => [
                 const NoTransitionPage(child: UserPickerScreen()),
           ),
           GoRoute(
-            path: 'detail',
-            name: ChatDetailScreen.routeName,
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: ChatDetailScreen()),
+            path: 'detail/:rid',
+            name: ChatRoomScreen.routeName,
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: ChatRoomScreen(id: state.pathParameters['rid']!),
+            ),
           ),
         ],
       ),
@@ -328,10 +345,9 @@ List<RouteBase> get routes => [
           GoRoute(
             path: ':rid',
             name: SurveyDetailScreen.routeName,
-            pageBuilder: (context, state) =>
-                 NoTransitionPage(child: SurveyDetailScreen(
-                   poId: state.pathParameters['rid']!,
-                 )),
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: SurveyDetailScreen(poId: state.pathParameters['rid']!),
+            ),
           ),
         ],
       ),
@@ -341,6 +357,19 @@ List<RouteBase> get routes => [
         pageBuilder: (context, state) =>
             const NoTransitionPage(child: ManualScreen()),
         routes: [
+          GoRoute(
+            path: 'update/:rid',
+            name: ManualFormScreen.routeNameUpdate,
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: ManualFormScreen(wrId: state.pathParameters['rid']!),
+            ),
+          ),
+          GoRoute(
+            path: 'create',
+            name: ManualFormScreen.routeNameCreate,
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: ManualFormScreen()),
+          ),
           GoRoute(
             path: ':rid',
             name: ManualDetailScreen.routeName,
