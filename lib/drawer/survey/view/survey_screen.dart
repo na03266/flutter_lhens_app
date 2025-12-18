@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-import 'package:lhens_app/common/components/report/report_list_scaffold.dart';
-import 'package:lhens_app/common/components/report/report_list_config.dart';
 import 'package:lhens_app/common/components/report/report_list_scaffold_v2.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/drawer/survey/component/survey_list_item.dart';
@@ -11,9 +8,6 @@ import 'package:lhens_app/drawer/survey/model/survey_model.dart';
 import 'package:lhens_app/drawer/survey/provider/survey_provider.dart';
 import 'package:lhens_app/drawer/survey/utils/survey_utils.dart';
 import 'package:lhens_app/drawer/survey/view/survey_detail_screen.dart';
-import 'package:lhens_app/gen/assets.gen.dart';
-import 'package:lhens_app/mock/survey/mock_survey_models.dart';
-import 'package:lhens_app/mock/survey/mock_survey_data.dart';
 
 class SurveyScreen extends ConsumerStatefulWidget {
   static String get routeName => '설문조사';
@@ -35,15 +29,16 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: ReportListScaffoldV2<SurveyModel>(
+        mineOnly: widget.mineOnly,
         tabs: ['진행', '마감'],
         filters: ['전체'],
         selectTabName: (String selectedTab) {
           setState(() {
             caName = selectedTab.replaceAll(" ", "");
           });
-          // ref
-          //     .read(noticeProvider.notifier)
-          //     .paginate(fetchPage: 1, caName: selectedTab, forceRefetch: true);
+          ref
+              .read(surveyProvider.notifier)
+              .paginate(fetchPage: 1, caName: selectedTab, forceRefetch: true);
         },
         selectFilterName: (String selectedFilter) {
           setState(() {
@@ -84,7 +79,9 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
             child: SurveyListItem(
               isProcessing: getSurveyStatus(model),
               title: model.poSubject,
-              dateRangeText: '${model.poDate} ~ ${model.poDateEnd}',
+              dateRangeText: model.poDateEnd.startsWith('1899')
+                  ? '기한 없음'
+                  : '${model.poDate} ~ ${model.poDateEnd}',
               author: model.poCount.toString(),
               participated: model.isSurvey,
             ),

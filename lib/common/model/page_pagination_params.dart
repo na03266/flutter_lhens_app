@@ -9,6 +9,7 @@ class PagePaginationParams {
   final String? caName;
   final String? wr1;
   final String? title;
+  final int mineOnly; // ✅ 추가
 
   const PagePaginationParams({
     this.take,
@@ -16,6 +17,7 @@ class PagePaginationParams {
     this.caName,
     this.wr1,
     this.title,
+    this.mineOnly = 0, // ✅ 추가
   });
 
   PagePaginationParams copyWith({
@@ -24,6 +26,7 @@ class PagePaginationParams {
     String? caName,
     String? wr1,
     String? title,
+    int? mineOnly,
   }) {
     return PagePaginationParams(
       page: page ?? this.page,
@@ -31,6 +34,7 @@ class PagePaginationParams {
       caName: caName ?? this.caName,
       wr1: wr1 ?? this.wr1,
       title: title ?? this.title,
+      mineOnly: mineOnly ?? this.mineOnly,
     );
   }
 

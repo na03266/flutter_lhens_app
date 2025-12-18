@@ -11,6 +11,7 @@ class _PagePaginationInfo {
   final String caName;
   final String wr1;
   final String title;
+  final int mineOnly; // ✅ 추가
   final bool fetchMore;
   final bool forceRefetch;
 
@@ -20,6 +21,7 @@ class _PagePaginationInfo {
     this.caName = '',
     this.wr1 = '',
     this.title = '',
+    this.mineOnly = 0, // ✅ 추가
     this.fetchMore = false,
     this.forceRefetch = false,
   });
@@ -48,6 +50,7 @@ class PagePaginationProvider<T, U extends IBasePagePaginationRepository<T>>
     String caName = '',
     String wr1 = '',
     String title = '',
+    int mineOnly = 0,
     bool fetchMore = false,
     bool forceRefetch = false,
   }) async {
@@ -58,6 +61,7 @@ class PagePaginationProvider<T, U extends IBasePagePaginationRepository<T>>
         fetchMore: fetchMore,
         forceRefetch: forceRefetch,
         caName: caName,
+        mineOnly: mineOnly,
         wr1: wr1,
         title: title,
       ),
@@ -107,6 +111,7 @@ class PagePaginationProvider<T, U extends IBasePagePaginationRepository<T>>
         caName: info.caName,
         wr1: info.wr1,
         title: info.title,
+        mineOnly: info.mineOnly,
       );
 
       state = PagePaginationLoading();

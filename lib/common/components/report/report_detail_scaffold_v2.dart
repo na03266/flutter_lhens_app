@@ -147,10 +147,10 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
     final sel = await showActionSheet(
       context,
       actions: [
+        if (widget.onPass != null) ActionItem('pass', '상위부서 이관'),
         if (widget.onUpdate != null) ActionItem('edit', '수정'),
         if (widget.onDelete != null)
           ActionItem('delete', '삭제', destructive: true),
-        if (widget.onPass != null) ActionItem('pass', '상위부서 이관'),
       ],
     );
     if (!mounted || sel == null) return;

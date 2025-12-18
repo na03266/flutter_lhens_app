@@ -76,9 +76,7 @@ class _ComplaintDetailScreenState extends ConsumerState<ComplaintDetailScreen> {
               _showMsg('정상적으로 삭제되었습니다.');
             }
           : null,
-      onPass:
-          me is UserModel &&
-              (me.mbLevel == 10 || state.wrName.contains(me.mbId))
+      onPass: me is UserModel && me.mbLevel >= 4
           ? () {
               try {
                 ref

@@ -26,6 +26,29 @@ class SurveyStateNotifier
     extends PagePaginationProvider<SurveyModel, SurveyRepository> {
   SurveyStateNotifier({required super.repository});
 
+  @override
+  Future<void> paginate({
+    int fetchTake = 10,
+    int fetchPage = 1,
+    String caName = '',
+    String wr1 = '',
+    String title = '',
+    int mineOnly = 0,
+    bool fetchMore = false,
+    bool forceRefetch = false,
+  }) {
+    return super.paginate(
+      fetchTake: fetchTake,
+      fetchPage: fetchPage,
+      caName: caName,
+      wr1: wr1,
+      title: title,
+      mineOnly: mineOnly, // ✅ 전달
+      fetchMore: fetchMore,
+      forceRefetch: forceRefetch,
+    );
+  }
+
   getDetail({required String poId}) async {
     if (state is! PagePagination) {
       await paginate();
