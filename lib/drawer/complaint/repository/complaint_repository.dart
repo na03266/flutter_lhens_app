@@ -62,6 +62,10 @@ abstract class ComplaintRepository
     @Body() required CreatePostDto dto,
   });
 
+  @PATCH('pass')
+  @Headers({'accessToken': 'true'})
+  Future<String?> passOnPost({@Query('wrId') required String wrId});
+
   @DELETE('')
   @Headers({'accessToken': 'true'})
   Future<String?> delete({@Query('wrId') required String wrId});

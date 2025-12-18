@@ -25,6 +25,7 @@ import '../label_value_line.dart';
 class ReportDetailScaffoldV2 extends StatefulWidget {
   final Function()? onUpdate;
   final Function()? onDelete;
+  final Function()? onPass;
   final Function(int, CreatePostDto)? postComment;
   final Function(int, int, CreatePostDto)? postReply;
   final int wrId;
@@ -52,6 +53,7 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     super.key,
     this.onUpdate,
     this.onDelete,
+    this.onPass,
     this.postComment,
     this.postReply,
     required this.wrId,
@@ -83,6 +85,7 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     required PostDetailModel model,
     Function()? onUpdate,
     Function()? onDelete,
+    Function()? onPass,
     Function(int, CreatePostDto)? postComment,
     Function(int, CreatePostDto)? updateComment,
     Function(int, int, CreatePostDto)? postReply,
@@ -94,6 +97,7 @@ class ReportDetailScaffoldV2 extends StatefulWidget {
     return ReportDetailScaffoldV2(
       onUpdate: onUpdate,
       onDelete: onDelete,
+      onPass: onPass,
       postComment: postComment,
       postReply: postReply,
       wrId: model.wrId,
@@ -146,11 +150,16 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
         if (widget.onUpdate != null) ActionItem('edit', '수정'),
         if (widget.onDelete != null)
           ActionItem('delete', '삭제', destructive: true),
+        if (widget.onPass != null) ActionItem('pass', '상위부서 이관'),
       ],
     );
     if (!mounted || sel == null) return;
 
     if (sel == 'edit') {
+      widget.onUpdate!();
+      return;
+    }
+    if (sel == 'pass') {
       widget.onUpdate!();
       return;
     }

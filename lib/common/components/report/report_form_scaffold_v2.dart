@@ -49,6 +49,7 @@ class ReportFormScaffoldV2 extends ConsumerStatefulWidget {
 class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
   final _title = TextEditingController();
   final _wr4 = TextEditingController();
+  final _wr3 = TextEditingController();
   final HtmlEditorController _htmlController = HtmlEditorController(); // ★ 추가
 
   bool _secret = false;
@@ -181,7 +182,7 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
           wr1: _ca2Name,
           wr2: _ca3Name,
           // todo 조직도
-          wr3: "전체",
+          wr3: _wr3.text.trim(),
           wr4: widget.isEduEvent ? _wr4.text.trim() : null,
           wr5: _thumbnailUrl,
           files: widget.submitText == '등록' && _newFiles.isNotEmpty
@@ -275,6 +276,15 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
               ),
               SizedBox(height: 12.h),
               // 기간
+              if (widget.isEduEvent) ...[
+                AppTextField(
+                  hint: '수신부서',
+                  controller: _wr3,
+                  textInputAction: TextInputAction.next,
+                  dimOnLocked: false,
+                ),
+                SizedBox(height: 12.h),
+              ],
               if (widget.isEduEvent) ...[
                 AppTextField(
                   hint: '0000.00.00 ~ 0000.00.00',

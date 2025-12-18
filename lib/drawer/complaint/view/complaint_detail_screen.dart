@@ -76,6 +76,30 @@ class _ComplaintDetailScreenState extends ConsumerState<ComplaintDetailScreen> {
               _showMsg('정상적으로 삭제되었습니다.');
             }
           : null,
+      onPass:
+          me is UserModel &&
+              (me.mbLevel == 10 || state.wrName.contains(me.mbId))
+          ? () {
+              try {
+                ref
+                    .read(complaintProvider.notifier)
+                    .passOnPost(wrId: widget.wrId);
+              } on DioException catch (e) {
+                final data = e.response?.data;
+                String? serverMsg;
+                if (data is Map<String, dynamic>) {
+                  final m = data['message'];
+                  if (m is String) {
+                    serverMsg = m;
+                  } else if (m is List && m.isNotEmpty) {
+                    serverMsg = m.first.toString();
+                  }
+                  _showMsg(serverMsg ?? '이관중 오류가 발생했습니다.');
+                }
+              }
+              _showMsg('정상적으로 이관 처리되었습니다.');
+            }
+          : null,
       postComment: (wrId, dto) {
         ref.read(complaintProvider.notifier).postComment(wrId: wrId, dto: dto);
       },
@@ -116,20 +140,24 @@ class _ComplaintDetailScreenState extends ConsumerState<ComplaintDetailScreen> {
               _showMsg(serverMsg ?? '삭제 중 오류가 발생했습니다.');
             }
           }
-          await ref.read(complaintProvider.notifier).getDetail(wrId: widget.wrId);
+          await ref
+              .read(complaintProvider.notifier)
+              .getDetail(wrId: widget.wrId);
         }
       },
       onCommentUpdate: (id, item) async {
-        await ref.read(complaintProvider.notifier).patchPost(wrId: id, dto: item);
+        await ref
+            .read(complaintProvider.notifier)
+            .patchPost(wrId: id, dto: item);
       },
       onProgressUpdate: (wrId, wr2) {
         if (me is UserModel && me.mbLevel >= 4) {
           ref
               .read(complaintProvider.notifier)
               .patchPost(
-            wrId: wrId,
-            dto: CreatePostDto(wrContent: state.wrContent, wr2: wr2),
-          );
+                wrId: wrId,
+                dto: CreatePostDto(wrContent: state.wrContent, wr2: wr2),
+              );
         }
         return;
       },

@@ -84,4 +84,7 @@ class ComplaintStateNotifier
   deleteReply({required String wrId}) async {
     await repository.delete(wrId: wrId);
   }
+  passOnPost({required String wrId}) async {
+    await repository.passOnPost(wrId: wrId);
+  }
 }
