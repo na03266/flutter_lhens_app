@@ -49,7 +49,7 @@ class _EduEventDetailScreenState extends ConsumerState<EduEventDetailScreen> {
             }
           : null,
       onDelete:
-          me is UserModel && (me.mbLevel > 10 || state.wrName.contains(me.mbId))
+          me is UserModel && (me.mbLevel == 10 || state.wrName.contains(me.mbId))
           ? () {
               try {
                 ref.read(eduProvider.notifier).deletePost(wrId: widget.wrId);
