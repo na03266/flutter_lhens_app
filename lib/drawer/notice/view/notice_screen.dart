@@ -28,6 +28,19 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
   String wr1 = '';
   String title = '';
 
+  List<String> _filteredTabs(String rawTabs, ) {
+    final tabs = rawTabs.split('|').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+
+    if (caName == '외부공지사항') {
+      return tabs.where((t) => ['공고문', '언론보도'].contains(t)).toList();
+    }
+    if (caName == '내부공지사항') {
+      return tabs.where((t) => !['공고문', '언론보도'].contains(t)).toList();
+    }
+
+    return tabs;
+  }
+
   @override
   Widget build(BuildContext context) {
     final board = ref.watch(boardProvider);
@@ -47,7 +60,7 @@ class _NoticeScreenState extends ConsumerState<NoticeScreen> {
       backgroundColor: AppColors.white,
       body: ReportListScaffoldV2<PostModel>(
         tabs: item.boCategoryList.split('|'),
-        filters: ['전체', ...item.bo1.split('|')],
+        filters: ['전체', ..._filteredTabs(item.bo1)],
         selectTabName: (String selectedTab) {
           setState(() {
             caName = selectedTab.replaceAll(" ", "");

@@ -164,25 +164,29 @@ class BaseListItem extends StatelessWidget {
                       ],
                     ),
                     SizedBox(width: 10.w),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isEdu ? author : dateText,
-                          style: AppTextStyles.pr13.copyWith(
-                            color: AppColors.textTer,
-                          ),
-                        ),
-                        if (isEdu) ...[
-                          SizedBox(height: 5.h),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
-                            dateText,
+                            isEdu ? author : dateText,
+                            softWrap: true,
+                            maxLines: 1,
                             style: AppTextStyles.pr13.copyWith(
                               color: AppColors.textTer,
                             ),
                           ),
+                          if (isEdu) ...[
+                            SizedBox(height: 5.h),
+                            Text(
+                              dateText,
+                              style: AppTextStyles.pr13.copyWith(
+                                color: AppColors.textTer,
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                     if (commentCount != null) ...[
                       SizedBox(width: 8.w),

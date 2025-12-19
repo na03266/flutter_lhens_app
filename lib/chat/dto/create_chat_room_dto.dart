@@ -6,9 +6,9 @@ part 'create_chat_room_dto.g.dart';
 class CreateChatRoomDto {
   final List<int>? memberNos;
   final List<int>? teamNos;
-  final String name;
+  final String? name;
 
-  CreateChatRoomDto({required this.name, this.teamNos, this.memberNos});
+  CreateChatRoomDto({this.name, this.teamNos, this.memberNos});
 
   CreateChatRoomDto copyWith({
     List<int>? memberNos,

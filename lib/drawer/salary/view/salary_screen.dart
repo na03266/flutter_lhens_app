@@ -1,3 +1,6 @@
+import 'dart:collection';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -42,6 +45,13 @@ class _SalaryScreenState extends ConsumerState<SalaryScreen> {
     }
 
     final isSalaries = state is SalaryModel;
+    final yearItems =
+        SplayTreeSet<int>((a, b) => b.compareTo(a)) // 최신연도 우선
+          ..add(year) // 현재 선택 연도(또는 현재연도) 보장
+          ..addAll(isSalaries ? state.years : const []);
+
+    final items = yearItems.toList();
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: Padding(
@@ -56,7 +66,7 @@ class _SalaryScreenState extends ConsumerState<SalaryScreen> {
                 boxShadow: _scrolled ? AppShadows.stickyBar : null,
               ),
               child: Selector<int>(
-                items: isSalaries ? [year, ...state.years] : [year],
+                items: isSalaries ? items : [year],
                 selected: year,
                 getLabel: (y) => '$y년',
                 onSelected: (v) {

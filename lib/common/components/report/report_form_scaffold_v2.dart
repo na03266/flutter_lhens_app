@@ -203,7 +203,20 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
       ).showSnackBar(const SnackBar(content: Text('필수 항목을 입력해주세요')));
     }
   }
+  List<String> _filteredCa2Items() {
+    final items = widget.ca2Names;
 
+    if (_ca1Name == '외부공지사항') {
+      return items.where((e) => ['공고문', '언론보도'].contains(e)).toList();
+    }
+
+    if (_ca1Name == '내부공지사항') {
+      return items.where((e) => !['공고문', '언론보도'].contains(e)).toList();
+    }
+
+    // 외부/내부가 아닌 경우(또는 미선택)는 전체
+    return items;
+  }
   @override
   Widget build(BuildContext context) {
     final displayOldFiles = _oldFiles
@@ -239,13 +252,7 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
                   widget.ca2Names.isNotEmpty && _ca1Name != null) ...[
                 Selector<String>(
                   hint: '유형2 선택',
-                  items: _ca1Name != '외부공지사항'
-                      ? widget.ca2Names
-                            .where((e) => !['공고문', '언론보도'].contains(e))
-                            .toList()
-                      : widget.ca2Names
-                            .where((e) => ['공고문', '언론보도'].contains(e))
-                            .toList(),
+                  items: _filteredCa2Items(),
                   selected: _ca2Name,
                   getLabel: (v) => v,
                   onSelected: (v) => setState(() {

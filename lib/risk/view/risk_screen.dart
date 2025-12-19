@@ -46,6 +46,7 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: ReportListScaffoldV2<PostModel>(
+        mineOnly: widget.mineOnly,
         tabs: item.boCategoryList.split('|'),
         filters: ['전체'],
         selectTabName: (String selectedTab) {

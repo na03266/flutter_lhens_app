@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart' hide Headers;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lhens_app/chat/dto/create_chat_room_dto.dart';
 import 'package:lhens_app/common/const/data.dart';
 import 'package:lhens_app/common/dio/dio.dart';
 import 'package:lhens_app/common/model/page_pagination_model.dart';
@@ -62,9 +63,12 @@ abstract class ComplaintRepository
     @Body() required CreatePostDto dto,
   });
 
-  @PATCH('pass')
+  @PATCH('/pass')
   @Headers({'accessToken': 'true'})
-  Future<String?> passOnPost({@Query('wrId') required String wrId});
+  Future<String?> passOnPost({
+    @Query('wrId') required String wrId,
+    @Body() required CreateChatRoomDto dto,
+  });
 
   @DELETE('')
   @Headers({'accessToken': 'true'})

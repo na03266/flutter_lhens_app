@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lhens_app/chat/dto/create_chat_room_dto.dart';
 import 'package:lhens_app/common/model/page_pagination_model.dart';
 import 'package:lhens_app/common/provider/page_pagination_providar.dart';
 import 'package:lhens_app/drawer/model/create_post_dto.dart';
@@ -84,7 +85,8 @@ class ComplaintStateNotifier
   deleteReply({required String wrId}) async {
     await repository.delete(wrId: wrId);
   }
-  passOnPost({required String wrId}) async {
-    await repository.passOnPost(wrId: wrId);
+  passOnPost({required String wrId,
+  required CreateChatRoomDto dto}) async {
+    await repository.passOnPost(wrId: wrId, dto:dto);
   }
 }

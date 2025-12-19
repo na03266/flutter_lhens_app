@@ -65,19 +65,19 @@ class LabelValueLine extends StatelessWidget {
     return Padding(
       padding: vpad,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             width: lw,
-            child: Text(label1, style: ls, maxLines: 1),
+            child: Text(label1, style: ls, maxLines: null),
           ),
           SizedBox(width: gap),
           Expanded(
             child: Text(
               value1,
+              softWrap: true,
+              maxLines: null,
               style: vs,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

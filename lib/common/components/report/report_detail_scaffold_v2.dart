@@ -160,7 +160,7 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
       return;
     }
     if (sel == 'pass') {
-      widget.onUpdate!();
+      widget.onPass!();
       return;
     }
 
@@ -293,21 +293,74 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                         title: widget.wrSubject,
                         onMoreTap: _onMore,
                       ),
-
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: TextSizer(
-                            value: _scale,
-                            onChanged: (v) => setState(() => _scale = v),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 12.h),
+                      SizedBox(height: 16.h),
 
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (widget.wr3 != null && widget.wr3!.isNotEmpty)
+                              LabelValueLine.single(
+                                label1: '수신부서',
+                                value1: widget.wr3!,
+                                verticalPadding: EdgeInsets.symmetric(
+                                  vertical: 2.h,
+                                ),
+                                labelWidth: 80.w,
+                                labelStyle: AppTextStyles.psb16,
+                                valueStyle: AppTextStyles.pr16,
+                              ),
+
+                            if (widget.wr4 != null && widget.wr4!.isNotEmpty)
+                              LabelValueLine.single(
+                                label1: '기간',
+                                value1: widget.wr4!,
+                                labelWidth: 80.w,
+                                labelStyle: AppTextStyles.psb16,
+                                valueStyle: AppTextStyles.pr16,
+                                verticalPadding: EdgeInsets.symmetric(
+                                  vertical: 2.h,
+                                ),
+                              ),
+                            LabelValueLine.single(
+                              label1: '작성자',
+                              value1: widget.wrName,
+                              labelWidth: 80.w,
+                              labelStyle: AppTextStyles.psb16,
+                              valueStyle: AppTextStyles.pr16,
+                              verticalPadding: EdgeInsets.symmetric(
+                                vertical: 2.h,
+                              ),
+                            ),
+                            LabelValueLine.single(
+                              label1: '등록일',
+                              value1: DataUtils.datetimeParse(
+                                widget.wrDatetime,
+                              ),
+                              labelWidth: 80.w,
+                              labelStyle: AppTextStyles.psb16,
+                              valueStyle: AppTextStyles.pr16,
+                              verticalPadding: EdgeInsets.symmetric(
+                                vertical: 2.h,
+                              ),
+                            ),
+                            LabelValueLine.single(
+                              label1: '조회수',
+                              value1: widget.wrHit,
+                              labelWidth: 80.w,
+                              labelStyle: AppTextStyles.psb16,
+                              valueStyle: AppTextStyles.pr16,
+                              verticalPadding: EdgeInsets.symmetric(
+                                vertical: 2.h,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 0),
                         child: Container(
                           decoration: const BoxDecoration(
                             border: Border(
@@ -317,73 +370,16 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                               ),
                             ),
                           ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 4.w,
-                            vertical: 20.h,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (widget.wr3 != null && widget.wr3!.isNotEmpty)
-                                LabelValueLine.single(
-                                  label1: '수신부서',
-                                  value1: widget.wr3!,
-                                  verticalPadding: EdgeInsets.symmetric(
-                                    vertical: 2.h,
-                                  ),
-                                  labelWidth: 80.w,
-                                  labelStyle: AppTextStyles.psb16,
-                                  valueStyle: AppTextStyles.pr16,
-                                ),
-
-                              if (widget.wr4 != null && widget.wr4!.isNotEmpty)
-                                LabelValueLine.single(
-                                  label1: '기간',
-                                  value1: widget.wr4!,
-                                  labelWidth: 80.w,
-                                  labelStyle: AppTextStyles.psb16,
-                                  valueStyle: AppTextStyles.pr16,
-                                  verticalPadding: EdgeInsets.symmetric(
-                                    vertical: 2.h,
-                                  ),
-                                ),
-                              LabelValueLine.single(
-                                label1: '작성자',
-                                value1: widget.wrName,
-                                labelWidth: 80.w,
-                                labelStyle: AppTextStyles.psb16,
-                                valueStyle: AppTextStyles.pr16,
-                                verticalPadding: EdgeInsets.symmetric(
-                                  vertical: 2.h,
-                                ),
-                              ),
-                              LabelValueLine.single(
-                                label1: '등록일',
-                                value1: DataUtils.datetimeParse(
-                                  widget.wrDatetime,
-                                ),
-                                labelWidth: 80.w,
-                                labelStyle: AppTextStyles.psb16,
-                                valueStyle: AppTextStyles.pr16,
-                                verticalPadding: EdgeInsets.symmetric(
-                                  vertical: 2.h,
-                                ),
-                              ),
-                              LabelValueLine.single(
-                                label1: '조회수',
-                                value1: widget.wrHit,
-                                labelWidth: 80.w,
-                                labelStyle: AppTextStyles.psb16,
-                                valueStyle: AppTextStyles.pr16,
-                                verticalPadding: EdgeInsets.symmetric(
-                                  vertical: 2.h,
-                                ),
-                              ),
-                            ],
+                          padding: EdgeInsets.fromLTRB(4.w, 0, 4.w, 8.h),
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: TextSizer(
+                              value: _scale,
+                              onChanged: (v) => setState(() => _scale = v),
+                            ),
                           ),
                         ),
                       ),
-
                       SizedBox(height: 16.h),
 
                       Padding(

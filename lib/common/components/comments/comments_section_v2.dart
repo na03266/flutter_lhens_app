@@ -18,7 +18,7 @@ class CommentsSectionV2 extends StatelessWidget {
   const CommentsSectionV2({
     super.key,
     required this.comments,
-    required this.onTapReply,
+    this.onTapReply,
     this.canDeleteOf,
     this.onDelete,
     this.onUpdate,

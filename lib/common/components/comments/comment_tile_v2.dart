@@ -33,13 +33,13 @@ class CommentTileV2 extends StatelessWidget {
     Widget? deleteBtn;
     if (canDeleteMe) {
       deleteBtn = GestureDetector(
-        onTap:  () => onDelete?.call(comment),
+        onTap: () => onDelete?.call(comment),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-          child:  Text(
-                  '삭제',
-                  style: AppTextStyles.pr14.copyWith(color: AppColors.textTer),
-                ),
+          child: Text(
+            '삭제',
+            style: AppTextStyles.pr14.copyWith(color: AppColors.textTer),
+          ),
         ),
       );
     }
@@ -47,13 +47,13 @@ class CommentTileV2 extends StatelessWidget {
     Widget? updateBtn;
     if (canDeleteMe) {
       updateBtn = GestureDetector(
-        onTap:  () => onUpdate?.call(comment),
+        onTap: () => onUpdate?.call(comment),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-          child:  Text(
-                  '수정',
-                  style: AppTextStyles.pr14.copyWith(color: AppColors.textTer),
-                ),
+          child: Text(
+            '수정',
+            style: AppTextStyles.pr14.copyWith(color: AppColors.textTer),
+          ),
         ),
       );
     }
@@ -114,24 +114,25 @@ class CommentTileV2 extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 8.w),
-                          GestureDetector(
-                            onTap: () => onTapReply?.call(
-                              comment.wrId,
-                              comment.wrName,
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 4.w,
-                                vertical: 2.h,
+                          if (onTapReply != null)
+                            GestureDetector(
+                              onTap: () => onTapReply?.call(
+                                comment.wrId,
+                                comment.wrName,
                               ),
-                              child: Text(
-                                '답글쓰기',
-                                style: AppTextStyles.pr14.copyWith(
-                                  color: AppColors.textTer,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 4.w,
+                                  vertical: 2.h,
+                                ),
+                                child: Text(
+                                  '답글쓰기',
+                                  style: AppTextStyles.pr14.copyWith(
+                                    color: AppColors.textTer,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
                         ],
                       ),
                     ],

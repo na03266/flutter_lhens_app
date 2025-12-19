@@ -2,13 +2,17 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lhens_app/chat/dto/create_chat_room_dto.dart';
 import 'package:lhens_app/common/components/dialogs/confirm_dialog.dart';
 import 'package:lhens_app/common/components/report/report_detail_scaffold_v2.dart';
 import 'package:lhens_app/drawer/complaint/provider/complaint_provider.dart';
 import 'package:lhens_app/drawer/complaint/view/complaint_form_screen.dart';
 import 'package:lhens_app/drawer/model/create_post_dto.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
+import 'package:lhens_app/drawer/model/post_model.dart';
 import 'package:lhens_app/user/model/user_model.dart';
+import 'package:lhens_app/user/model/user_pick_result.dart';
+import 'package:lhens_app/user/model/user_picker_args.dart';
 import 'package:lhens_app/user/provider/user_me_provier.dart';
 
 class ComplaintDetailScreen extends ConsumerStatefulWidget {
@@ -34,6 +38,9 @@ class _ComplaintDetailScreenState extends ConsumerState<ComplaintDetailScreen> {
     final state = ref.watch(complaintDetailProvider(widget.wrId));
 
     if (state == null || state is! PostDetailModel) {
+      if (state is PostModel) {
+        ref.read(complaintProvider.notifier).getDetail(wrId: widget.wrId);
+      }
       return Center(child: CircularProgressIndicator());
     }
 
@@ -77,11 +84,24 @@ class _ComplaintDetailScreenState extends ConsumerState<ComplaintDetailScreen> {
             }
           : null,
       onPass: me is UserModel && me.mbLevel >= 4
-          ? () {
+          ? () async {
+              final res = await GoRouter.of(context).pushNamed<UserPickResult>(
+                '커뮤니케이션-사용자선택',
+                extra: UserPickerArgs(UserPickerMode.chatCreate),
+              );
+
+              if (!context.mounted || res == null) return;
+
               try {
                 ref
                     .read(complaintProvider.notifier)
-                    .passOnPost(wrId: widget.wrId);
+                    .passOnPost(
+                      wrId: widget.wrId,
+                      dto: CreateChatRoomDto(
+                        teamNos: res.departments,
+                        memberNos: res.members,
+                      ),
+                    );
               } on DioException catch (e) {
                 final data = e.response?.data;
                 String? serverMsg;
