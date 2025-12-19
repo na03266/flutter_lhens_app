@@ -48,7 +48,7 @@ class ChatMessageGroup extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        UserAvatar(size: 37, iconSize: 20, icon: pickIcon(user)),
+        UserAvatar(size: 37, iconSize: 2, icon: pickIcon(user)),
         SizedBox(width: 12.w),
         Expanded(
           child: Column(
@@ -56,7 +56,9 @@ class ChatMessageGroup extends StatelessWidget {
             children: [
               if (user != null)
                 Text(
-                  '(${user?.mb5}) ${user?.mbName}',
+                  user!.mbLevel >= 10
+                      ? user!.mbName
+                      : "(${user?.mb5}) ${user?.mbName}",
                   style: AppTextStyles.pm14.copyWith(color: AppColors.text),
                 ),
               if (user != null) SizedBox(height: 12.h),

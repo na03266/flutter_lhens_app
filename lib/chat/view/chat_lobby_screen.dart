@@ -211,7 +211,8 @@ class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
       ),
 
       floatingActionButton:
-          me is UserModel && ['실장', '팀장', '지사장', '본부장'].contains(me.mb2)
+          me is UserModel &&
+              (['실장', '팀장', '지사장', '본부장'].contains(me.mb2) || me.mbLevel >= 10)
           ? Padding(
               padding: EdgeInsets.only(bottom: 20.h),
               child: FabAddButton(

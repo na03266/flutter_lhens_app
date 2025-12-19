@@ -12,7 +12,7 @@ class UserAvatar extends StatelessWidget {
   const UserAvatar({
     super.key,
     this.size = 36,
-    this.iconSize = 70,
+    this.iconSize = 60,
     this.bg,
     this.icon,
   });
@@ -24,12 +24,13 @@ class UserAvatar extends StatelessWidget {
       child: Container(
         width: size.w,
         height: size.w,
+        alignment: Alignment.center, // 이 한 줄이 핵심
         color: bg ?? AppColors.border,
         child: icon != null
             ? icon!.image(
-          fit: BoxFit.fitHeight,          // 가득 채우기
-          width: double.infinity,
-          height: double.infinity,
+          fit: BoxFit.contain, // fitHeight 대신 contain 권장
+          width: size.w * 0.9,
+          height: size.w * 0.9,
         )
             : Assets.icons.user.svg(
           width: size.w * 0.7,
