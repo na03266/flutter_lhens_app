@@ -40,7 +40,7 @@ class _EduEventDetailScreenState extends ConsumerState<EduEventDetailScreen> {
     return ReportDetailScaffoldV2.fromModel(
       model: state,
       onUpdate:
-          me is UserModel && (me.mbLevel > 10 || state.wrName.contains(me.mbId))
+          me is UserModel && (me.mbLevel == 10 || state.wrName.contains(me.mbId))
           ? () {
               context.goNamed(
                 EduEventFormScreen.routeNameUpdate,

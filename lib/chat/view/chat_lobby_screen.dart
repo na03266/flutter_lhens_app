@@ -238,7 +238,7 @@ class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
 
                   if (!context.mounted || res == null) return;
 
-                  ref
+                  final response = ref
                       .read(chatRoomProvider.notifier)
                       .createChatRoom(
                         dto: CreateChatRoomDto(
@@ -255,7 +255,10 @@ class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
                     ),
                   );
 
-                  GoRouter.of(context).pushNamed(ChatRoomScreen.routeName);
+                  GoRouter.of(context).pushNamed(
+                    ChatRoomScreen.routeName,
+                    pathParameters: {'rid': response},
+                  );
                 },
               ),
             )
