@@ -48,7 +48,7 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
       body: ReportListScaffoldV2<PostModel>(
         mineOnly: widget.mineOnly,
         tabs: item.boCategoryList.split('|'),
-        filters: ['전체'],
+        filters: ['제목'],
         selectTabName: (String selectedTab) {
           setState(() {
             caName = selectedTab;
@@ -74,7 +74,7 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
         },
         selectFilterName: (String selectedFilter) {
           setState(() {
-            if (selectedFilter == '전체') {
+            if (selectedFilter == '제목') {
               wr1 = '';
             } else {
               wr1 = selectedFilter;

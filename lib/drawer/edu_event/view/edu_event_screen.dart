@@ -47,7 +47,7 @@ class _EduEventScreenState extends ConsumerState<EduEventScreen> {
       body: ReportListScaffoldV2<PostModel>(
         tabs: item.boCategoryList.split('|'),
         filters: [
-          '전체',
+          '제목',
           ...item.bo1.split('|').length > 1 ? item.bo1.split('|') : [],
         ],
         selectTabName: (String selectedTab) {
@@ -60,7 +60,7 @@ class _EduEventScreenState extends ConsumerState<EduEventScreen> {
         },
         selectFilterName: (String selectedFilter) {
           setState(() {
-            if (selectedFilter == '전체') {
+            if (selectedFilter == '제목') {
               wr1 = '';
             } else {
               wr1 = selectedFilter;

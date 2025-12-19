@@ -31,7 +31,7 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
       body: ReportListScaffoldV2<SurveyModel>(
         mineOnly: widget.mineOnly,
         tabs: ['진행', '마감'],
-        filters: ['전체'],
+        filters: ['제목'],
         selectTabName: (String selectedTab) {
           setState(() {
             caName = selectedTab.replaceAll(" ", "");
@@ -57,7 +57,7 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
         },
         selectFilterName: (String selectedFilter) {
           setState(() {
-            if (selectedFilter == '전체') {
+            if (selectedFilter == '제목') {
               wr1 = '';
             } else {
               wr1 = selectedFilter;

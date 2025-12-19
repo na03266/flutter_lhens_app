@@ -16,8 +16,10 @@ import 'package:lhens_app/common/model/cursor_pagination_model.dart';
 import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_shadows.dart';
 import 'package:lhens_app/gen/assets.gen.dart';
+import 'package:lhens_app/user/model/user_model.dart';
 import 'package:lhens_app/user/model/user_pick_result.dart';
 import 'package:lhens_app/user/model/user_picker_args.dart';
+import 'package:lhens_app/user/provider/user_me_provier.dart';
 
 import 'chat_name_screen.dart';
 
@@ -31,8 +33,8 @@ class ChatLobbyScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
-  final List<String> _categories = const ['전체'];
-  String _category = '전체';
+  final List<String> _categories = const ['제목'];
+  String _category = '제목';
   final ScrollController controller = ScrollController();
   final TextEditingController _textEditingController = TextEditingController();
 
@@ -82,6 +84,7 @@ class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
     }
     // fetchMore 중인지 여부
     final isFetchingMore = state is CursorPaginationFetchingMore<ChatRoom>;
+    final me = ref.read(userMeProvider);
     final rooms = state.data;
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -207,51 +210,55 @@ class _ChatScreenState extends ConsumerState<ChatLobbyScreen> {
         ),
       ),
 
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: 20.h),
-        child: FabAddButton(
-          label: '새 채팅',
-          onTap: () async {
-            // 1) 채팅방 이름 설정 화면으로 이동
-            final roomName = await GoRouter.of(
-              context,
-            ).pushNamed<String>(ChatNameScreen.routeName);
+      floatingActionButton:
+          me is UserModel && ['실장', '팀장', '지사장', '본부장'].contains(me.mb2)
+          ? Padding(
+              padding: EdgeInsets.only(bottom: 20.h),
+              child: FabAddButton(
+                label: '새 채팅',
+                onTap: () async {
+                  // 1) 채팅방 이름 설정 화면으로 이동
+                  final roomName = await GoRouter.of(
+                    context,
+                  ).pushNamed<String>(ChatNameScreen.routeName);
 
-            if (!context.mounted ||
-                roomName == null ||
-                roomName.trim().isEmpty) {
-              return;
-            }
+                  if (!context.mounted ||
+                      roomName == null ||
+                      roomName.trim().isEmpty) {
+                    return;
+                  }
 
-            // 2) 사용자 선택 화면으로 이동
-            final res = await GoRouter.of(context).pushNamed<UserPickResult>(
-              '커뮤니케이션-사용자선택',
-              extra: UserPickerArgs(UserPickerMode.chatCreate),
-            );
+                  // 2) 사용자 선택 화면으로 이동
+                  final res = await GoRouter.of(context)
+                      .pushNamed<UserPickResult>(
+                        '커뮤니케이션-사용자선택',
+                        extra: UserPickerArgs(UserPickerMode.chatCreate),
+                      );
 
-            if (!context.mounted || res == null) return;
+                  if (!context.mounted || res == null) return;
 
-            ref
-                .read(chatRoomProvider.notifier)
-                .createChatRoom(
-                  dto: CreateChatRoomDto(
-                    name: roomName,
-                    teamNos: res.departments,
-                    memberNos: res.members,
-                  ),
-                );
+                  ref
+                      .read(chatRoomProvider.notifier)
+                      .createChatRoom(
+                        dto: CreateChatRoomDto(
+                          name: roomName,
+                          teamNos: res.departments,
+                          memberNos: res.members,
+                        ),
+                      );
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('채팅방 "$roomName"을 생성했습니다.'),
-                duration: const Duration(seconds: 1),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('채팅방 "$roomName"을 생성했습니다.'),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+
+                  GoRouter.of(context).pushNamed(ChatRoomScreen.routeName);
+                },
               ),
-            );
-
-            GoRouter.of(context).pushNamed(ChatRoomScreen.routeName);
-          },
-        ),
-      ),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );
   }
