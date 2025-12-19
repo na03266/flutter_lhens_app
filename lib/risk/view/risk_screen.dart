@@ -53,9 +53,24 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
           setState(() {
             caName = selectedTab;
           });
-          ref
-              .read(riskProvider.notifier)
-              .paginate(fetchPage: 1, caName: selectedTab, forceRefetch: true);
+          if (widget.mineOnly) {
+            ref
+                .read(riskProvider.notifier)
+                .paginate(
+                  fetchPage: 1,
+                  caName: selectedTab,
+                  forceRefetch: true,
+                  mineOnly: 1,
+                );
+          } else {
+            ref
+                .read(riskProvider.notifier)
+                .paginate(
+                  fetchPage: 1,
+                  caName: selectedTab,
+                  forceRefetch: true,
+                );
+          }
         },
         selectFilterName: (String selectedFilter) {
           setState(() {
@@ -70,23 +85,47 @@ class _RiskScreenState extends ConsumerState<RiskScreen> {
           setState(() {
             title = input;
           });
-          ref
-              .read(riskProvider.notifier)
-              .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
+          if (widget.mineOnly) {
+            ref
+                .read(riskProvider.notifier)
+                .paginate(
+                  fetchPage: 1,
+                  caName: caName,
+                  wr1: wr1,
+                  title: title,
+                  mineOnly: 1,
+                );
+          } else {
+            ref
+                .read(riskProvider.notifier)
+                .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
+          }
         },
         addPost: () {
           context.goNamed(RiskFormScreen.routeNameCreate);
         },
         provider: riskProvider,
         changePage: (int page) {
-          ref
-              .read(riskProvider.notifier)
-              .paginate(
-                fetchPage: page,
-                caName: caName,
-                wr1: wr1,
-                title: title,
-              );
+          if (widget.mineOnly) {
+            ref
+                .read(riskProvider.notifier)
+                .paginate(
+                  fetchPage: page,
+                  caName: caName,
+                  wr1: wr1,
+                  title: title,
+                  mineOnly: 1,
+                );
+          } else {
+            ref
+                .read(riskProvider.notifier)
+                .paginate(
+                  fetchPage: page,
+                  caName: caName,
+                  wr1: wr1,
+                  title: title,
+                );
+          }
         },
         itemBuilder: (_, index, model) {
           return GestureDetector(

@@ -36,9 +36,24 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
           setState(() {
             caName = selectedTab.replaceAll(" ", "");
           });
-          ref
-              .read(surveyProvider.notifier)
-              .paginate(fetchPage: 1, caName: selectedTab, forceRefetch: true);
+          if (widget.mineOnly) {
+            ref
+                .read(surveyProvider.notifier)
+                .paginate(
+                  fetchPage: 1,
+                  caName: selectedTab,
+                  forceRefetch: true,
+                  mineOnly: 1,
+                );
+          } else {
+            ref
+                .read(surveyProvider.notifier)
+                .paginate(
+                  fetchPage: 1,
+                  caName: selectedTab,
+                  forceRefetch: true,
+                );
+          }
         },
         selectFilterName: (String selectedFilter) {
           setState(() {
@@ -53,20 +68,44 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
           setState(() {
             title = input;
           });
-          ref
-              .read(surveyProvider.notifier)
-              .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
+          if (widget.mineOnly) {
+            ref
+                .read(surveyProvider.notifier)
+                .paginate(
+                  fetchPage: 1,
+                  caName: caName,
+                  wr1: wr1,
+                  title: title,
+                  mineOnly: 1,
+                );
+          } else {
+            ref
+                .read(surveyProvider.notifier)
+                .paginate(fetchPage: 1, caName: caName, wr1: wr1, title: title);
+          }
         },
         provider: surveyProvider,
         changePage: (int page) {
-          ref
-              .read(surveyProvider.notifier)
-              .paginate(
-                fetchPage: page,
-                caName: caName,
-                wr1: wr1,
-                title: title,
-              );
+          if (widget.mineOnly) {
+            ref
+                .read(surveyProvider.notifier)
+                .paginate(
+                  fetchPage: page,
+                  caName: caName,
+                  wr1: wr1,
+                  title: title,
+                  mineOnly: 1,
+                );
+          } else {
+            ref
+                .read(surveyProvider.notifier)
+                .paginate(
+                  fetchPage: page,
+                  caName: caName,
+                  wr1: wr1,
+                  title: title,
+                );
+          }
         },
         itemBuilder: (_, index, model) {
           return GestureDetector(
@@ -79,9 +118,7 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
             child: SurveyListItem(
               isProcessing: getSurveyStatus(model),
               title: model.poSubject,
-              dateRangeText: model.poDateEnd.startsWith('1899')
-                  ? '기한 없음'
-                  : '${model.poDate} ~ ${model.poDateEnd}',
+              dateRangeText: '${model.poDate} ~ ${model.poDateEnd}',
               author: model.poCount.toString(),
               participated: model.isSurvey,
             ),

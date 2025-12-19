@@ -8,7 +8,7 @@ bool getSurveyStatus(SurveyModel model) {
   //    - 서버 포맷에 맞춰서 조건을 추가하세요.
   if (endStr == '1899-11-30' || endStr == '18991130') {
     // "마감일 없음" → 항상 진행중으로 판단
-    return true;
+    return false;
   }
 
   // 2) 혹시라도 이상한 값이 들어왔을 때를 대비한 안전 처리
