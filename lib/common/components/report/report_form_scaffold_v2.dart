@@ -394,11 +394,14 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      me is UserModel && me.deptSite?.parent?.name != null
-                          ? '■ 알림 전달부서 : 안전보건팀, ${me.deptSite?.parent?.name}'
-                          : '■ 알림 전달부서 : 안전보건팀'
-                    ),
+                    if (widget.ca1Names.contains('위험요소건의'))
+                      Text(
+                        me is UserModel && me.deptSite?.parent?.name != null
+                            ? '■ 알림 전달부서 : 안전보건팀, ${me.deptSite?.parent?.name}'
+                            : '■ 알림 전달부서 : 안전보건팀',
+                      )
+                    else
+                      SizedBox(),
                     AppCheckbox(
                       label: '비공개',
                       value: _secret,

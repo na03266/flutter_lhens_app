@@ -300,10 +300,10 @@ class _ReportDetailScaffoldV2State extends State<ReportDetailScaffoldV2> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (widget.wr3 != null && widget.wr3!.isNotEmpty)
+                            if (widget.wr3 != null && widget.wr3!.isNotEmpty ||['위험요소건의','작업중지요청'].contains(widget.caName))
                               LabelValueLine.single(
                                 label1: '수신부서',
-                                value1: widget.wr3!,
+                                value1: ['위험요소건의','작업중지요청'].contains(widget.caName)? '안전보건팀, 상위지사':widget.wr3!,
                                 verticalPadding: EdgeInsets.symmetric(
                                   vertical: 2.h,
                                 ),
