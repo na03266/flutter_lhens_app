@@ -18,6 +18,8 @@ import 'package:lhens_app/common/theme/app_colors.dart';
 import 'package:lhens_app/common/theme/app_text_styles.dart';
 import 'package:lhens_app/drawer/model/create_post_dto.dart';
 import 'package:lhens_app/drawer/model/post_detail_model.dart';
+import 'package:lhens_app/user/model/user_model.dart';
+import 'package:lhens_app/user/provider/user_me_provier.dart';
 
 class ReportFormScaffoldV2 extends ConsumerStatefulWidget {
   final List<String> ca1Names;
@@ -203,6 +205,7 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
       ).showSnackBar(const SnackBar(content: Text('필수 항목을 입력해주세요')));
     }
   }
+
   List<String> _filteredCa2Items() {
     final items = widget.ca2Names;
 
@@ -217,12 +220,13 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
     // 외부/내부가 아닌 경우(또는 미선택)는 전체
     return items;
   }
+
   @override
   Widget build(BuildContext context) {
     final displayOldFiles = _oldFiles
         .where((f) => _keepFileIds.contains(f.bfNo))
         .toList();
-
+    final me = ref.read(userMeProvider);
     return Scaffold(
       backgroundColor: AppColors.white,
       body: GestureDetector(
@@ -384,12 +388,17 @@ class _ReportFormScaffoldV2State extends ConsumerState<ReportFormScaffoldV2> {
               ),
               SizedBox(height: 12.h),
 
-              // 비공개
+              // 비공개  & 알림대상 팀 표기
               if (!widget.ca1Names.contains('공개') &&
                   !widget.ca2Names.contains('공통'))
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Text(
+                      me is UserModel && me.deptSite?.parent?.name != null
+                          ? '■ 알림 전달부서 : 안전보건팀, ${me.deptSite?.parent?.name}'
+                          : '■ 알림 전달부서 : 안전보건팀'
+                    ),
                     AppCheckbox(
                       label: '비공개',
                       value: _secret,

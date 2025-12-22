@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LH EnS Technical Documentation</title>
+    <!-- CDN for Marked (Markdown Parser) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- CDN for Mermaid (Diagrams) -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <!-- CDN for Highlight.js (Code Highlighting) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --primary-color: #0088cc;
+            --text-color: #333;
+            --bg-color: #fff;
+            --sidebar-bg: #f8f9fa;
+            --border-color: #e9ecef;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar h2 {
+            padding: 0 20px;
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: #495057;
+            text-decoration: none;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #e9ecef;
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background: #e3f2fd;
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        #main {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 40px 60px;
+            max-width: 1000px;
+        }
+
+        /* Markdown Styles */
+        .markdown-body {
+            line-height: 1.7;
+        }
+
+        .markdown-body h1 {
+            font-size: 2.2em;
+            border-bottom: 2px solid #eaecef;
+            padding-bottom: 0.3em;
+            margin-top: 0;
+            margin-bottom: 24px;
+        }
+
+        .markdown-body h2 {
+            font-size: 1.75em;
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 0.3em;
+            margin-top: 36px;
+            margin-bottom: 16px;
+        }
+
+        .markdown-body h3 {
+            font-size: 1.4em;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+
+        .markdown-body ul,
+        .markdown-body ol {
+            padding-left: 2em;
+        }
+
+        .markdown-body li {
+            margin-bottom: 0.5em;
+        }
+
+        .markdown-body code {
+            background-color: #f1f3f5;
+            border-radius: 4px;
+            padding: 0.2em 0.4em;
+            font-family: 'D2Coding', 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #d63384;
+        }
+
+        .markdown-body pre {
+            background-color: #212529;
+            border-radius: 8px;
+            padding: 16px;
+            overflow: auto;
+            margin: 20px 0;
+        }
+
+        .markdown-body pre code {
+            background-color: transparent;
+            padding: 0;
+            color: #f8f9fa;
+            font-size: 0.95em;
+        }
+
+        .markdown-body blockquote {
+            border-left: 4px solid #ced4da;
+            color: #6c757d;
+            padding: 10px 20px;
+            margin: 20px 0;
+            background-color: #f8f9fa;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .markdown-body table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+
+        .markdown-body table th,
+        .markdown-body table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+        }
+
+        .markdown-body table th {
+            background-color: #f1f3f5;
+            font-weight: 600;
+        }
+
+        .markdown-body table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .doc-section {
+            margin-bottom: 60px;
+        }
+
+        .doc-divider {
+            border: 0;
+            height: 1px;
+            background: #dee2e6;
+            margin: 40px 0;
+        }
+
+        /* Mermaid Adjustments */
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            background: #fff;
+        }
+
+        @media print {
+            #sidebar {
+                display: none;
+            }
+
+            #main {
+                padding: 0;
+                max-width: 100%;
+                overflow: visible;
+            }
+
+            body {
+                height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="sidebar">
+        <h2>LH EnS 문서</h2>
+        <div id="nav-links"></div>
+    </div>
+
+    <div id="main">
+        <div class="markdown-body" id="content"></div>
+    </div>
+
+    <!-- Raw Markdown Content Data -->
+    <script type="text/markdown" id="md-00">
+# 문서 목록 (Index)
+
+본 문서는 LH EnS 프로젝트의 기술 및 운영 문서를 포함합니다.
+
+## 1. 문서 체계
+
+| 문서 ID | 문서명 | 주요 내용 | 대상 독자 |
+|:---:|:---|:---|:---:|
+| **00** | [INDEX](00_INDEX.md) | 문서 목록 및 가이드 | 전원 |
+| **01** | [OVERVIEW](01_OVERVIEW.md) | 프로젝트 개요, 기술 스택, 릴리즈 요약 | 전원 |
+| **02** | [ARCHITECTURE](02_ARCHITECTURE.md) | 시스템 구성도, 아키텍처 (Flutter/NestJS) | 개발/운영 |
+| **03** | [API_SPEC](03_API_SPEC.md) | API 명세, 인증/에러 규약 (Client Code 기반 추론) | 개발 |
+| **04** | [DATA_MODEL](04_DATA_MODEL.md) | 데이터 모델, DTO 매핑 | 개발/DBA |
+| **05** | [DEPLOYMENT_RUNBOOK](05_DEPLOYMENT_RUNBOOK.md) | 배포 절차, 환경 설정, 운영/장애 대응 | 운영/DevOps |
+| **06** | [TESTING_QA](06_TESTING_QA.md) | 테스트 가이드, TC, 결함 기준 | QA/개발 |
+| **07** | [SECURITY_CHECKLIST](07_SECURITY_CHECKLIST.md) | 보안 점검 리스트 (인증, 네트워크 등) | 보안/개발 |
+| **08** | [CHANGELOG_TEMPLATE](08_CHANGELOG_TEMPLATE.md) | 릴리즈 노트 작성 템플릿 | PM/개발 |
+
+## 2. 권장 읽기 순서
+- **신규 입사자/인수인계**: 01 -> 02 -> 05
+- **백엔드/API 개발자**: 02 -> 03 -> 04
+- **오픈/운영 이관 시**: 05 -> 07 -> 01 (릴리즈 노트 확인)
+
+---
+> **Note**: NestJS 서버 저장소(`G:\lh_app_back`) 접근 권한 부재로, 서버 측 상세 구현 내용은 Flutter 클라이언트 코드를 기반으로 추론되었거나 TBD(To Be Determined)로 표기되었습니다.
+</script>
+
+    <script type="text/markdown" id="md-01">
+# 01. 프로젝트 개요 (Overview)
+
+## 1. 프로젝트 목적
+**LH EnS Flutter App**은 업무 지원을 위한 모바일 애플리케이션입니다.
+관리자와 사용자가 게시판, 채팅, 알림 등의 기능을 통해 효율적으로 소통하고 업무를 처리하는 것을 목표로 합니다.
+
+## 2. 기술 스택 (Tech Stack)
+*소스코드(`pubspec.yaml`, `main.dart`) 분석 기반*
+
+| 구분 | 기술 / 라이브러리 | 버전 (Min) | 비고 |
+|:---:|:---:|:---:|:---|
+| **Language** | Dart | 3.x | Flutter 3.9.0 호환 |
+| **Framework** | Flutter | 3.22.0+ (추정) | SDK Constraint `^3.9.0` (Dart) |
+| **State Mgt** | **Riverpod** | 2.5.3 | `flutter_riverpod`, `riverpod_annotation` |
+| **Routing** | **GoRouter** | 14.6.1 | `go_router` |
+| **Network** | Dio | 5.9.0 | with `retrofit` 4.6.0 |
+| **Push** | Firebase FCM | 16.0.4 | `firebase_messaging` |
+| **Storage** | Flutter Secure Storage | 9.2.4 | 토큰 저장용 |
+| **Backend** | NestJS | TBD | *Repository 접근 불가* |
+
+## 3. 주요 기능 (Key Features)
+*Flutter `lib/` 폴더 구조 기반*
+
+*   **인증 (User/Auth)**
+    *   로그인 (Auto Login 지원), 로그아웃, 비밀번호 변경 (`user/repository/user_me_repository.dart`)
+    *   토큰 갱신 (Refresh Token)
+*   **게시판/커뮤니티 (Drawer/Board)**
+    *   공지사항, 교육/행사, 제안(Complaint)
+    *   급여 조회(`salary`), 설문조사(`survey`)
+*   **위험 신고 (Risk)**
+    *   위험 신고 게시글 조회/작성/수정/삭제
+    *   댓글/대댓글 작성 (`risk/repository/risk_repository.dart`)
+*   **채팅 (Chat)**
+    *   채팅방 목록, 채팅 메시지 전송 (`chat/view/chat_lobby_screen.dart`)
+    *   Socket.io 연동 (`socket_io_client`)
+*   **알림 (Alarm)**
+    *   FCM 푸시 알림 수신 및 목록 조회
+
+## 4. 릴리즈 정보
+*   **App Version**: 1.0.0+1 (`pubspec.yaml`)
+*   **Target Platforms**: Android, iOS
+*   **Server Endpoint**: `http://110.10.147.37/app` (개발/운영 공통 혹은 분리 필요 확인 TBD)
+
+## 5. 잔여 이슈 및 리스크
+*   **Backend 접근 권한**: 현재 백엔드 소스코드 확인 불가로, DB 스키마 및 서버 로직 상세 문서화 미비.
+*   **Hardcoded IP**: `lib/common/const/data.dart`에 IP(`110.10.147.37`)가 하드코딩 되어 있음. 환경 변수(`flutter_dotenv` 등)로 분리 필요.
+*   **SSL Bypass**: `main.dart` 내 `HttpOverrides`가 특정 도메인(`lhes.co.kr` 등)에 대해 인증서 검증을 무시하도록 설정되어 있음. 운영 배포 시 보안 취약점이 될 수 있음.
+</script>
+
+    <script type="text/markdown" id="md-02">
+# 02. 아키텍처 (Architecture)
+
+## 1. 전체 시스템 구성도 (System Context)
+
+```mermaid
+graph TD
+    User([사용자 app])
+    LB[Load Balancer / Nginx (TBD)]
+    API[NestJS API Server]
+    DB[(MySQL/TBD)]
+    FCM[Firebase Cloud Messaging]
+    Socket[Socket.IO Server]
+
+    User -- HTTP/REST --> API
+    User -- WebSocket --> Socket
+    API -- Read/Write --> DB
+    API -- Push Request --> FCM
+    FCM -- Push Notification --> User
+```
+
+## 2. Flutter 클라이언트 아키텍처
+
+### 2.1 디렉토리 구조 (Feature-first Pattern)
+기능(Feature) 단위로 폴더를 구분하고, 공통 모듈은 `common`에 배치하는 구조입니다.
+
+```text
+lib/
+├── common/             # 공통 컴포넌트, 상수, 유틸리티, 네트워크 설정
+│   ├── dio/            # Dio 클라이언트 및 Interceptor (Auth Token 처리)
+│   ├── provider/       # 전역 Provider (GoRouter 등)
+│   └── secure_storage/ # 로컬 보안 저장소 관리
+├── user/               # 회원/인증 관련 기능
+│   ├── auth/           # 로그인, 토큰 관리 로직
+│   ├── repository/     # 회원 API (Retrofit)
+│   └── view/           # 로그인 화면 등
+├── risk/               # 위험성 평가 기능
+├── drawer/             # 햄버거 메뉴 하위 기능 (공지, 급여, 설문 등)
+├── chat/               # 채팅 기능
+└── main.dart           # 앱 진입점, ProviderScope, Router 설정
+```
+
+### 2.2 상태 관리 (State Management)
+*   **Riverpod**를 사용합니다.
+*   `Provider`, `StateNotifierProvider` 등을 사용하여 비즈니스 로직과 UI를 분리합니다.
+*   API 호출 결과는 Repository -> Provider 순으로 전달되어 UI(ConsumerWidget)에서 구독합니다.
+
+### 2.3 라우팅 (Routing)
+*   **GoRouter**를 사용합니다 (`common/provider/go_router.dart`).
+*   `authProvider`의 리디렉션 로직(`redirectLogic`)을 통해 로그인 여부에 따라 로그인 화면 또는 메인 화면으로 자동 이동합니다.
+
+### 2.4 네트워크 계층
+*   **Dio + Retrofit** 조합을 사용합니다.
+*   `CustomInterceptor` (`common/dio/dio.dart`)에서 다음 기능을 수행합니다:
+    *   **Request**: `accessToken: 'true'` 헤더가 있으면 Storage의 토큰을 `Authorization: Bearer` 헤더로 교체.
+    *   **Error (401)**: 토큰 만료 시 `/auth/token` 엔드포인트를 통해 토큰 갱신 시도 후 재요청 (Silent Refresh).
+
+## 3. NestJS 서버 아키텍처 (추정)
+*소스코드 접근 불가로 Client API 호출 패턴 기반 추정*
+
+*   **API 구조**: RESTful API
+*   **인증**: JWT (Access + Refresh Token) 방식
+*   **주요 모듈 (예상)**:
+    - UserModule (`/user`)
+    - AuthModule (`/auth`)
+    - BoardRiskModule (`/board-risk`)
+    - ChatModule (WebSocket Gateway 포함 예상)
+</script>
+
+    <script type="text/markdown" id="md-03">
+# 03. API 명세 (API Specification)
+
+## 1. 개요
+*   **Base URL**: `http://110.10.147.37/app` (개발/운영 공통)
+*   **Protocol**: HTTP/1.1
+*   **Content-Type**: `application/json`
+
+## 2. 인증 (Authentication)
+*   **방식**: Bearer Token (JWT)
+*   **Header 규약**:
+    *   Client Request Header: `accessToken: 'true'` (Dio Interceptor가 `Authorization: Bearer ...`로 변환)
+    *   `refreshToken: 'true'` (토큰 갱신 시 사용)
+*   **Automatic Refresh**:
+    *   401 Unauthorized 발생 시 `CustomInterceptor`가 자동으로 `/auth/token`을 호출하여 토큰 갱신 후 재요청.
+
+## 3. 엔드포인트 목록 (Endpoints)
+*Client Repository Code (`retrofit`) 기반 추론*
+
+### 3.1 회원 (User) - `/user`
+| Method | Path | Auth | 설명 | Request | Response |
+|:---:|:---|:---:|:---|:---|:---|
+| GET | `/me` | O | 내 정보 조회 | - | `UserModel` |
+| PATCH | `/password` | O | 비밀번호 변경 | `ChangePasswordDto` | Top-level `void` |
+| POST | `/auth/token` | R | 토큰 갱신 | `RefreshToken Header` | `{accessToken}` |
+
+### 3.2 위험성 평가 (Risk) - `/board-risk`
+| Method | Path | Auth | 설명 | Request | Response |
+|:---:|:---|:---:|:---|:---|:---|
+| GET | `/` | O | 게시글 목록 (Pagination) | `PagePaginationParams` | `PagePagination<PostModel>` |
+| GET | `/{wrId}` | O | 게시글 상세 | - | `PostDetailModel` |
+| POST | `/` | O | 게시글 작성 | `CreatePostDto` | `String?` (ID) |
+| POST | `/comment` | O | 댓글 작성 | `CreatePostDto`, `parentId` | `String?` |
+| POST | `/comment/reply`| O | 대댓글 작성 | `CreatePostDto`, `parentId`, `commentId` | `String?` |
+| PATCH | `/` | O | 게시글 수정 | `CreatePostDto`, `wrId` | `String?` |
+| DELETE | `/` | O | 게시글 삭제 | `wrId` | `String?` |
+
+### 3.3 채팅 (Chat) - `/room`
+| Method | Path | Auth | 설명 | Request | Response |
+|:---:|:---|:---:|:---|:---|:---|
+| GET | `/room` | O | 채팅방 목록 | `CursorPaginationParams` | `CursorPagination<ChatRoom>` |
+| POST | `/room` | O | 채팅방 생성 | `CreateChatRoomDto` | `String?` |
+| GET | `/room/{id}` | O | 채팅방 상세 정보 | - | `ChatRoomDetail` |
+| PATCH | `/room/{id}` | O | 채팅방 수정 | `CreateChatRoomDto` | `String` |
+| DELETE| `/room/{id}` | O | 채팅방 나가기 | - | `String` |
+
+### 3.4 부서/조직 (Department) - `/department`
+| Method | Path | Auth | 설명 | Request | Response |
+|:---:|:---|:---:|:---|:---|:---|
+| GET | `/` | O | 부서 목록 | - | `DepartmentModelList` |
+| GET | `/{id}` | O | 부서원 조회 | - | `DepartmentDetailModel` |
+
+### 3.5 급여 (Salary) - `/salary`
+| Method | Path | Auth | 설명 | Request | Response |
+|:---:|:---|:---:|:---|:---|:---|
+| GET | `/` | O | 급여 목록 | `year` | `SalaryModel` |
+| GET | `/html/{id}` | O | 급여 명세서(HTML) | - | `String` (HTML) |
+
+## 4. 에러 규약 (Error Protocol)
+*   **HTTP Status Code**:
+    *   `200/201`: 성공
+    *   `401`: 인증 실패 (토큰 만료 등) -> **Interceptor가 자동 처리**
+    *   `500`: 서버 내부 오류
+*   **클라이언트 처리**:
+    *   DioException 캐치 후 로깅.
+    *   401 재발급 실패 시 강제 로그아웃 처리 (`ref.read(authProvider.notifier).logout()`).
+</script>
+
+    <script type="text/markdown" id="md-04">
+# 04. 데이터 모델 (Data Model)
+
+## 1. 개요
+본 문서는 Flutter 클라이언트의 DTO 및 Model 클래스를 기반으로 데이터 구조를 설명합니다.
+서버 DB 스키마(Entity)는 접근이 불가능하여 클라이언트 모델로 대체합니다.
+
+## 2. 주요 모델 (Flutter Models)
+
+### 2.1 회원 (UserModel)
+*   **식별자**: `id` (String/Int 추정)
+*   **주요 필드**:
+    *   `username`: 로그인 아이디
+    *   `nickname`: 사용자 이름
+    *   `email`: 이메일 (Optional)
+    *   `imageUrl`: 프로필 이미지 URL
+    *   `department`: 소속 부서 (`DepartmentModel`)
+
+### 2.2 게시글 (PostModel / Risk)
+*   **식별자**: `wrId` (String) - 원글 ID
+*   **주요 필드**:
+    *   `title`: 제목
+    *   `content`: 내용 (`PostDetailModel`에만 포함될 수 있음)
+    *   `author`: 작성자 (`UserModel`)
+    *   `createdAt`: 작성일시
+    *   `replyCount`: 댓글 수
+
+### 2.3 채팅방 (ChatRoom)
+*   **식별자**: `id` (String)
+*   **주요 필드**:
+    *   `title`: 방 제목
+    *   `users`: 참여자 목록 (`List<UserModel>`)
+    *   `lastMessage`: 마지막 메시지 내용
+    *   `lastMessageAt`: 마지막 메시지 시간
+
+### 2.4 부서 (DepartmentModel)
+*   **식별자**: `id` (Int)
+*   **주요 필드**:
+    *   `name`: 부서명
+    *   `parentId`: 상위 부서 ID (계층 구조)
+
+### 2.5 급여 (SalaryModel)
+*   **식별자**: `paymentDate` (String YYYY-MM) 등
+*   **주요 필드**:
+    *   `totalAmount`: 실 수령액
+    *   `items`: 급여 상세 항목 리스트
+    *   `htmlContent`: 명세서 HTML 원본 (상세 조회 시)
+
+## 3. 공통 응답 래퍼 (Pagination)
+### 3.1 PagePagination<T>
+일반 게시판 페이징 처리에 사용됩니다.
+*   `data`: `List<T>` (실제 데이터 목록)
+*   `meta`: 페이지 메타 데이터 (`totalCount`, `count` 등)
+
+### 3.2 CursorPagination<T>
+채팅/무한스크롤 등에 사용됩니다.
+*   `data`: `List<T>`
+*   `meta`: `CursorPaginationMeta` (`count`, `hasMore`) -> `hasMore`가 `true`면 다음 데이터 요청 가능.
+
+## 4. 데이터베이스 ERD (추정)
+*서버 코드가 없어 정확한 관계는 불명확하나, DTO 구조상 아래 관계가 유추됨.*
+
+```mermaid
+erDiagram
+    Users ||--o{ Posts : writes
+    Users ||--o{ ChatRooms : joins
+    Departments ||--|{ Users : has
+    Posts ||--o{ Comments : has
+    ChatRooms ||--o{ Messages : contains
+
+    Users {
+        string id PK
+        string username
+        string password_hash
+        int department_id FK
+    }
+
+    Departments {
+        int id PK
+        string name
+        int parent_id
+    }
+
+    Posts {
+        string wr_id PK
+        string title
+        text content
+        string user_id FK
+        datetime created_at
+    }
+```
+</script>
+
+    <script type="text/markdown" id="md-05">
+# 05. 배포 및 운영 가이드 (Deployment & Runbook)
+
+## 1. 환경 설정 (Configuration)
+
+### 1.1 Flutter (Client)
+현재 소스코드 상 `lib/common/const/data.dart`에 서버 주소가 하드코딩 되어 있습니다.
+운영 환경 분리를 위해 `.env` 도입 혹은 Build Flavors 적용이 권장됩니다.
+```dart
+// lib/common/const/data.dart
+final defaultIp = '110.10.147.37/app'; // [주의] 운영 배포 시 확인 필요
+```
+
+### 1.2 NestJS (Server)
+*소스코드 미확인으로 일반적인 NestJS 운영 환경 변수를 기술합니다.*
+`.env` 파일에 아래 내용이 포함되어야 합니다.
+```bash
+NODE_ENV=production
+PORT=3000
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=[PLACEHOLDER]
+DB_NAME=lhens_db
+JWT_SECRET=[PLACEHOLDER]
+```
+
+## 2. 배포 절차 (Deployment Process)
+
+### 2.1 Android 배포
+1.  **KeyStore 준비**: `lhens_key.jks` 파일 확보 및 `android/key.properties` 설정.
+2.  **Version Code 증가**: `pubspec.yaml`의 `version: 1.0.0+1` 수정 (+2).
+3.  **빌드**:
+    ```bash
+    flutter clean
+    flutter pub get
+    flutter build apk --release
+    # 또는 App Bundle
+    flutter build appbundle --release
+    ```
+4.  **산출물**: `build/app/outputs/flutter-apk/app-release.apk`
+
+### 2.2 iOS 배포 (Mac Only)
+1.  **Xcode 설정**: Signing & Capabilities에서 Team 선택 및 Provisioning Profile 설정.
+2.  **빌드**:
+    ```bash
+    flutter build ipa --release
+    ```
+3.  **업로드**: Xcode Organizer 또는 Transporter 앱을 통해 App Store Connect 업로드.
+
+### 2.3 NestJS 서버 배포 (Runbook)
+*사용자 가이드(pm2) 기반*
+1.  **소스 업데이트**: `git pull origin main`
+2.  **의존성 설치**: `npm install`
+3.  **빌드**:
+    ```bash
+    npm run build
+    ```
+4.  **서비스 재시작 (PM2)**:
+    ```bash
+    pm2 restart 0
+    # 또는
+    pm2 reload all
+    ```
+
+## 3. 장애 대응 (Troubleshooting)
+
+### 3.1 [장애] 앱에서 데이터 로딩 실패
+*   **증상**: 무한 로딩 혹은 "서버 연결 실패" 토스트 발생.
+*   **원인**:
+    *   서버(NestJS) 다운.
+    *   클라이언트 `data.dart`의 IP가 변경됨.
+    *   SSL 인증서 만료 (`main.dart`에서 Bypass 중이나, 서버 인증서 자체가 만료되면 문제 발생 가능).
+*   **조치**:
+    1.  서버 상태 확인 (`pm2 list`, `pm2 logs`).
+    2.  `http://110.10.147.37/app/api` 직접 호출 테스트.
+
+### 3.2 [장애] 로그인 풀림 반복
+*   **원인**: Refresh Token 만료 혹은 DB 상의 유효하지 않은 토큰.
+*   **조치**:
+    1.  사용자에게 재로그인 안내.
+    2.  서버 로그에서 401 빈도 확인.
+
+### 3.3 [운영] DB 마이그레이션
+백엔드 배포 전 마이그레이션이 필수일 수 있습니다.
+```bash
+# TypeORM 사용 시 (예시)
+npm run typeorm migration:run
+```
+</script>
+
+    <script type="text/markdown" id="md-06">
+# 06. 테스트 및 QA 가이드 (Testing & QA)
+
+## 1. 테스트 환경
+*   **Unit/Widget Test**: Flutter 내장 `test` 라이브러리 사용.
+*   **Integration Test**: 실제 기기 또는 에뮬레이터 필요.
+
+## 2. 테스트 실행 방법
+소스코드 루트(`G:\lhens_app`)에서 실행:
+```bash
+# 전체 테스트 실행
+flutter test
+
+# 특정 파일 테스트
+flutter test test/widget_test.dart
+```
+
+## 3. 핵심 사용자 시나리오 (UAT Checklist)
+배포 전 반드시 확인해야 할 체크리스트입니다.
+
+| ID | 시나리오 | 기대 결과 | 통과 여부 |
+|:---:|:---|:---|:---:|
+| TC-01 | **로그인** | 아이디/비밀번호 입력 후 메인 화면 진입 성공, 토큰 저장됨 | |
+| TC-02 | **자동 로그인** | 앱 재실행 시 로그인 화면 없이 메인 화면 진입 | |
+| TC-03 | **위험성 평가 작성** | 글 작성 후 목록 최상단 노출, 상세 진입 가능 | |
+| TC-04 | **채팅방 생성** | 사용자 초대 후 채팅방 생성 완료, 메시지 전송 및 수신(양방향) | |
+| TC-05 | **알림 수신** | 앱 백그라운드 상태에서 FCM 푸시 알림 도착 및 탭 시 해당 화면 이동 | |
+| TC-06 | **오프라인 대응** | 네트워크 연결 해제 시 적절한 에러 메시지(Toast/Dialog) 표시 | |
+
+## 4. 결함 등급 기준 (Defect Priority)
+*   **P1 (Critical)**: 앱 구동 불가, 로그인 불가, 데이터 유실 발생. **(즉시 픽스/배포 중단)**
+*   **P2 (Major)**: 주요 기능(게시글 작성, 채팅) 동작 실패, 우회 방법 없음.
+*   **P3 (Minor)**: UI 깨짐(오타, 레이아웃), 간헐적 버그, 사용성 불편.
+</script>
+
+    <script type="text/markdown" id="md-07">
+# 07. 보안 점검 체크리스트 (Security Checklist)
+
+본 문서는 OWASP Mobile Top 10 및 소스코드 분석을 기반으로 작성되었습니다.
+
+## 1. 취약점 분석 보고 (Code Analysis Findings)
+
+### 🚨 Critical Issues
+1.  **SSL/TLS 검증 우회 (Insecure HttpOverrides)**
+    *   **파일**: `lib/main.dart` (Line 59~72 `InsecureHttpOverrides`)
+    *   **내용**: `host == 'lhes.co.kr'` 도메인 등에 대해 인증서 검증을 강제로 `true` 반환.
+    *   **위험**: 중간자 공격(MITM)에 취약함. 개발 서버용이라면 배포 시 반드시 제거해야 함.
+
+2.  **Hardcoded Server IP**
+    *   **파일**: `lib/common/const/data.dart`
+    *   **내용**: `110.10.147.37` IP 노출.
+    *   **위험**: IP 변경 시 대응 불가 및 공격 대상 노출 가능성.
+
+### ✅ Good Practices
+1.  **Secure Storage 사용**
+    *   **내용**: Access/Refresh Token을 `flutter_secure_storage`에 저장하여 기기 내 평문 저장 방지.
+    *   **파일**: `lib/common/secure_storage/secure_storage.dart`
+
+2.  **Token Refresh Logic**
+    *   **내용**: 401 발생 시 Silent Refresh 수행으로 사용자 편의성 및 세션 관리 구현됨.
+
+## 2. 보안 점검 체크리스트
+
+| 카테고리 | 항목 | 상태 | 비고 |
+|:---:|:---|:---:|:---|
+| **M1: 권한 사용** | 카메라/갤러리 등 민감 권한 요청 시 근거 명시 | 확인필요 | `AndroidManifest.xml`, `Info.plist` 확인 필요 |
+| **M2: 데이터 저장** | 로그에 민감정보(비밀번호, 토큰) 출력 금지 | **취약** | `dio.dart`의 `Generic interceptor`에서 `print`문 사용 중. `debugPrint`로 교체하거나 릴리즈 모드에서 비활성화 필요. |
+| **M3: 통신 보안** | 모든 HTTP 통신에 HTTPS 적용 | **취약** | SSL Bypass 코드 존재. |
+| **M4: 인증** | 비밀번호 변경/찾기 시 2FA 제공 등 | 확인불가 | 서버 로직 확인 필요. |
+| **M5: 입력 검증** | XSS 방지 (HTML 렌더링 시) | 확인필요 | `flutter_html` 사용 중. `UserMeRepository` 등에서 입력값 검증 필요. |
+
+## 3. 권고 사항 (Recommendations)
+1.  **프로덕션 배포 전 `main.dart`의 `HttpOverrides` 코드 삭제 혹은 `#if DEBUG` 처리.**
+2.  `print()` 함수를 `log()` 혹은 래퍼 함수로 변경하여 릴리즈 빌드에서 로그가 남지 않도록 조치.
+3.  앱 난독화(`--obfuscate`) 적용하여 빌드 및 배포.
+</script>
+
+    <script type="text/markdown" id="md-08">
+# 08. 릴리즈 노트 (Changelog Template)
+
+## [v1.0.0] - 2025-12-19
+### 🚀 주요 변경사항 (Highlights)
+*   최초 앱 릴리즈 (Android / iOS)
+*   [기능 A] 추가
+*   [기능 B] 개선
+
+### ✨ 신규 기능 (New Features)
+*   회원가입/로그인 (자동로그인 포함)
+*   위험성 평가 게시판 CRUD
+*   실시간 채팅 기능
+
+### 🐛 버그 수정 (Bug Fixes)
+*   [FIX] 로그인 시 간헐적 401 오류 수정
+*   [FIX] 채팅방 목록 갱신 안 되는 문제 해결
+
+### ⚙️ DB / API 변경 (Server Changes)
+*   `User` 테이블: `last_login_at` 컬럼 추가
+*   API: `POST /board-risk` 파라미터 변경
+
+### ⚠️ 주의사항 (Notes)
+*   기존 앱 데이터 호환 불가로 **재설치** 필요합니다.
+*   서버 재시작(PM2 reload)이 **2024-00-00 22:00**에 예정되어 있습니다.
+</script>
+
+    <script>
+        function renderDocs() {
+            const navContainer = document.getElementById('nav-links');
+            const contentContainer = document.getElementById('content');
+
+            // Document List
+            const docIds = ['md-00', 'md-01', 'md-02', 'md-03', 'md-04', 'md-05', 'md-06', 'md-07', 'md-08'];
+            const docTitles = [
+                '00_INDEX (문서 목록)',
+                '01_OVERVIEW (개요)',
+                '02_ARCHITECTURE (아키텍처)',
+                '03_API_SPEC (API 명세)',
+                '04_DATA_MODEL (데이터 모델)',
+                '05_DEPLOYMENT_RUNBOOK (배포/운영)',
+                '06_TESTING_QA (테스트/QA)',
+                '07_SECURITY_CHECKLIST (보안 점검)',
+                '08_CHANGELOG (릴리즈 노트)'
+            ];
+
+            // Initialize libraries
+            marked.setOptions({
+                highlight: function (code, lang) {
+                    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                    return hljs.highlight(code, { language }).value;
+                },
+                langPrefix: 'hljs language-'
+            });
+            mermaid.initialize({ startOnLoad: false, theme: 'default' });
+
+            docIds.forEach((id, index) => {
+                const rawContent = document.getElementById(id).textContent;
+                const docTitle = docTitles[index];
+                const sectionId = id.replace('md-', 'doc-');
+
+                // 1. Navbar Link
+                const navItem = document.createElement('a');
+                navItem.className = 'nav-item';
+                navItem.textContent = docTitle;
+                navItem.href = '#' + sectionId;
+                navItem.onclick = (e) => {
+                    e.preventDefault();
+                    document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+                    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                    navItem.classList.add('active');
+                };
+                navContainer.appendChild(navItem);
+
+                // 2. Render Content
+                const section = document.createElement('div');
+                section.id = sectionId;
+                section.className = 'doc-section';
+
+                // Render basic markdown
+                section.innerHTML = marked.parse(rawContent);
+                contentContainer.appendChild(section);
+
+                // Add Divider
+                if (index < docIds.length - 1) {
+                    const hr = document.createElement('div');
+                    hr.className = 'doc-divider';
+                    contentContainer.appendChild(hr);
+                }
+            });
+
+            // 3. Render Mermaid Diagrams
+            setTimeout(() => {
+                mermaid.run().catch(err => console.error('Mermaid render error:', err));
+            }, 500);
+
+            // Scroll Spy (Optional: Highlight nav item on scroll)
+            window.addEventListener('scroll', () => {
+                let current = '';
+                document.querySelectorAll('.doc-section').forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (scrollY >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                document.querySelectorAll('.nav-item').forEach(li => {
+                    li.classList.remove('active');
+                    if (li.getAttribute('href') === '#' + current) {
+                        li.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        window.onload = renderDocs;
+    </script>
+
+</body>
+
+</html>
